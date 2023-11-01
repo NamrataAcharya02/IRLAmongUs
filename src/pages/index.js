@@ -96,7 +96,7 @@ function Pages(){
             <h1>IRL AMONG US</h1>
             {/* <Button as={Link} to="/adminpage">Go to Admin</Button> */}
             {/* <Link to="/adminpage"> */}
-            <button onClick={signInWithGoogle}>Create a Room</button>
+            <button onClick={signInWithGoogle}>Create a Game</button>
             {/* </Link> */}
             <br></br>
             <button onClick={toggleTextField}>Join a Room</button>

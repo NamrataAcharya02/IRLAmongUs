@@ -1,4 +1,6 @@
 @import url('https://fonts.googleapis.com/css2?family=Amatic+SC:wght@700&display=swap');
+
+
 button {
     position: relative;
     background-color: #000000; /* Green */
@@ -51,6 +53,10 @@ h2{
 
 h3{
     color:aqua;
+}
+
+h4{
+    color:white;
 }
 
 .nickname{

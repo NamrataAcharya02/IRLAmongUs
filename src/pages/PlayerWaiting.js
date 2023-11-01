@@ -8,8 +8,8 @@ function PlayerWaiting(){
         <Link to="/">
                 <button className="back">Back</button>
             </Link>
-        <h1>HELLO WORLD! lol</h1>
-        <h1>{nickname}</h1>
+        <h1>Hello {nickname}!</h1>
+        <h3>player lobby waiting screen here</h3>
         </div>
     );
 }
