@@ -1,6 +1,9 @@
 // used to pass data more easily between react components
 import { configureStore } from '@reduxjs/toolkit'
+import counterReducer from '../features/counter/counterSlice'
 
 export default configureStore({
-  reducer: {},
+  reducer: {
+    counter: counterReducer,
+  },
 })

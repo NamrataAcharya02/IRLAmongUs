@@ -3,6 +3,8 @@
 import React, {useState, useId} from "react";
 import Popup from 'reactjs-popup';
 import PlayerWaiting from "./PlayerWaiting";
+import { useSelector, useDispatch } from 'react-redux'
+import { setValue } from '../features/counter/counterSlice.js'
 
 import {Link} from "react-router-dom";
 import "./homepage.css";
@@ -88,6 +90,10 @@ function Pages(){
     const [roomCode, setRoomCode] = useState('');
     const [nickname, setNickname] = useState('');
 
+
+    const count = useSelector(state => state.counter.value)
+    const dispatch = useDispatch()
+
     return (
         <div className="center">
             <h1>IRL AMONG US</h1>
@@ -132,7 +138,12 @@ function Pages(){
                                             Cancel
                                     </button>
                                     <Link to="/lobby">
-                                        <button className="enter2">Enter</button>
+                                        <button 
+                                            className="enter2"
+                                            onClick={() => dispatch(setValue(nickname))}
+                                        >
+                                            Enter
+                                        </button>
                                     </Link>
                                 </div>
                             </div>
