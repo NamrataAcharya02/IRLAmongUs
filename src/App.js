@@ -7,6 +7,7 @@ import {
 } from "react-router-dom";
 import Pages from "./pages/index";
 import AdminPage from './pages/AdminPage';
+import PlayerWaiting from './pages/PlayerWaiting';
 // firebase imports
 import firebase from 'firebase/compat/app';
 import 'firebase/compat/firestore';
@@ -21,7 +22,7 @@ import { useCollectionData } from 'react-firebase-hooks/firestore';
 // Import the functions you need from the SDKs you need
 import { initializeApp } from "firebase/app";
 import { getAnalytics } from "firebase/analytics";
-import PlayerWaiting from './pages/PlayerWaiting';
+
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
 
