@@ -2,7 +2,7 @@
 
 import React, {useState, useId} from "react";
 import Popup from 'reactjs-popup';
-import PlayerWaiting from "./PlayerWaiting";
+import PlayerWaiting from "./PlayerWaiting.js";
 import { useSelector, useDispatch } from 'react-redux'
 import { setValue } from '../features/counter/counterSlice.js'
 import background from "../images/stars-background.jpg";

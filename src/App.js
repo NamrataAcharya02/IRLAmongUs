@@ -5,7 +5,7 @@ import {
   Routes,
   Route
 } from "react-router-dom";
-import Pages from "./pages/index";
+import Pages from "./pages/homepage";
 import AdminPage from './pages/AdminPage';
 import PlayerWaiting from './pages/PlayerWaiting';
 // firebase imports
