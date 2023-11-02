@@ -10,7 +10,9 @@ function PlayerWaiting(){
             </Link>
         <h1>Hello {nickname}!</h1>
         <h2 className="waitingRoomh2">Room Code: pretend there's a code here</h2>
-        <h3>player lobby waiting screen here</h3>
+        <div className="player-lobby">
+            <h3>player lobby waiting screen here</h3>
+        </div>
         </div>
     );
 }
