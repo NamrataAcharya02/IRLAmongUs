@@ -5,6 +5,7 @@ import Popup from 'reactjs-popup';
 import PlayerWaiting from "./PlayerWaiting";
 import { useSelector, useDispatch } from 'react-redux'
 import { setValue } from '../features/counter/counterSlice.js'
+import background from "../images/stars-background.jpg";
 
 import { useNavigate } from 'react-router-dom';
 import { redirect } from "react-router-dom";
@@ -92,7 +93,7 @@ function Pages(){
     
 
     return (
-        <div className="center">
+        <div className="center" style={{ backgroundImage: `url(${background})` }}>
             <h1>IRL AMONG US</h1>
             {/* <Button as={Link} to="/adminpage">Go to Admin</Button> */}
             {/* <Link to="/adminpage"> */}
