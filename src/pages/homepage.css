@@ -51,11 +51,19 @@ h2{
     font-size: xx-large;
 }
 
+.waitingRoomh2{
+    color: white;
+}
+
 h3{
     color:aqua;
 }
 
 h4{
+    color:white;
+}
+
+output{
     color:white;
 }
 
@@ -142,3 +150,7 @@ main {
     display: flex;
     flex-direction: column;
   }
+
+.slider-parent{
+    position:relative;
+}
