@@ -17,10 +17,11 @@ import { useAuthState } from 'react-firebase-hooks/auth';
 import { useCollectionData } from 'react-firebase-hooks/firestore';
 
 import {auth, googleAuthProvider} from "../firebase";
+import { signInWithPopup, onAuthStateChanged, signOut } from "firebase/auth";
 
 function SignOut() {
   return auth.currentUser && (
-    <button onClick={() => auth.signOut()} className='sign-out'>Sign Out</button>
+    <button onClick={() => signOut(auth)} className='sign-out'>Sign Out</button>
   )
 }
 
@@ -37,14 +38,14 @@ function Pages(){
     const navigate = useNavigate();
 
     const signInWithGoogle = () => {
-        auth.signInWithPopup(googleAuthProvider)
+        signInWithPopup(auth, googleAuthProvider)
         .then(function(){
             console.log("REDIRECTED")
             navigate('/adminpage');
         });
     }
 
-    auth.onAuthStateChanged(function(user) {
+    onAuthStateChanged(auth, function(user) {
         if (user) {
           // User is signed in.
         } else {
