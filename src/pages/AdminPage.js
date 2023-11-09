@@ -1,26 +1,8 @@
 import React,{useState,useEffect} from "react";
-import {Link} from "react-router-dom";
-
-import {Room} from "../models/Room"
+import {Link} from "react-router-dom";  
 
 const AdminPage = () => {
   const [data,setData]=useState(0);
-  
-  const [roomCode, setRoomCode] = useState("");
-  const [error, setError] = useState(null);
-  
-  // Wrap async in effect to get db queries.
-  useEffect(() => {
-    (async function () {
-      let adminId = "10000000";     // Dummy for dev purposes
-      let room = new Room(adminId); 
-      try {
-        const roomCode = await room.getRoom(adminId);
-        setRoomCode(roomCode);
-      } catch (e) { console.log(e); setError(e); }
-    })();
-  }, []);
-  
 
   return (
     <div className="center">
@@ -40,7 +22,6 @@ const AdminPage = () => {
           <input className={data>50?'heigh':'less'} type="range" min="0" max="20" step="1" value={data} onChange={(e)=>setData(e.target.value)} />
           <p>{data}</p>
       </div>
-      <p>Room code + {roomCode}</p>
       <button>Start a Room</button>
     </div>
   );

@@ -1,37 +1,53 @@
-import { useCollectionData } from "react-firebase-hooks/firestore";
-import { db } from "../firebase";
+/************************************************************
+ * Room.js
+ * 
+ * Below is a snippit that can be used in a react element
+ ************************************************************
+  
+  import {Room} from "../models/Room";
+  
+  let room = null;
+  
+  // Wrap async in effect to get db queries.
+  useEffect(() => {
+    (async function () {
+      let adminId = "10000000";     // Dummy for dev purposes
+      try {
+        room = await Room.getOrCreateRoom(adminId);
+      } catch (error) { 
+        console.log(error); 
+        room = null;
+      }
+    })();
+  }, []);
+ */
 
-import { collection, query, where, getDocs } from "firebase/firestore";
+import { collection, query, where, 
+    getDocs, setDoc, doc, serverTimestamp } from "firebase/firestore";
+
+import { db } from "../firebase";
+import { RoomNotExistError, MoreThanOneRoomError } from "../errors/roomError";
 
 export class Room {
-    constructor(adminId) { 
+    constructor(id, adminId, code, createdAt) { 
+        this.id = id;
         this.adminId = adminId;
-        console.log('adminId ' + adminId + ": typeof " + typeof adminId);
+        this.code = code;
+        this.createdAt = createdAt;
     }
 
-    async createRoom(adminId) {
-        // let roomCode = null;
-        // try {
-        //     // TODO: sort this out
-        //     roomCode = await this.getRoom(adminId);
-        //     // await this.getRoom(adminId);
-        //     console.log("createRoom roomCode: " + roomCode);
-
-        // } catch (e) {
-        //     console.log("Error getting document: ", e);
-        // }
+    static async createRoom(adminId) {
         
-        // if ( !roomCode ) {
-        //     roomCode = this._generateRoomCode(4)
-        // }
-        // console.log("roomCode " + roomCode);
+        const roomCode = this._generateRoomCode(4)
+        console.log("createRoom: roomCode " + roomCode);
 
-        // //TODO: Save code to database
+        const roomsRef = doc(collection(db, "rooms")).withConverter(roomConverter);
+        await setDoc(roomsRef, new Room(null, adminId, roomCode, null));
 
-        // return roomCode;
+        return this.getRoom(adminId);
     }
 
-    _generateRoomCode(length) {
+    static _generateRoomCode(length) {
         let result = '';
         const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
         const charactersLength = characters.length;
@@ -41,30 +57,68 @@ export class Room {
         return result;
     }
 
-    deleteRoom(code) {
-        // remove all players from room
-    }
-
-    async getRoom(adminId) {
-        const q = query(collection(db, "rooms"), where("adminId", "==", adminId));
+    static async getRoom(adminId) {
+        const q = query(collection(db, "rooms"), where("adminId", "==", adminId)).withConverter(roomConverter);
         
         const querySnapshot = await getDocs(q);
-
+    
         // Currently, support admin having only one room.
         if (querySnapshot.size > 1) {
-            throw "More than one roome exists for this admin";
+            throw new MoreThanOneRoomError("More than one roome exists for adminID " + adminId);
         } else if (querySnapshot.empty) {
-            throw "No room exists for admin";
+            throw new RoomNotExistError("No room for adminId: " + adminId);
         }
-
-        const one_room = querySnapshot.docs.map((doc) => doc.data())[0];
-
-        return one_room.code;
+    
+        const room = querySnapshot.docs.map((doc) => doc.data())[0];
+        // console.log('room: ' + room.constructor.name);
+        return room;
     }
 
-    joinRoom(code, playerId) {
+    static async getOrCreateRoom(adminId) {
+        let room = null;
+        try {
+            room = await this.getRoom(adminId);
+            // console.log("getOrCreateRoom.getRoom(adminID).roomCode: " + room.code);
+        } catch (error) {
+            if (error instanceof RoomNotExistError) {
+                room = await this.createRoom(adminId);
+                // console.log("getOrCreateRoom.createRoom(adminID).roomCode: " + room.code);
+            } else if (error instanceof MoreThanOneRoomError) {
+                throw error;
+            } else {
+                console.log("error" + error);
+            }
+        }
+        return room;
+    }
+
+    static async deleteRoom(code) {
+        // remove all players from room
+
+        // then delete this instance of room from the databse
+
+        // optional: return boolean indicating success
+    }
+
+    static async joinRoom(code, playerId) {
         // add player to room
     }
 
-    leaveRoom(code, playerId) {}
+    static async leaveRoom(code, playerId) {
+        // remove a player from an instance of a room
+    }
 }
+
+const roomConverter = {
+    toFirestore: (room) => {
+        return {
+            adminId: room.adminId,
+            code: room.code,
+            createdAt: serverTimestamp()
+            };
+    },
+    fromFirestore: (snapshot, options) => {
+        const data = snapshot.data(options);
+        return new Room(data.id, data.adminId, data.code, data.createdAt);
+    }
+};
