@@ -22,6 +22,7 @@ import { useCollectionData } from 'react-firebase-hooks/firestore';
 // Import the functions you need from the SDKs you need
 import { initializeApp } from "firebase/app";
 import { getAnalytics } from "firebase/analytics";
+import { getDatabase } from "firebase/database";
 
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
@@ -35,12 +36,15 @@ const firebaseConfig = {
   storageBucket: "irl-among-us-d5453.appspot.com",
   messagingSenderId: "299437319897",
   appId: "1:299437319897:web:1a4aff6578a93b98cd40c8",
-  measurementId: "G-1SS9R7WKDG"
+  measurementId: "G-1SS9R7WKDG", 
+  databaseURL: "https://irl-among-us-d5453-default-rtdb.firebaseio.com",
+
 };
 
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
 const analytics = getAnalytics(app);
+const database = getDatabase(app);
 
 // Initialize application
 firebase.initializeApp(firebaseConfig)
