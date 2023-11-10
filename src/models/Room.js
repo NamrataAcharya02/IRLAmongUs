@@ -7,13 +7,21 @@
   import {Room} from "../models/Room";
   
   let room = null;
-  
-  // Wrap async in effect to get db queries.
+  const tasklistObj = {
+    name: "frontend set task list",
+    tasks: {
+        0: "frontend_set_task1",
+        1: "frontend_set_task2",
+        2: "frontend_set_task3",
+    }
+  }
+
   useEffect(() => {
     (async function () {
-      let adminId = "10000000";     // Dummy for dev purposes
+      let adminId = "30000000";     // Dummy for dev purposes
       try {
-        room = await Room.getOrCreateRoom(adminId);
+        room = await Room.getOrCreateRoom(adminId, tasklistObj);
+        console.log(room);
       } catch (error) { 
         console.log(error); 
         room = null;
@@ -29,20 +37,21 @@ import { db } from "../firebase";
 import { RoomNotExistError, MoreThanOneRoomError } from "../errors/roomError";
 
 export class Room {
-    constructor(id, adminId, code, createdAt) { 
+    constructor(id, adminId, code, createdAt, tasklistObj) { 
         this.id = id;
         this.adminId = adminId;
         this.code = code;
         this.createdAt = createdAt;
+        this.tasklistObj = tasklistObj;
     }
 
-    static async createRoom(adminId) {
+    static async createRoom(adminId, tasklistObj) {
         
         const roomCode = this._generateRoomCode(4)
-        console.log("createRoom: roomCode " + roomCode);
+        console.log("createRoom: " + roomCode);
 
         const roomsRef = doc(collection(db, "rooms")).withConverter(roomConverter);
-        await setDoc(roomsRef, new Room(null, adminId, roomCode, null));
+        await setDoc(roomsRef, new Room(null, adminId, roomCode, null, tasklistObj));
 
         return this.getRoom(adminId);
     }
@@ -74,14 +83,14 @@ export class Room {
         return room;
     }
 
-    static async getOrCreateRoom(adminId) {
+    static async getOrCreateRoom(adminId, tasklistObj) {
         let room = null;
         try {
             room = await this.getRoom(adminId);
             // console.log("getOrCreateRoom.getRoom(adminID).roomCode: " + room.code);
         } catch (error) {
             if (error instanceof RoomNotExistError) {
-                room = await this.createRoom(adminId);
+                room = await this.createRoom(adminId, tasklistObj);
                 // console.log("getOrCreateRoom.createRoom(adminID).roomCode: " + room.code);
             } else if (error instanceof MoreThanOneRoomError) {
                 throw error;
@@ -107,6 +116,10 @@ export class Room {
     static async leaveRoom(code, playerId) {
         // remove a player from an instance of a room
     }
+
+    setTasklist(tasklistObj){
+        this.tasklistObj = tasklistObj;
+    }
 }
 
 const roomConverter = {
@@ -114,11 +127,17 @@ const roomConverter = {
         return {
             adminId: room.adminId,
             code: room.code,
-            createdAt: serverTimestamp()
+            createdAt: serverTimestamp(),
+            taskListName: room.tasklistObj.name,
+            tasklist: room.tasklistObj.tasks
             };
     },
     fromFirestore: (snapshot, options) => {
         const data = snapshot.data(options);
-        return new Room(data.id, data.adminId, data.code, data.createdAt);
+        const tasklistObj = {
+            name: data.taskListName,
+            tasks: data.tasklist
+        }
+        return new Room(data.id, data.adminId, data.code, data.createdAt, tasklistObj);
     }
 };
