@@ -6,8 +6,10 @@ let room = null;
 
 const AdminPage = () => {
   const [data,setData]=useState(0);
-  const [tasklist, setTasklist] = useState([{task: ""}, ])
+  const [tasklist, setTasklist] = useState([{task: ""}, ]) //object that stores tasklist
   console.log(tasklist)
+
+  //handle adding a task, adds an extra input field
   const handleAddTask  = () => {
     setTasklist([...tasklist, {task: ""}]);
   }
@@ -25,6 +27,7 @@ const AdminPage = () => {
     })();
   }, []);
 
+  //handle task name change in textbox
   const handleTaskChange = (e, index) => {
     const {name, value} = e.target 
     console.log("name", name, "val", value)
@@ -35,12 +38,11 @@ const AdminPage = () => {
 
   }
 
+  //handle saving the tasklist (incomplete)
   const handleSaveTasklist = async () => {
     const list = [...tasklist]
     console.log(list)
     const res = await room.update({tasklist: list});
-
-
   }
 
 
