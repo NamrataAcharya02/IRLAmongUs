@@ -7,31 +7,49 @@
   import {Room} from "../models/Room";
   
   let room = null;
-  const tasklistObj = {
+  const taskListObjs = [{
     name: "frontend set task list",
     tasks: {
         0: "frontend_set_task1",
         1: "frontend_set_task2",
         2: "frontend_set_task3",
     }
-  }
+  },
+  {
+    name: "New list",
+    tasks: {
+        0: "new task 1",
+        1: "new task 2",
+        2: "new task 3",
+    }
+  }]
+  
+  const tasklistObj = taskListObjs[1];
+  const numImposters = 1;
+  const numTasksToDo = 2;
 
   useEffect(() => {
     (async function () {
       let adminId = "30000000";     // Dummy for dev purposes
       try {
-        room = await Room.getOrCreateRoom(adminId, tasklistObj);
+        room = await Room.getOrCreateRoom(adminId, tasklistObj, numImposters, numTasksToDo);
+        await room.updateRoom(tasklistObj, numImposters, numTasksToDo)
         console.log(room);
       } catch (error) { 
         console.log(error); 
         room = null;
       }
     })();
-  }, []);
+  }, []); // end useEffect()
  */
 
-import { collection, query, where, 
-    getDocs, setDoc, doc, serverTimestamp } from "firebase/firestore";
+import { 
+    doc,
+    getDoc,
+    serverTimestamp,
+    setDoc,
+    updateDoc, 
+} from "firebase/firestore";
 
 import { db } from "../firebase";
 import { RoomNotExistError, MoreThanOneRoomError } from "../errors/roomError";
@@ -63,11 +81,20 @@ export class Room {
         this.#numTasksToDo = numTasksToDo;
     }
 
+    getRoomId() { return this.#id; }
+    getAdminId() { return this.#adminId; }
     getRoomCode() { return this.#code; }
     getCreatedAt() { return this.#createdAt; }
     getTaskList() { return this.#tasklistObj; }
     getNumImposters() { return this.#numImposters; }
     getNumTasksToDo() { return this.#numTasksToDo; }
+    setRoomId(id) { this.#id = id; }
+    setAdminId(adminId) { this.#adminId = adminId; }
+    setRoomCode(code) { this.#code = code; }
+    setCreatedAt(createdAt) { this.#createdAt = createdAt; }
+    setTaskList(tasklistObj) { this.#tasklistObj = tasklistObj; }
+    setNumImposters(numImposters) { this.#numImposters = numImposters; }
+    setNumTasksToDo(numTasksToDo) { this.#numTasksToDo = numTasksToDo; }
 
     /**
      * Create a room for game play. This method calls _generateRoomCode and ensures 
@@ -89,21 +116,29 @@ export class Room {
      * @returns {Room} A concrete room that has been added to the database.
      */
     static async createRoom(adminId, tasklistObj, numImposters, numTasksToDo) {
-        
-        // TODO: make sure roomCode doesn't exist in the database. Upon successfully
-        // generating a code, it should immediately add it to the database so it will
-        // not conflict with some other room being created.
-        const roomCode = this.#_generateRoomCode(ROOM_CODE_LENGTH);
-        console.log("createRoom: " + roomCode);
+        // only run this method once
+        if (typeof this.createRoom.created == 'undefined') {
+            this.createRoom.created = false;
+        }
 
-        // TODO: validate numImposters to be greater than zero, and less than XX??
+        if (!this.createRoom.created) {
+            this.createRoom.created = true;
+            // TODO: make sure roomCode doesn't exist in the database. Upon successfully
+            // generating a code, it should immediately add it to the database so it will
+            // not conflict with some other room being created.
+            const roomCode = this.#_generateRoomCode(ROOM_CODE_LENGTH);
+            console.log("createRoom: " + roomCode);
 
-        // TODO: validate numTasksToDo to be greater than zero, and less than tasklistObj.tasks.length
+            // TODO: validate numImposters to be greater than zero, and less than XX??
 
-        const roomsRef = doc(collection(db, "rooms")).withConverter(roomConverter);
-        await setDoc(roomsRef, new Room(null, adminId, roomCode, null, tasklistObj, numImposters, numTasksToDo));
+            // TODO: validate numTasksToDo to be greater than zero, and less than tasklistObj.tasks.length
 
-        return this.getRoom(adminId);
+            // const docRef = doc(db, "rooms", adminId).withConverter(roomConverter);
+            const docRef = this.#_roomRefForAdmin(adminId);
+            await setDoc(docRef, new Room(adminId, adminId, roomCode, null, tasklistObj, numImposters, numTasksToDo));
+            
+            return this.getRoom(adminId);
+        }
     }
 
     /**
@@ -121,6 +156,10 @@ export class Room {
         return result;
     }
 
+    static #_roomRefForAdmin(adminId) {
+        return doc(db, "rooms", adminId).withConverter(roomConverter);
+    }
+
     /**
      * Query the database for the unique room belonging to the admin as defined by
      * the parameter `adminId`.
@@ -135,19 +174,21 @@ export class Room {
      * @returns A Room object belonging to the admin defined by `adminId`.
      */
     static async getRoom(adminId) {
-        const q = query(collection(db, "rooms"), where("adminId", "==", adminId)).withConverter(roomConverter);
-        
-        const querySnapshot = await getDocs(q);
-    
         // Currently, support admin having only one room.
-        if (querySnapshot.size > 1) {
+        // const docRef = doc(db, "rooms", adminId).withConverter(roomConverter);
+        const docRef = this.#_roomRefForAdmin(adminId);
+        const docSnap = await getDoc(docRef);
+        if (docSnap.size > 1) {
             throw new MoreThanOneRoomError("More than one roome exists for adminID " + adminId + ". Contact system adminstrator for help.");
-        } else if (querySnapshot.empty) {
+        } else if (docSnap.empty) {
+            throw new RoomNotExistError("No room for adminId: " + adminId);
+        } else if (!docSnap.exists()) {
             throw new RoomNotExistError("No room for adminId: " + adminId);
         }
     
-        const room = querySnapshot.docs.map((doc) => doc.data())[0];
-        // console.log('room: ' + room.constructor.name);
+        const room = docSnap.data();
+
+        console.log('room: ' + room.constructor.name);
         return room;
     }
 
@@ -180,10 +221,10 @@ export class Room {
     static async getOrCreateRoom(adminId, tasklistObj, numImposters, numTasksToDo) {
         let room = null;
         try {
-            room = await this.getRoom(adminId);
+            room = await Room.getRoom(adminId);
         } catch (error) {
             if (error instanceof RoomNotExistError) {
-                room = await this.createRoom(adminId, tasklistObj, numImposters, numTasksToDo);
+                room = this.createRoom(adminId, tasklistObj, numImposters, numTasksToDo);
             } else if (error instanceof MoreThanOneRoomError) {
                 throw error;
             } else {
@@ -198,6 +239,24 @@ export class Room {
      * @param {tasklistObj} tasklistObj 
      */
     updateTaskList(tasklistObj) {}
+
+    async updateRoom(tasklistObj, numImposters, numTasksToDo) {
+        if (JSON.stringify(this.getTaskList()) !== JSON.stringify(tasklistObj)  ||
+            this.getNumImposters() !== numImposters                             ||
+            this.getNumTasksToDo() !== numTasksToDo) 
+        {
+            const docRef = Room.#_roomRefForAdmin(this.getAdminId());
+            this.setTaskList(tasklistObj);
+            this.setNumImposters(numImposters);
+            this.setNumTasksToDo(numTasksToDo);
+            await updateDoc(docRef, {
+                tasklist: tasklistObj,
+                numImposters: numImposters,
+                numTasksToDo: numTasksToDo
+            });
+            console.log("successfully updated room document " + this.getRoomId());
+        }
+    }
 
     /**
      * TODO:
@@ -229,13 +288,6 @@ export class Room {
         // remove a player from an instance of a room
     }
 
-    /**
-     * 
-     * @param {*} tasklistObj 
-     */
-    setTasklist(tasklistObj){
-        this.#tasklistObj = tasklistObj;
-    }
 }
 
 
@@ -247,11 +299,14 @@ export class Room {
 const roomConverter = {
     toFirestore: (room) => {
         return {
-            adminId: room.adminId,
-            code: room.code,
+            id: room.getRoomId(),
+            adminId: room.getAdminId(),
+            code: room.getRoomCode(),
             createdAt: serverTimestamp(),
-            taskListName: room.tasklistObj.name,
-            tasklist: room.tasklistObj.tasks
+            taskListName: room.getTaskList().name,
+            tasklist: room.getTaskList().tasks,
+            numImposters: room.getNumImposters(),
+            numTasksToDo: room.getNumTasksToDo()
             };
     },
     fromFirestore: (snapshot, options) => {
@@ -260,6 +315,6 @@ const roomConverter = {
             name: data.taskListName,
             tasks: data.tasklist
         }
-        return new Room(data.id, data.adminId, data.code, data.createdAt, tasklistObj);
+        return new Room(data.id, data.adminId, data.code, data.createdAt, tasklistObj, data.numImposters, data.numTasksToDo);
     }
 };
