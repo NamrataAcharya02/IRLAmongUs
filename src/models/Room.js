@@ -180,15 +180,12 @@ export class Room {
         const docSnap = await getDoc(docRef);
         if (docSnap.size > 1) {
             throw new MoreThanOneRoomError("More than one roome exists for adminID " + adminId + ". Contact system adminstrator for help.");
-        } else if (docSnap.empty) {
-            throw new RoomNotExistError("No room for adminId: " + adminId);
         } else if (!docSnap.exists()) {
             throw new RoomNotExistError("No room for adminId: " + adminId);
         }
     
         const room = docSnap.data();
 
-        console.log('room: ' + room.constructor.name);
         return room;
     }
 
@@ -224,7 +221,7 @@ export class Room {
             room = await Room.getRoom(adminId);
         } catch (error) {
             if (error instanceof RoomNotExistError) {
-                room = this.createRoom(adminId, tasklistObj, numImposters, numTasksToDo);
+                room = Room.createRoom(adminId, tasklistObj, numImposters, numTasksToDo);
             } else if (error instanceof MoreThanOneRoomError) {
                 throw error;
             } else {
@@ -233,12 +230,6 @@ export class Room {
         }
         return room;
     }
-
-    /**
-     * TODO:
-     * @param {tasklistObj} tasklistObj 
-     */
-    updateTaskList(tasklistObj) {}
 
     async updateRoom(tasklistObj, numImposters, numTasksToDo) {
         if (JSON.stringify(this.getTaskList()) !== JSON.stringify(tasklistObj)  ||
@@ -256,6 +247,7 @@ export class Room {
             });
             console.log("successfully updated room document " + this.getRoomId());
         }
+        return this;
     }
 
     /**
