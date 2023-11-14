@@ -8,12 +8,15 @@ export class Task {
     completeTask() {
         this.completed = true;
     }
+    updateTask(newDescription) {
+        this.description = newDescription;
+    }
 }
 
 export class TaskList {
-    constructor(name) { 
+    constructor(name, list) { 
         this.name = name;
-        this.list = [];
+        this.list = list
     }
 
     // Method to add a task to the task list
