@@ -11,25 +11,12 @@ const AdminPage = () => {
   const [listName, setListName] = useState("") //name of tasklist
   console.log(tasklist)
 
-  //handle adding a task, adds an extra input field
+  //handle adding a task, adds an extra input field and new task object to tasklist
   const handleAddTask  = () => {
     setTasklist([...tasklist, new Task("")]);
   }
 
-  /*useEffect(() => {
-    (async function () {
-      let adminId = "60000000";     // Dummy for dev purposes
-      try {
-        room = await Room.getOrCreateRoom(adminId);
-        console.log(room)
-      } catch (error) { 
-        console.log(error); 
-        room = null;
-      }
-    })();
-  }, []);*/
-
-  //handle task name change in textbox
+  //handle task name change in textbox. Updates task object as changes are being made
   const handleTaskChange = (e, index) => {
     const {name, value} = e.target 
     console.log("name", name, "val", value)
@@ -41,6 +28,7 @@ const AdminPage = () => {
   }
 
   //handle saving the tasklist (incomplete)
+  //This creates a new tasklist object and prints it to console
   const handleSaveTasklist = async () => {
     const list = [...tasklist]
     const tasklistObj = new TaskList(listName, list)
@@ -67,14 +55,11 @@ const AdminPage = () => {
         Task list name: 
         <input value={listName} onChange={(e)=>setListName(e.target.value)} />
 
-
-
         <h2>Task list</h2>
         {tasklist.map((singleTask, index) => (
           <div> 
             <input required type="text" value={singleTask.task} name = "task" onChange= {(e) => (handleTaskChange(e, index))} />
-            {index == tasklist.length - 1
-            }
+            {index == tasklist.length - 1}
            
           </div>
 
@@ -83,7 +68,7 @@ const AdminPage = () => {
         
         }
         <div>
-              <button onClick={handleAddTask} > Add Task </button>
+            <button onClick={handleAddTask} > Add Task </button>
             <button onClick={handleSaveTasklist}> Save List</button>
               </div>
 
