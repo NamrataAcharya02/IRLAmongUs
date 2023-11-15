@@ -8,6 +8,7 @@ import {
 import Pages from "./pages/homepage";
 import AdminPage from './pages/AdminPage';
 import PlayerWaiting from './pages/PlayerWaiting';
+import AdminRoom from './pages/AdminRoom';
 
 // react hooks
 import { useAuthState } from 'react-firebase-hooks/auth';
@@ -31,6 +32,7 @@ function App(){
           <Route path="/" element={<Pages />} />
           <Route path="adminpage" element={<AdminPage />} />
           <Route path="lobby" element={<PlayerWaiting />} />
+          <Route path="room" element={<AdminRoom />} />
        </Routes>
     </Router>
   )
