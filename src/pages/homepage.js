@@ -59,7 +59,7 @@ function Pages(){
     
 
     return (
-        <div className="center" style={{ backgroundImage: `url(${background})` }}>
+        <div className="centerHome" style={{ backgroundImage: `url(${background})` }}>
             <h1>IRL AMONG US</h1>
             {/* <Button as={Link} to="/adminpage">Go to Admin</Button> */}
             {/* <Link to="/adminpage"> */}

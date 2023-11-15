@@ -70,22 +70,24 @@ class TaskList extends Component {
 	render() { 
 		return ( 
 			<div className="task-list"> 
+				<h4>Select a task list</h4>
 				<select>
-          <option value="list 1">Los Angeles</option>
-          <option value="list 2">UCLA</option>
-          <option value="list 3">San Francisco</option>
-          <option value="list 4">London</option>
+          			<option value="list 1">Los Angeles</option>
+          			<option value="list 2">UCLA</option>
+          			<option value="list 3">San Francisco</option>
+          			<option value="list 4">London</option>
 				</select> 
 
-				<hr /> 
-          <input 
+				<hr />
+				<h4>Add a task</h4> 
+          	<input 
             placeholder="add item . . . "
             size="lg"
             value={this.state.userInput} 
             onChange={(item) => 
               this.updateInput(item.target.value) 
             } 
-          /> 
+          	/> 
             <button 
               onClick={() => this.addItem()} 
             > 
