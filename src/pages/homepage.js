@@ -10,7 +10,7 @@ import background from "../images/stars-background.jpg";
 import { useNavigate } from 'react-router-dom';
 import { redirect } from "react-router-dom";
 import {Link} from "react-router-dom";
-import "./homepage.css";
+import "../style/homepage.css";
 
 // react hooks
 import { useAuthState } from 'react-firebase-hooks/auth';

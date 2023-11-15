@@ -105,7 +105,7 @@ input{
     padding: 0px 0px;
     margin-left: 30px;
     margin-right: 30px;
-    font-size:24px;
+    font-size: 24px;
     border: 1px solid white;
 }
 
@@ -173,3 +173,55 @@ main {
     display: flex;
     flex-direction: column;
 }
+
+
+.task-list {
+    list-style: none;
+    /* padding: 0; */
+}
+
+.task-list button{
+    width: 40px;
+    height: 30px;
+    padding: 0px 0px;
+    margin-left: 11px;
+    font-size: 16px;
+    border: 1px solid white;
+}
+
+.delete, .edit {
+    position: absolute;
+    right: -90px;
+    top:auto;
+}
+  
+.edit {
+    margin-right: 45px;
+}
+
+.task-list ul{
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.task-list li {
+    display: flex;
+    justify-content: space-between;
+    background-color: #f0f0f0;
+    padding-top: 5px;
+    padding-bottom: 5px;
+    padding-left: 5px;
+    padding-right: 5px;
+    position: relative;
+    margin-bottom: 8px;
+    margin-left: 0px;
+    min-height: 30px;
+    width: 345px;
+    align-items: center;
+}
+
+.task-list input{
+    width: 365px;
+}
+

@@ -1,5 +1,7 @@
 import React,{useState,useEffect} from "react";
 import {Link} from "react-router-dom";
+import TaskList from "../features/TaskList.js";
+import "../style/homepage.css";
 const AdminPage = () => {
   const [data,setData]=useState(0);
 
@@ -8,7 +10,9 @@ const AdminPage = () => {
       <Link to="/">
             <button className="back">Back</button>
         </Link>
+        
       <div className="text-in-box">
+      <TaskList></TaskList>
         <h3>List here</h3>
         <h4>not a task 1 I'm just a header for good looks</h4>
         <h4>not a task 2 Just a placeholding space</h4>
