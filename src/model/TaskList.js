@@ -8,6 +8,7 @@ export class Task {
     completeTask() {
         this.completed = true;
     }
+    // Method to update task description
     updateTask(newDescription) {
         this.description = newDescription;
     }
