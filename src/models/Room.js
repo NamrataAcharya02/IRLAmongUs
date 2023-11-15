@@ -7,6 +7,8 @@
   import {Room} from "../models/Room";
   
   let room = null;
+
+  // use for Example 1
   const taskListObjs = [{
     name: "frontend set task list",
     tasks: {
@@ -28,12 +30,24 @@
   const numImposters = 1;
   const numTasksToDo = 2;
 
+  // Use for Example: 2
+  let roomCodes = {
+    'exists': "7380",
+    'not_exists': "NotE"
+  }
+  let playerIds = ["h8j9k0", "m3n2j4", "p1l3f2"];
+
   useEffect(() => {
     (async function () {
       let adminId = "30000000";     // Dummy for dev purposes
       try {
+        // Example 1: call to getOrCreateRoom
         room = await Room.getOrCreateRoom(adminId, tasklistObj, numImposters, numTasksToDo);
         await room.updateRoom(tasklistObj, numImposters, numTasksToDo)
+        console.log(room);
+
+        // Example 2: call to joinRoom
+        room = await Room.joinRoom(roomCodes['exists'], playerIds[1]);
         console.log(room);
       } catch (error) { 
         console.log(error); 
@@ -44,15 +58,22 @@
  */
 
 import { 
+    arrayUnion,
+    collection,
     doc,
     getDoc,
+    getDocs,
+    query,
     serverTimestamp,
     setDoc,
     updateDoc, 
+    where,
+
+    Firestore
 } from "firebase/firestore";
 
 import { db } from "../firebase";
-import { RoomNotExistError, MoreThanOneRoomError } from "../errors/roomError";
+import { RoomNotExistError, MoreThanOneRoomError, RoomCodeDoesNotExistError } from "../errors/roomError";
 
 /**
  * Configuration settings for Room.
@@ -71,6 +92,7 @@ export class Room {
     #tasklistObj;
     #numImposters;
     #numTasksToDo;
+    #players; // TODO: convert to Player
     constructor(id, adminId, code, createdAt, tasklistObj, numImposters, numTasksToDo) { 
         this.#id = id;
         this.#adminId = adminId;
@@ -79,6 +101,7 @@ export class Room {
         this.#tasklistObj = tasklistObj;
         this.#numImposters = numImposters;
         this.#numTasksToDo = numTasksToDo;
+        this.#players = [];
     }
 
     getRoomId() { return this.#id; }
@@ -88,6 +111,8 @@ export class Room {
     getTaskList() { return this.#tasklistObj; }
     getNumImposters() { return this.#numImposters; }
     getNumTasksToDo() { return this.#numTasksToDo; }
+    getPlayers() { return this.#players; }
+
     setRoomId(id) { this.#id = id; }
     setAdminId(adminId) { this.#adminId = adminId; }
     setRoomCode(code) { this.#code = code; }
@@ -95,6 +120,9 @@ export class Room {
     setTaskList(tasklistObj) { this.#tasklistObj = tasklistObj; }
     setNumImposters(numImposters) { this.#numImposters = numImposters; }
     setNumTasksToDo(numTasksToDo) { this.#numTasksToDo = numTasksToDo; }
+    setPlayers(players) { this.#players = players; }
+
+    addPlayer(player) { this.#players.push(player); }
 
     /**
      * Create a room for game play. This method calls _generateRoomCode and ensures 
@@ -128,14 +156,18 @@ export class Room {
             // not conflict with some other room being created.
             const roomCode = this.#_generateRoomCode(ROOM_CODE_LENGTH);
             console.log("createRoom: " + roomCode);
-
+            
             // TODO: validate numImposters to be greater than zero, and less than XX??
 
             // TODO: validate numTasksToDo to be greater than zero, and less than tasklistObj.tasks.length
 
             // const docRef = doc(db, "rooms", adminId).withConverter(roomConverter);
+            
+            let room = new Room(adminId, adminId, roomCode, null, tasklistObj, numImposters, numTasksToDo);
+            room.setPlayers([]);
+
             const docRef = this.#_roomRefForAdmin(adminId);
-            await setDoc(docRef, new Room(adminId, adminId, roomCode, null, tasklistObj, numImposters, numTasksToDo));
+            await setDoc(docRef, room);
             
             return this.getRoom(adminId);
         }
@@ -158,6 +190,10 @@ export class Room {
 
     static #_roomRefForAdmin(adminId) {
         return doc(db, "rooms", adminId).withConverter(roomConverter);
+    }
+
+    static #_roomsQueryForCode(roomCode) {
+        return query(collection(db, "rooms"), where("code", "==", roomCode)).withConverter(roomConverter);
     }
 
     /**
@@ -263,12 +299,52 @@ export class Room {
     }
 
     /**
-     * TODO: 
-     * @param {*} code 
-     * @param {*} playerId 
+     * Add a player to a rooms `players` list and update firestore to reflect a
+     * newly added added player.
+     * 
+     * If this method returns, it will always yield a Room object.
+     * 
+     * joinRoom throws two errors:
+     *      - RoomCodeDoesNotExistError
+     *      - MoreThanOneRoomError
+     * when the queried room code doesn't exist or when more than one room exists
+     * with the room code, respectively.
+     * 
+     * @param {String} roomCode ROOM_CODE_LENGTH code of the room provided by Game Admins.
+     * @param {String} playerId alphanumeric id assigned to anonymous users
+     * @returns {Room} The room object associated with the roomCode sent in
      */
-    static async joinRoom(code, playerId) {
-        // add player to room
+    static async joinRoom(roomCode, playerId) {
+        // get the room reference
+        const roomsQuery = this.#_roomsQueryForCode(roomCode);
+
+        // get the room object
+        const roomsQuerySnap = await getDocs(roomsQuery);
+
+        // list of documents, if any, in the query snapshot
+        var roomDocData = roomsQuerySnap.docs.map((doc) => { return doc.data(); });
+        if (roomsQuerySnap.empty) {
+            throw new RoomCodeDoesNotExistError("Room "+ roomCode + " does not exist");
+        } else if (roomsQuerySnap.size > 1) {
+            throw new MoreThanOneRoomError("Multiple rooms with code " + roomCode + ".");
+        }
+        let room = roomDocData[0];
+        
+        // only add the player to this rooms `players` list if it doesn't exist in it
+        if (room.getPlayers().includes(playerId)) {
+            console.log("Player " + playerId + " already in room " + roomCode);
+            return room;
+        }
+
+        // update the room retrieved from the database
+        room.addPlayer(playerId);
+
+        // update database
+        const roomDocRef = this.#_roomRefForAdmin(room.getAdminId());
+        await updateDoc(roomDocRef, {
+            players: arrayUnion(playerId)
+        });
+        return room;
     }
 
     /**
@@ -298,7 +374,8 @@ const roomConverter = {
             taskListName: room.getTaskList().name,
             tasklist: room.getTaskList().tasks,
             numImposters: room.getNumImposters(),
-            numTasksToDo: room.getNumTasksToDo()
+            numTasksToDo: room.getNumTasksToDo(),
+            players: room.getPlayers(),
             };
     },
     fromFirestore: (snapshot, options) => {
@@ -307,6 +384,8 @@ const roomConverter = {
             name: data.taskListName,
             tasks: data.tasklist
         }
-        return new Room(data.id, data.adminId, data.code, data.createdAt, tasklistObj, data.numImposters, data.numTasksToDo);
+        let room = new Room(data.id, data.adminId, data.code, data.createdAt, tasklistObj, data.numImposters, data.numTasksToDo);
+        room.setPlayers(data.players);
+        return room;
     }
 };

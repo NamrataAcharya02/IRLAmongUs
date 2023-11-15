@@ -3,11 +3,8 @@ import {Link} from "react-router-dom";
 
 
 
-
-
 const AdminPage = () => {
   const [data,setData]=useState(0);
-  
 
   return (
     <div className="center">
