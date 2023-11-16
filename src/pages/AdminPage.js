@@ -7,6 +7,7 @@ import { Room } from "../models/Room";
 import { Task, TaskList } from "../components/TaskListComponent.js";
 import background from "../images/stars-background.jpg";
 import FrontendTaskList from "../features/TaskList";
+import { useNavigate } from 'react-router-dom';
 
 let room = null;
 
@@ -50,8 +51,9 @@ const AdminPage = () => {
       } */
 
   }
+  //---------------------- Room Creation ----------------------------------------
   const [room, setRoom] = useState(null);
-
+  const navigate = useNavigate();
   // Temporary Task Lists
   const taskListObjs = [{
     name: "frontend set task list",
@@ -75,21 +77,26 @@ const AdminPage = () => {
   const numImposters = 1;
   const numTasksToDo = 2;
 
+
   //function to create a room
-  useEffect(() => {
-    (async function () {
-      let adminId = "30000000";     // Dummy for dev purposes
-      try {
-        const newRoom = await Room.getOrCreateRoom(adminId, tasklistObj, numImposters, numTasksToDo);
-        await newRoom.updateRoom(tasklistObj, numImposters, numTasksToDo);
-        setRoom(newRoom);
-        // console.log(newRoom);
-      } catch (error) {
-        console.log(error);
-        room = null;
-      }
-    })();
-  }, []);
+  const startRoom = async () => {
+    try {
+      let adminId = "30000000"; // Dummy for dev purposes
+      const newRoom = await Room.getOrCreateRoom(
+        adminId,
+        tasklistObj,
+        numImposters,
+        numTasksToDo
+      );
+      await newRoom.updateRoom(tasklistObj, numImposters, numTasksToDo);
+      setRoom(newRoom);
+      navigate("/room");
+    } catch (error) {
+      console.error(error);
+      setRoom(null);
+    }
+  };
+  //----------------------- Room Creation ---------------------------------------
 
   //TODO: Sign out button (refer to skeleton code)
   // function SignOut() {
@@ -146,8 +153,8 @@ const AdminPage = () => {
       {/* Game customizations other than task list: */}
 
       {/* Room Generation: */}
-      <button onClick={() => { }}>Start a Room</button>
-      <h1>Room Code: {room ? room.getRoomCode() : 'N/A'}</h1>
+      <button onClick={startRoom}>Start a Room</button>
+      {/* <h1>Room Code: {room ? room.getRoomCode() : 'N/A'}</h1> */}
     </div>
   );
 }
