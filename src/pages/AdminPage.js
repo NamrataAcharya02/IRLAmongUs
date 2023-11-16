@@ -2,13 +2,56 @@
 // Admin may modify lists, customize a game, and start a room
 
 import React,{useState,useEffect} from "react";
-import {Link} from "react-router-dom";
+import {Link} from "react-router-dom";  
 import {Room} from "../models/Room";
+import {Task, TaskList} from "../model/TaskList";
+
+let room = null;
+
+const AdminPage = () => {
+  const [data,setData]=useState(0);
+  const [tasklist, setTasklist] = useState([]) //object that stores tasklist
+  const [listName, setListName] = useState("") //name of tasklist
+  console.log(tasklist)
+
+  //handle adding a task, adds an extra input field and new task object to tasklist
+  const handleAddTask  = () => {
+    setTasklist([...tasklist, new Task("")]);
+  }
+
+  //handle task name change in textbox. Updates task object as changes are being made
+  const handleTaskChange = (e, index) => {
+    const {name, value} = e.target 
+    console.log("name", name, "val", value)
+    const list = [...tasklist];
+    list[index].updateTask(value);
+    console.log(list)
+    setTasklist(list)
+
+  }
+
+  //handle saving the tasklist (incomplete)
+  //This creates a new tasklist object and prints it to console
+  const handleSaveTasklist = async () => {
+    const list = [...tasklist]
+    const tasklistObj = new TaskList(listName, list)
+
+    console.log(tasklistObj)
+    /*
+    let adminId = "60000000";     // Dummy for dev purposes
+      try {
+        room = await Room.getOrCreateRoom(adminId, data, tasklist );
+        console.log(room)
+      } catch (error) { 
+        console.log(error); 
+        room = null;
+      } */
+    
+  }
+
 import TaskList from "../features/TaskList";
 import background from "../images/stars-background.jpg";
 
-
-const AdminPage = () => {
   const [data,setData]=useState(0);
   const [room, setRoom] = useState(null);
   
@@ -34,7 +77,6 @@ const AdminPage = () => {
   const tasklistObj = taskListObjs[1];
   const numImposters = 1;
   const numTasksToDo = 2;
-
 
   //function to create a room
   useEffect(() => {
@@ -62,6 +104,32 @@ const AdminPage = () => {
     <div className="center" style={{ backgroundImage: `url(${background})` }}>
       <Link to="/">
             <button className="back">Back</button>
+        </Link>
+
+        Task list name: 
+        <input value={listName} onChange={(e)=>setListName(e.target.value)} />
+
+        <h2>Task list</h2>
+        {tasklist.map((singleTask, index) => (
+          <div> 
+            <input required type="text" value={singleTask.task} name = "task" onChange= {(e) => (handleTaskChange(e, index))} />
+            {index == tasklist.length - 1}
+           
+          </div>
+
+        ))
+        
+        
+        }
+        <div>
+            <button onClick={handleAddTask} > Add Task </button>
+            <button onClick={handleSaveTasklist}> Save List</button>
+              </div>
+
+      <div className="text-in-box">
+        
+        <h3>List here</h3>
+        <h4>not a task 1 I'm just a header for good looks</h4>
       </Link>
       {/* TaskList:: */}
       <div className="text-in-box">
