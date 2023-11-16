@@ -211,7 +211,7 @@ export class Room {
      */
     static async getRoom(adminId) {
         // Currently, support admin having only one room.
-        // const docRef = doc(db, "rooms", adminId).withConverter(roomConverter);
+
         const docRef = this.#_roomRefForAdmin(adminId);
         const docSnap = await getDoc(docRef);
         if (docSnap.size > 1) {
@@ -219,10 +219,8 @@ export class Room {
         } else if (!docSnap.exists()) {
             throw new RoomNotExistError("No room for adminId: " + adminId);
         }
-    
-        const room = docSnap.data();
 
-        return room;
+        return docSnap.data();
     }
 
     /**
@@ -267,6 +265,20 @@ export class Room {
         return room;
     }
 
+    /**
+     * Update a room instance and database with parameters, only if a change in any one of the 
+     * parameters has occured. This method checks for changes to prevent unnecessary database
+     * writes.
+     * 
+     * TODO: Refactor this method to make it more robust and handle all types of updates.
+     * Ideally, arglist is a dictionary who's key's correspond to Room attributes,
+     * and whos values corresopnd to the new value. 
+     * 
+     * @param {TaskList} tasklistObj Admin defined tasks all players who join room will receive
+     * @param {Number} numImposters Admin defined number of imposters who "kill" Crewmates
+     * @param {Number} numTasksToDo Admin defined number of tasks each Crewmate must complete for game to be won
+     * @returns The room object instance that called the method
+     */
     async updateRoom(tasklistObj, numImposters, numTasksToDo) {
         if (JSON.stringify(this.getTaskList()) !== JSON.stringify(tasklistObj)  ||
             this.getNumImposters() !== numImposters                             ||
