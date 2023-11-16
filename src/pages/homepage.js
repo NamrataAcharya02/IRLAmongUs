@@ -4,13 +4,13 @@ import React, {useState, useId} from "react";
 import Popup from 'reactjs-popup';
 import PlayerWaiting from "./PlayerWaiting.js";
 import { useSelector, useDispatch } from 'react-redux'
-import { setValue } from '../features/counter/counterSlice.js'
+import { setValue } from '../components/counter/counterSlice.js'
 import background from "../images/stars-background.jpg";
 
 import { useNavigate } from 'react-router-dom';
 import { redirect } from "react-router-dom";
 import {Link} from "react-router-dom";
-import "./homepage.css";
+import "../style/homepage.css";
 
 // react hooks
 import { useAuthState } from 'react-firebase-hooks/auth';
@@ -59,7 +59,7 @@ function Pages(){
     
 
     return (
-        <div className="center" style={{ backgroundImage: `url(${background})` }}>
+        <div className="centerHome" style={{ backgroundImage: `url(${background})` }}>
             <h1>IRL AMONG US</h1>
             {/* <Button as={Link} to="/adminpage">Go to Admin</Button> */}
             {/* <Link to="/adminpage"> */}
