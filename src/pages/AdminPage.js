@@ -4,9 +4,9 @@
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { Room } from "../models/Room";
-import { Task, TaskList } from "../model/TaskListComponent.js";
+import { Task, TaskList } from "../models/TaskList.js";
 import background from "../images/stars-background.jpg";
-import FrontendTaskList from "../components/TaskList";
+import FrontendTaskList from "../components/TaskListComponent.js";
 import { useNavigate } from 'react-router-dom';
 
 let room = null;
