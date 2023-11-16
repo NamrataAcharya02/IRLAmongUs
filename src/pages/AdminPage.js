@@ -110,12 +110,6 @@ const AdminPage = () => {
         <button className="back">Back</button>
       </Link>
 
-
-
-
-
-      <h3>List here</h3>
-      <h4>not a task 1 I'm just a header for good looks</h4>
       {/* TaskList:: */}
       <div className="text-in-box">
         <h2>Task list name:</h2>
@@ -137,11 +131,6 @@ const AdminPage = () => {
           <button onClick={handleAddTask} > Add Task </button>
           <button onClick={handleSaveTasklist}> Save List</button>
         </div>
-        <h3>Create a Task List</h3>
-        {/* <FrontendTaskList></FrontendTaskList> */}
-        {/* <h4>not a task 1 I'm just a header for good looks</h4>
-        <h4>not a task 2 Just a placeholding space</h4>
-        <h4>not a task 3 I should make my cheatsheet</h4> */}
         <h3>Game customizations here</h3>
         {/* <input type="range" min="1" max="100"/> */}
         <p>Here's a slider wow:</p>
