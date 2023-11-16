@@ -17,7 +17,7 @@ export class Task {
 export class TaskList {
     constructor(name, list) { 
         this.name = name;
-        this.list = list
+        this.tasks = list
     }
 
     // Method to add a task to the task list
@@ -25,7 +25,7 @@ export class TaskList {
 
         const newTask = new Task(taskDescription);
         this.tasks.push(newTask);
-        console.log("num of tasks after adding: " + this.list.length);
+        console.log("num of tasks after adding: " + this.tasks.length);
     }
 
     // Method to delete a task from the task list
@@ -35,6 +35,6 @@ export class TaskList {
         if (taskIndex !== -1) {
             this.tasks.splice(taskIndex, 1);
         }
-        console.log("num of tasks of deleting: " + this.list.length);
+        console.log("num of tasks of deleting: " + this.tasks.length);
     }
 }
