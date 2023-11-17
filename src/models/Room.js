@@ -52,7 +52,8 @@ import {
 } from "firebase/firestore";
 
 import { db } from "../firebase";
-import { RoomNotExistError, MoreThanOneRoomError } from "../errors/roomError";
+import { RoomNotExistError, MoreThanOneRoomError, InvalidRoomCodeError } from "../errors/roomError";
+import { FirebaseError } from "firebase/app";
 
 /**
  * Configuration settings for Room.
@@ -117,27 +118,41 @@ export class Room {
      */
     static async createRoom(adminId, tasklistObj, numImposters, numTasksToDo) {
         // only run this method once
-        if (typeof this.createRoom.created == 'undefined') {
-            this.createRoom.created = false;
+        if (typeof this.createRoom.called == 'undefined') {
+            this.createRoom.called = false;
         }
-
-        if (!this.createRoom.created) {
-            this.createRoom.created = true;
-            // TODO: make sure roomCode doesn't exist in the database. Upon successfully
-            // generating a code, it should immediately add it to the database so it will
-            // not conflict with some other room being created.
-            const roomCode = this.#_generateRoomCode(ROOM_CODE_LENGTH);
-            console.log("createRoom: " + roomCode);
-
-            // TODO: validate numImposters to be greater than zero, and less than XX??
-
-            // TODO: validate numTasksToDo to be greater than zero, and less than tasklistObj.tasks.length
-
-            // const docRef = doc(db, "rooms", adminId).withConverter(roomConverter);
-            const docRef = this.#_roomRefForAdmin(adminId);
-            await setDoc(docRef, new Room(adminId, adminId, roomCode, null, tasklistObj, numImposters, numTasksToDo));
-            
-            return this.getRoom(adminId);
+        console.log("create Room");
+        
+        // create a room code that doesn't conflict with existing documents in the db
+        let i = 0;
+        if (!this.createRoom.called) {
+            this.createRoom.called = true;
+            while(i < 3) {
+                try {
+                    i++; // fail safe to prevent infinite loops
+    
+                    const roomCode = this.#_generateRoomCode(ROOM_CODE_LENGTH);
+                    console.log("createRoom: " + roomCode);
+    
+                    // TODO: validate numImposters to be greater than zero, and less than XX??
+    
+                    // TODO: validate numTasksToDo to be greater than zero, and less than tasklistObj.tasks.length
+    
+                    const docRef = this.#_roomRefForRoomCode(roomCode);
+                    if (!(await getDoc(docRef)).exists()) {
+                        
+                        console.log("creating room doc " + roomCode);
+                        
+                        await setDoc(docRef, new Room(roomCode, adminId, roomCode, null, tasklistObj, numImposters, numTasksToDo));
+                        return this.getRoom(roomCode);
+                    }
+                } catch (error) {
+                    if (error instanceof FirebaseError) {
+                        console.log("caught FirebaseError: " + error + ". Rethrowing!");
+                        throw error;
+                    }
+                }
+            }
         }
     }
 
@@ -156,8 +171,8 @@ export class Room {
         return result;
     }
 
-    static #_roomRefForAdmin(adminId) {
-        return doc(db, "rooms", adminId).withConverter(roomConverter);
+    static #_roomRefForRoomCode(roomCode) {
+        return doc(db, "rooms", roomCode).withConverter(roomConverter);
     }
 
     /**
@@ -173,15 +188,19 @@ export class Room {
      * @param {String} adminId The unique identifier provided by firebase
      * @returns A Room object belonging to the admin defined by `adminId`.
      */
-    static async getRoom(adminId) {
+    // static async getRoom(adminId) {
+    static async getRoom(roomCode) {
+        if (roomCode == null) {
+            throw new RoomNotExistError("null roomCode");
+        }
         // Currently, support admin having only one room.
         // const docRef = doc(db, "rooms", adminId).withConverter(roomConverter);
-        const docRef = this.#_roomRefForAdmin(adminId);
+        const docRef = this.#_roomRefForRoomCode(roomCode);
         const docSnap = await getDoc(docRef);
         if (docSnap.size > 1) {
-            throw new MoreThanOneRoomError("More than one roome exists for adminID " + adminId + ". Contact system adminstrator for help.");
+            throw new MoreThanOneRoomError("More than one roome with code " + roomCode + ". Contact system adminstrator for help.");
         } else if (!docSnap.exists()) {
-            throw new RoomNotExistError("No room for adminId: " + adminId);
+            throw new RoomNotExistError("No room with code: " + roomCode);
         }
     
         const room = docSnap.data();
@@ -215,10 +234,10 @@ export class Room {
      *                              to complete to win the game
      * @returns A Room object corresponding to the adminId
      */
-    static async getOrCreateRoom(adminId, tasklistObj, numImposters, numTasksToDo) {
+    static async getOrCreateRoom(roomCode, adminId, tasklistObj, numImposters, numTasksToDo) {
         let room = null;
         try {
-            room = await Room.getRoom(adminId);
+            room = await Room.getRoom(roomCode);
         } catch (error) {
             if (error instanceof RoomNotExistError) {
                 room = Room.createRoom(adminId, tasklistObj, numImposters, numTasksToDo);
@@ -236,7 +255,7 @@ export class Room {
             this.getNumImposters() !== numImposters                             ||
             this.getNumTasksToDo() !== numTasksToDo) 
         {
-            const docRef = Room.#_roomRefForAdmin(this.getAdminId());
+            const docRef = Room.#_roomRefForRoomCode(this.getRoomCode());
             this.setTaskList(tasklistObj);
             this.setNumImposters(numImposters);
             this.setNumTasksToDo(numTasksToDo);
@@ -245,7 +264,7 @@ export class Room {
                 numImposters: numImposters,
                 numTasksToDo: numTasksToDo
             });
-            console.log("successfully updated room document " + this.getRoomId());
+            console.log("successfully updated room " + this.getRoomCode());
         }
         return this;
     }
@@ -254,7 +273,7 @@ export class Room {
      * TODO:
      * @param {*} code 
      */
-    static async deleteRoom(code) {
+    static async deleteRoom(room) {
         // remove all players from room
 
         // then delete this instance of room from the databse
