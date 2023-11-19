@@ -22,8 +22,8 @@ export class Player {
     // TODO: gain consensus on the following vars
     #roomCode;
     #taskList; // how to associate tasklist with player
-    #isImposter
-    #calledMeeting
+    #isImposter;
+    #calledMeeting;
 
     constructor( name, roomCode) {
         this.#id = "0";
