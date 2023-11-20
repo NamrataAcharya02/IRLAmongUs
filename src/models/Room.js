@@ -215,6 +215,10 @@ export class Room {
         return query(collection(db, "rooms"), where("code", "==", roomCode)).withConverter(roomConverter);
     }
 
+    static #_roomsQueryForCode(roomCode) {
+        return query(collection(db, "rooms"), where("code", "==", roomCode)).withConverter(roomConverter);
+    }
+
     /**
      * Query the database for the unique room belonging to the admin as defined by
      * the parameter `adminId`.
