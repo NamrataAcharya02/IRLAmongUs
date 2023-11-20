@@ -211,13 +211,9 @@ export class Room {
         return doc(db, "rooms", roomCode).withConverter(roomConverter);
     }
 
-    static #_roomsQueryForCode(roomCode) {
-        return query(collection(db, "rooms"), where("code", "==", roomCode)).withConverter(roomConverter);
-    }
-
-    static #_roomsQueryForCode(roomCode) {
-        return query(collection(db, "rooms"), where("code", "==", roomCode)).withConverter(roomConverter);
-    }
+    // static #_roomsQueryForCode(roomCode) {
+    //     return query(collection(db, "rooms"), where("code", "==", roomCode)).withConverter(roomConverter);
+    // }
 
     /**
      * Query the database for the unique room belonging to the admin as defined by
@@ -356,36 +352,34 @@ export class Room {
      * @returns {Room} The room object associated with the roomCode sent in
      */
     static async joinRoom(roomCode, playerId) {
-        // get the room reference
-        const roomsQuery = this.#_roomsQueryForCode(roomCode);
+        try {
+            let room = await Room.getRoom(roomCode);
+            
+            // only add the player to this rooms `players` list if it doesn't exist in it
+            if (room.getPlayers().includes(playerId)) {
+                console.log("Player " + playerId + " already in room " + roomCode);
+                return room;
+            }
+            
+            // update the room retrieved from the database
+            room.addPlayer(playerId);
 
-        // get the room object
-        const roomsQuerySnap = await getDocs(roomsQuery);
-
-        // list of documents, if any, in the query snapshot
-        var roomDocData = roomsQuerySnap.docs.map((doc) => { return doc.data(); });
-        if (roomsQuerySnap.empty) {
-            throw new RoomNotExistError("Room "+ roomCode + " does not exist");
-        } else if (roomsQuerySnap.size > 1) {
-            throw new MoreThanOneRoomError("Multiple rooms with code " + roomCode + ".");
-        }
-        let room = roomDocData[0];
-        
-        // only add the player to this rooms `players` list if it doesn't exist in it
-        if (room.getPlayers().includes(playerId)) {
-            console.log("Player " + playerId + " already in room " + roomCode);
+            // update database
+            const roomDocRef = this.#_roomRefForRoomCode(room.getRoomCode());
+            await updateDoc(roomDocRef, {
+                players: arrayUnion(playerId)
+            });
+            console.log("performed array union");
             return room;
+
+            
+        } catch (error) {
+            if (error instanceof RoomNotExistError) {
+                throw error;
+            } else {
+                throw error;
+            }
         }
-
-        // update the room retrieved from the database
-        room.addPlayer(playerId);
-
-        // update database
-        const roomDocRef = this.#_roomRefForRoomCode(room.getRoomCode());
-        await updateDoc(roomDocRef, {
-            players: arrayUnion(playerId)
-        });
-        return room;
     }
 
     /**
