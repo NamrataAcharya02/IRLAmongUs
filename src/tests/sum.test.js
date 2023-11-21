@@ -1,5 +1,5 @@
 import React from 'react';
-import sum from '../devleopment-components/sum.js'
+import sum from '../development-components/sum';
 
 //tests sum from sum.js
 
