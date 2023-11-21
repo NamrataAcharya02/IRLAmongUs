@@ -104,7 +104,7 @@ function Pages(){
                                     <Link to="/lobby">
                                         <button 
                                             className="enter2"
-                                            onClick={() => dispatch(setValue(nickname))}
+                                            onClick={setValue(nickname)}
                                         >
                                             Enter
                                         </button>
