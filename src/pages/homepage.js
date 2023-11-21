@@ -3,12 +3,12 @@
 import React, {useState, useId} from "react";
 import Popup from 'reactjs-popup';
 import PlayerWaiting from "./PlayerWaiting.js";
-import { useSelector, useDispatch } from 'react-redux'
+// import { useSelector, useDispatch } from 'react-redux'
 import { setValue } from '../components/counter/counterSlice.js'
 import background from "../images/stars-background.jpg";
 
 import { useNavigate } from 'react-router-dom';
-import { redirect } from "react-router-dom";
+// import { redirect } from "react-router-dom";
 import {Link} from "react-router-dom";
 import "../style/homepage.css";
 
@@ -53,8 +53,8 @@ function Pages(){
         }
     });
 
-    const count = useSelector(state => state.counter.value)
-    const dispatch = useDispatch()
+    // const count = useSelector(state => state.counter.value)
+    // const dispatch = useDispatch()
 
     
 
