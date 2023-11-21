@@ -82,8 +82,10 @@ const AdminPage = () => {
   const startRoom = async () => {
     try {
       let adminId = "30000000"; // Dummy for dev purposes
+      let roomCode = '1234';
       const newRoom = await Room.getOrCreateRoom(
         adminId,
+        roomCode,
         tasklistObj,
         numImposters,
         numTasksToDo
