@@ -3,6 +3,7 @@
 import React, {useState, useId} from "react";
 import Popup from 'reactjs-popup';
 import PlayerWaiting from "./PlayerWaiting.js";
+import { Admin } from "../models/Admin.js";
 import { useSelector, useDispatch } from 'react-redux'
 import { setValue } from '../components/counter/counterSlice.js'
 import background from "../images/stars-background.jpg";
@@ -41,12 +42,14 @@ function Pages(){
         signInWithPopup(auth, googleAuthProvider)
         .then(function(){
             console.log("REDIRECTED")
+           
             navigate('/adminpage');
         });
     }
 
     onAuthStateChanged(auth, function(user) {
         if (user) {
+            Admin.getOrCreateAdmin(auth.currentUser.uid, {"taskList": ["test"]});
           // User is signed in.
         } else {
           // No user is signed in.

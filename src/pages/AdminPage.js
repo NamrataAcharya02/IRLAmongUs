@@ -5,9 +5,11 @@ import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { Room } from "../models/Room";
 import { Task, TaskList } from "../models/TaskList.js";
+import {Admin} from "../models/Admin.js";
 import background from "../images/stars-background.jpg";
 import FrontendTaskList from "../components/TaskListComponent.js";
 import { useNavigate } from 'react-router-dom';
+import {auth, googleAuthProvider} from "../firebase";
 
 let room = null;
 
@@ -15,6 +17,7 @@ const AdminPage = () => {
   const [data, setData] = useState(0);
   const [tasklist, setTasklist] = useState([]) //object that stores tasklist
   const [listName, setListName] = useState("") //name of tasklist
+  var tasklistObject = null;
   console.log(tasklist)
 
   //handle adding a task, adds an extra input field and new task object to tasklist
@@ -36,10 +39,15 @@ const AdminPage = () => {
   //handle saving the tasklist (incomplete)
   //This creates a new tasklist object and prints it to console
   const handleSaveTasklist = async () => {
-    const list = [...tasklist]
-    const tasklistObj = new TaskList(listName, list)
+    const list = [...tasklist];
+    const tasklistObj = new TaskList(listName, list);
+    tasklistObject = tasklistObj;
+    let admin = await Admin.getAdmin(auth.currentUser.uid);
+    console.log(admin)
 
-    console.log(tasklistObj)
+    //await admin.updateAdminTasklists(tasklistObj);
+
+    console.log(tasklistObj);
     /*
     let adminId = "60000000";     // Dummy for dev purposes
       try {
@@ -80,15 +88,16 @@ const AdminPage = () => {
 
   //function to create a room
   const startRoom = async () => {
+    console.log("Current user", auth.currentUser.uid);
     try {
-      let adminId = "30000000"; // Dummy for dev purposes
+      let adminId = auth.currentUser.uid; // Dummy for dev purposes
       const newRoom = await Room.getOrCreateRoom(
         adminId,
-        tasklistObj,
+        tasklistObject,
         numImposters,
         numTasksToDo
       );
-      await newRoom.updateRoom(tasklistObj, numImposters, numTasksToDo);
+      await newRoom.updateRoom(tasklistObject, numImposters, numTasksToDo);
       setRoom(newRoom);
       navigate("/room");
     } catch (error) {
