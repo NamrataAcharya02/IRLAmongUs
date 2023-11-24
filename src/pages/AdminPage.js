@@ -6,7 +6,6 @@ import { Link } from "react-router-dom";
 import { Room } from "../models/Room";
 import { Task, TaskList } from "../models/TaskList.js";
 import background from "../images/stars-background.jpg";
-import FrontendTaskList from "../components/TaskListComponent.js";
 import { useNavigate } from 'react-router-dom';
 
 let room = null;
@@ -82,8 +81,10 @@ const AdminPage = () => {
   const startRoom = async () => {
     try {
       let adminId = "30000000"; // Dummy for dev purposes
+      let roomCode = '1234';
       const newRoom = await Room.getOrCreateRoom(
         adminId,
+        roomCode,
         tasklistObj,
         numImposters,
         numTasksToDo
