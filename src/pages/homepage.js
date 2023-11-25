@@ -103,8 +103,7 @@ function Pages(){
                                     </button>
                                     <Link to="/lobby">
                                         <button 
-                                            className="enter2"
-                                            onClick={setValue(nickname)}
+                                            className="enter2"                                            
                                         >
                                             Enter
                                         </button>
