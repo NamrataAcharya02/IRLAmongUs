@@ -25,16 +25,19 @@ function PlayerGame(){
         setEmergencyScreen(!isEmergencyScreen);
     };
 
+    //function to add 1 to currentComplete (tracks number of completed tasks)
     function completeATask(){
         setComplete(currentComplete + 1);
     }
-    
+    //function to calculate total number of tasks (toComplete) based on number of crewmates and number of tasks per crewmate
     function setNumTasksToComplete(numCrewmates, numTasksPerCrewmate){
         setToComplete(numCrewmates * numTasksPerCrewmate);
     }
 
     return (
         <div className="center" style={{paddingTop: "20px"}}>
+            {/* Progress bar shows how many tasks completed (currentComplete) out of total tasks (toComplete) */}
+            <h4>Total Tasks Completed</h4>
             <progress value={currentComplete} max={toComplete}></progress>
             <button onClick={completeATask}>Complete a Task</button>
             <FrontendTaskList></FrontendTaskList>
