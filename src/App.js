@@ -9,6 +9,7 @@ import Pages from "./pages/homepage";
 import AdminPage from './pages/AdminPage';
 import PlayerWaiting from './pages/PlayerWaiting';
 import AdminRoom from './pages/AdminRoom';
+import PlayerGame from './pages/PlayerGame';
 
 // react hooks
 import { useAuthState } from 'react-firebase-hooks/auth';
@@ -26,14 +27,16 @@ import { useCollectionData } from 'react-firebase-hooks/firestore';
 // }
 function App(){
   return(
-      <Router>
-        <Routes>
-            <Route path="/" element={<Pages />} />
-            <Route path="adminpage" element={<AdminPage />} />
-            <Route path="lobby" element={<PlayerWaiting />} />
-            <Route path="room" element={<AdminRoom />} />
-        </Routes>
-      </Router>
+    
+    <Router>
+       <Routes>
+          <Route path="/" element={<Pages />} />
+          <Route path="adminpage" element={<AdminPage />} />
+          <Route path="lobby" element={<PlayerWaiting />} />
+          <Route path="room" element={<AdminRoom />} />
+          <Route path="game" element={<PlayerGame />} />
+       </Routes>
+    </Router>
   )
 }
 export default App;
