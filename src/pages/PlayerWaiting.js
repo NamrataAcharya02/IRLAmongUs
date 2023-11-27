@@ -1,10 +1,9 @@
 import React, {useState} from "react";
 import {Link} from "react-router-dom";
-import { useSelector } from 'react-redux'
 import background from "../images/stars-background.jpg";
 
 function PlayerWaiting(){
-    const nickname = useSelector(state => state.counter.value)
+    const nickname = "pull me from the db"
     return (
         <div className="center" style={{ backgroundImage: `url(${background})` }}>
         <Link to="/">
