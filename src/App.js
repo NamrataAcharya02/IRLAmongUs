@@ -26,15 +26,14 @@ import { useCollectionData } from 'react-firebase-hooks/firestore';
 // }
 function App(){
   return(
-    
-    <Router>
-       <Routes>
-          <Route path="/" element={<Pages />} />
-          <Route path="adminpage" element={<AdminPage />} />
-          <Route path="lobby" element={<PlayerWaiting />} />
-          <Route path="room" element={<AdminRoom />} />
-       </Routes>
-    </Router>
+      <Router>
+        <Routes>
+            <Route path="/" element={<Pages />} />
+            <Route path="adminpage" element={<AdminPage />} />
+            <Route path="lobby" element={<PlayerWaiting />} />
+            <Route path="room" element={<AdminRoom />} />
+        </Routes>
+      </Router>
   )
 }
 export default App;
