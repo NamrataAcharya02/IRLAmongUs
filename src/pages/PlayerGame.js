@@ -25,7 +25,6 @@ function PlayerGame(){
 
     return (
         <div className="center">
-            <FrontendTaskList></FrontendTaskList>
             {/* emergency meeting called screen */}
             {isEmergencyScreen && (
                 <div className="overlay">
