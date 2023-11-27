@@ -58,18 +58,20 @@
  */
 
 import { 
+    QuerySnapshot,
     arrayUnion,
     collection,
+    deleteDoc,
     doc,
+    documentId,
     getDoc,
     getDocs,
+    onSnapshot,
     query,
     serverTimestamp,
     setDoc,
     updateDoc, 
-    where,
-
-    Firestore
+    where
 } from "firebase/firestore";
 
 import { db } from "../firebase";
@@ -94,6 +96,8 @@ export class Room {
     #numImposters;
     #numTasksToDo;
     #players; // TODO: convert to Player
+    
+    #callback;
     constructor(id, adminId, code, createdAt, tasklistObj, numImposters, numTasksToDo) { 
         this.#id = id;
         this.#adminId = adminId;
@@ -103,6 +107,10 @@ export class Room {
         this.#numImposters = numImposters;
         this.#numTasksToDo = numTasksToDo;
         this.#players = [];
+
+        this.#callback = null;
+
+        this.#addDocSnapshotListener();
     }
 
     getRoomId() { return this.#id; }
@@ -123,7 +131,97 @@ export class Room {
     setNumTasksToDo(numTasksToDo) { this.#numTasksToDo = numTasksToDo; }
     setPlayers(players) { this.#players = players; }
 
+    /**
+     * A hacky way to trigger frontend component updates taken from 
+     * https://stackoverflow.com/questions/53215285/how-can-i-force-a-component-to-re-render-with-hooks-in-react/53215514#53215514
+     * 
+     * This callback should be written in the front end as:
+     * 
+     * const forceUpdate = React.useReducer(() => ({}))[1];
+     * 
+     * Note: This callback is not secure, as it passes a function from the frontend to
+     * the backend that is run during a database update. This feels like it
+     * has latent security risks, so we want to find a way around this hack,
+     * but for the time being, we yield in the name of getting the project out
+     * the gate.
+     *  
+     * @param {React.Reducer} callback Method used to re-render the front end component
+     */
+    addCallback(callback) {
+        console.log("room adding callback");
+        this.#callback = callback;
+    }
+
     addPlayer(player) { this.#players.push(player); }
+
+    #__updateFromSnapshot(snapData) {
+        console.log("updating");
+        this.#id = snapData.id;
+        this.#adminId = snapData.adminId;
+        this.#code = snapData.code;
+        this.#createdAt = snapData.createdAt;
+        this.#tasklistObj = snapData.tasklistObj;
+        this.#numImposters = snapData.numImposters;
+        this.#numTasksToDo = snapData.numTasksToDo;
+        if (this.#callback != null) {
+            console.log("running callback in room");
+            this.#callback();
+        }
+        console.log("finished");
+        // this.#players = [];
+    }
+
+    // #addDocSnapshotListener() {
+    //     console.log("registering DocSnapshotListener for Room " + this.getRoomCode());
+    //     const docRef = doc(db, "rooms", this.getRoomCode());
+    //     this.unsub = onSnapshot(docRef, 
+    //         docSnap => {
+    //             console.log("onSnapshot triggerd");
+    //             try {
+    //                 console.log(docSnap.data());
+    //                 this.#__updateFromSnapshot(docSnap.data());
+    //             } catch (e) {
+    //                 if (e instanceof TypeError) {
+    //                     if (e.toString().includes("Cannot read properties of undefined")) {
+    //                         console.log('undefined caught');
+    //                     } else {
+    //                         throw e;
+    //                     }
+    //                 }
+    //             }
+    //         },
+    //         (err) => {
+    //             console.log("error while handling snapshot: " + err);
+    //         }
+    //         );
+    // }
+    #addDocSnapshotListener() {
+        console.log("registering DocSnapshotListener for Room " + this.getRoomCode());
+        const docQuery = query(collection(db, "rooms"), where(documentId(), "==", this.getRoomCode()));
+
+        this.unsub = onSnapshot(docQuery, 
+            snapshot => {
+                console.log("onSnapshot triggered");
+                snapshot.docChanges().forEach((change) => {
+                    if (change.type === "added") {
+                        console.log("New room: ", change.doc.data());
+                    }
+                    if (change.type === "modified") {
+                        const docData = change.doc.data();
+                        console.log("Modified room: ", docData.id);
+                        this.#__updateFromSnapshot(docData);
+                    }
+                    if (change.type === "removed") {
+                        console.log("Removed room: ", change.doc.data());
+                    }
+                  });
+            },
+            (err) => {
+                console.log("error while handling snapshot: " + err);
+            }
+            );
+    }
+
 
     /**
      * Create a room for game play. This method calls _generateRoomCode and ensures 
@@ -424,3 +522,18 @@ const roomConverter = {
         return room;
     }
 };
+
+export const removeExtraRooms = async () => {
+
+    try {
+        const ALLOWED_ROOMS = ["1966", "30000000"];
+        const qsnap = await getDocs(query(collection(db, "rooms"), where(documentId(), "not-in", ALLOWED_ROOMS)));
+        
+        qsnap.docs.forEach((doc) => {
+            console.log("deleting doc: " + doc.id );
+            deleteDoc(doc.ref);
+        });
+    } catch (e) {
+        console.log("removeExtraRooms Error: " + e);
+    }
+}
