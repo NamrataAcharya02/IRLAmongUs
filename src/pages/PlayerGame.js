@@ -2,7 +2,7 @@ import React, {useState} from "react";
 import {Link} from "react-router-dom";
 import { useSelector } from 'react-redux'
 import background from "../images/stars-background.jpg";
-
+import PlayerTaskList from "../components/PlayerTaskList";
 
 function PlayerGame(){
     const [isEmergencyScreen, setEmergencyScreen] = useState(false);
@@ -39,6 +39,10 @@ function PlayerGame(){
             <h4>Total Tasks Completed</h4>
             <progress value={currentComplete} max={toComplete}></progress>
             <button onClick={completeATask}>Complete a Task</button>
+
+            {/* Player's task list */}
+            <PlayerTaskList></PlayerTaskList>
+
             {/* emergency meeting called screen */}
             {isEmergencyScreen && (
                 <div className="overlay">
