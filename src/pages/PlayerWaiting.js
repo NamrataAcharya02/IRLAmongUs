@@ -16,6 +16,9 @@ function PlayerWaiting(){
             <h3>player lobby waiting screen here</h3>
             <PlayerTaskList></PlayerTaskList>
         </div>
+        <Link to="/game">
+            <button>To Temporary Player Screen</button>
+        </Link>
         </div>
     );
 }
