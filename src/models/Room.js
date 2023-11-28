@@ -96,6 +96,7 @@ export class Room {
     #numImposters;
     #numTasksToDo;
     #players; // TODO: convert to Player
+    #playerIds;
     
     #callback;
     constructor(id, adminId, code, createdAt, tasklistObj, numImposters, numTasksToDo) { 
@@ -107,6 +108,7 @@ export class Room {
         this.#numImposters = numImposters;
         this.#numTasksToDo = numTasksToDo;
         this.#players = [];
+        this.#playerIds = [];
 
         this.#callback = null;
 
@@ -121,7 +123,8 @@ export class Room {
     getNumImposters() { return this.#numImposters; }
     getNumTasksToDo() { return this.#numTasksToDo; }
     getPlayers() { return this.#players; }
-
+    getPlayerIds() { return this.#playerIds; }
+    
     setRoomId(id) { this.#id = id; }
     setAdminId(adminId) { this.#adminId = adminId; }
     setRoomCode(code) { this.#code = code; }
@@ -130,6 +133,7 @@ export class Room {
     setNumImposters(numImposters) { this.#numImposters = numImposters; }
     setNumTasksToDo(numTasksToDo) { this.#numTasksToDo = numTasksToDo; }
     setPlayers(players) { this.#players = players; }
+    setPlayerIds(playerIds) { this.#playerIds = playerIds; }
 
     /**
      * A hacky way to trigger frontend component updates taken from 
@@ -163,12 +167,12 @@ export class Room {
         this.#tasklistObj = snapData.tasklistObj;
         this.#numImposters = snapData.numImposters;
         this.#numTasksToDo = snapData.numTasksToDo;
+        this.#playerIds = snapData.players;
         if (this.#callback != null) {
             console.log("running callback in room");
             this.#callback();
         }
         console.log("finished");
-        // this.#players = [];
     }
 
     // #addDocSnapshotListener() {
@@ -454,13 +458,10 @@ export class Room {
             let room = await Room.getRoom(roomCode);
             
             // only add the player to this rooms `players` list if it doesn't exist in it
-            if (room.getPlayers().includes(playerId)) {
+            if (room.getPlayerIds().includes(playerId)) {
                 console.log("Player " + playerId + " already in room " + roomCode);
                 return room;
             }
-            
-            // update the room retrieved from the database
-            room.addPlayer(playerId);
 
             // update database
             const roomDocRef = this.#_roomRefForRoomCode(room.getRoomCode());
@@ -486,7 +487,15 @@ export class Room {
      * @param {*} playerId 
      */
     static async leaveRoom(code, playerId) {
-        // remove a player from an instance of a room
+        const room = await Room.getRoom(code);
+        const currPlayers = room.getPlayerIds();
+        try {
+            const updatedPlayers = currPlayers.splice(currPlayers.indexOf(playerId), 1);
+            const roomDocRef = this.#_roomRefForRoomCode(code);
+            await updateDoc(roomDocRef, {players: updatedPlayers});
+        } catch (err) {
+            console.log(err);
+        }
     }
 
 }
@@ -508,7 +517,7 @@ const roomConverter = {
             tasklist: room.getTaskList().tasks,
             numImposters: room.getNumImposters(),
             numTasksToDo: room.getNumTasksToDo(),
-            players: room.getPlayers(),
+            playerIds: room.getPlayerIds(),
             };
     },
     fromFirestore: (snapshot, options) => {
@@ -518,22 +527,7 @@ const roomConverter = {
             tasks: data.tasklist
         }
         let room = new Room(data.id, data.adminId, data.code, data.createdAt, tasklistObj, data.numImposters, data.numTasksToDo);
-        room.setPlayers(data.players);
+        room.setPlayerIds(data.playerIds);
         return room;
     }
 };
-
-export const removeExtraRooms = async () => {
-
-    try {
-        const ALLOWED_ROOMS = ["1966", "30000000"];
-        const qsnap = await getDocs(query(collection(db, "rooms"), where(documentId(), "not-in", ALLOWED_ROOMS)));
-        
-        qsnap.docs.forEach((doc) => {
-            console.log("deleting doc: " + doc.id );
-            deleteDoc(doc.ref);
-        });
-    } catch (e) {
-        console.log("removeExtraRooms Error: " + e);
-    }
-}
