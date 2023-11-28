@@ -2,12 +2,13 @@ import React, {useState} from "react";
 import {Link} from "react-router-dom";
 import { useSelector } from 'react-redux'
 import background from "../images/stars-background.jpg";
-import FrontendTaskList from "../components/TaskListComponent";
 
 
 function PlayerGame(){
     const [isEmergencyScreen, setEmergencyScreen] = useState(false);
     const [isMeetingRoom, setMeetingRoom] = useState(false);
+    const [currentComplete, setComplete] = useState(0);
+    const [toComplete, setToComplete] = useState(20);
 
     //function for toggling emergency screen to use (can also directly set emergency screen)
     const toggleEmergencyScreen = () => {
@@ -23,8 +24,21 @@ function PlayerGame(){
         setEmergencyScreen(!isEmergencyScreen);
     };
 
+    //function to add 1 to currentComplete (tracks number of completed tasks)
+    function completeATask(){
+        setComplete(currentComplete + 1);
+    }
+    //function to calculate total number of tasks (toComplete) based on number of crewmates and number of tasks per crewmate
+    function setNumTasksToComplete(numCrewmates, numTasksPerCrewmate){
+        setToComplete(numCrewmates * numTasksPerCrewmate);
+    }
+
     return (
-        <div className="center">
+        <div className="center" style={{paddingTop: "20px"}}>
+            {/* Progress bar shows how many tasks completed (currentComplete) out of total tasks (toComplete) */}
+            <h4>Total Tasks Completed</h4>
+            <progress value={currentComplete} max={toComplete}></progress>
+            <button onClick={completeATask}>Complete a Task</button>
             {/* emergency meeting called screen */}
             {isEmergencyScreen && (
                 <div className="overlay">
