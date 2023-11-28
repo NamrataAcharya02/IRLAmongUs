@@ -40,7 +40,6 @@ function PlayerGame(){
             <h4>Total Tasks Completed</h4>
             <progress value={currentComplete} max={toComplete}></progress>
             <button onClick={completeATask}>Complete a Task</button>
-            <FrontendTaskList></FrontendTaskList>
             {/* emergency meeting called screen */}
             {isEmergencyScreen && (
                 <div className="overlay">
