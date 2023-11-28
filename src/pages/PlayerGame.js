@@ -2,7 +2,6 @@ import React, {useState} from "react";
 import {Link} from "react-router-dom";
 import { useSelector } from 'react-redux'
 import background from "../images/stars-background.jpg";
-import FrontendTaskList from "../development-components/DevTaskListComponent.js";
 
 
 function PlayerGame(){
