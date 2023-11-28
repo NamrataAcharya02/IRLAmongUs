@@ -1,7 +1,6 @@
 import React, {useState} from "react";
 import {Link} from "react-router-dom";
 import background from "../images/stars-background.jpg";
-import PlayerTaskList from "../components/PlayerTaskList";
 
 function PlayerWaiting(){
     const nickname = "pull me from the db"
@@ -14,7 +13,6 @@ function PlayerWaiting(){
         <h2 className="waitingRoomh2">Room Code: pretend there's a code here</h2>
         <div className="player-lobby">
             <h3>player lobby waiting screen here</h3>
-            <PlayerTaskList></PlayerTaskList>
         </div>
         <Link to="/game">
             <button>To Temporary Player Screen</button>
