@@ -6,4 +6,21 @@ export default class AdminRoomController extends RoomController {
     constructor() {
         super();
     }
+
+    calculateMinMaxImposters() {}
+    calculateMinMaxTasksToComplete() {}
+    #determinePlayerRoles() {}
+    #assignPlayerRoles() {}
+
+    setGameParameters(paramsDict) {}
+    startGame() {}
+    displayGameCode() {}
+    endGame() {}
+    startVoting(){}
+    getVotingProgress() {}
+    endVoting() {}
+    getVotingResults() {}
+    finalizeVotingResults() {}
+    kickOutPlayer(playerId) {}
+    endMeeting() {}
 }
