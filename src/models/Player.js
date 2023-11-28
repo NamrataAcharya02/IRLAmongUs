@@ -6,6 +6,11 @@ import {
     updateDoc,
     deleteDoc, 
     collection,
+    onSnapshot,
+    query,
+    where,
+    arrayUnion,
+    serverTimestamp
 } from "firebase/firestore";
 
 import { db } from "../firebase";
@@ -25,6 +30,8 @@ export class Player {
     #isImposter;
     #calledMeeting;
 
+    #callback;
+
     constructor( name, roomCode) {
         this.#id = "0";
         this.#name = name;
@@ -35,6 +42,47 @@ export class Player {
         this.#taskList = [];
         this.#isImposter = false;
         this.#calledMeeting = false;
+
+        this.#callback = null;
+
+        this.#addDocSnapshotListener();
+    }
+
+    addCallback(callback) {
+        console.log("player adding callback");
+        this.#callback = callback;
+    }
+
+    #__updateFromSnapshot(snapData) {
+        console.log("updating");
+        this.#id = snapData.id;
+        this.#name = snapData.name;
+        this.#status = snapData.status;
+        this.#numVotesReceived = snapData.numVotesReceived;
+        this.#voteToCast = snapData.voteToCast;
+        this.#roomCode = snapData.roomCode;
+        this.#taskList = snapData.taskList;
+        this.#isImposter = snapData.isImposter;
+        this.#calledMeeting = snapData.calledMeeting;
+        if (this.#callback != null) {
+            console.log("running callback for player");
+            this.#callback();
+        }
+        console.log("finished");
+    }
+
+    #addDocSnapshotListener() {
+        const playerRef = doc(db, 'players', this.#id);
+
+        this.unsub = onSnapshot(playerRef, (docSnapshot) => {
+            if (docSnapshot.exists()) {
+                this.#__updateFromSnapshot(docSnapshot.data());
+            } else {
+                console.log("No player");
+            }
+        }, (error) => {
+            console.error("Error listening to pplayer updates: ", error);
+        });
     }
 
     //creates a player in the players collection
@@ -68,6 +116,7 @@ export class Player {
         }
     }
 
+
     //sets player as imposter
     async setAsImposter(){
         const playerRef = doc(db, "players", this.#id);
@@ -80,20 +129,23 @@ export class Player {
     }
 
     //returns imposter status of isImposter
-    async getImposterStatus() {
-        const playerRef = doc(db, 'players', this.id);
-        try {
-            const docSnap = await getDoc(playerRef);
-
-            if (docSnap.exists()) {
-                this.#isImposter = docSnap.data().isImposter;
-                return this.#isImposter;
-            } else {
-                console.log('No document');
-            }
-        } catch (error) {
-            console.error('Error', error);
-        }
+    //async getImposterStatus() {
+      //  const playerRef = doc(db, 'players', this.id);
+        //try {
+          //  const docSnap = await getDoc(playerRef);
+//
+  //          if (docSnap.exists()) {
+    //            this.#isImposter = docSnap.data().isImposter;
+      //          return this.#isImposter;
+        //    } else {
+          //      console.log('No document');
+            //}
+        //} catch (error) {
+          //  console.error('Error', error);
+        //}
+    //}
+    async gettImposterStatus() {
+        return this.#isImposter;
     }
 
     //changes name for player
@@ -109,19 +161,7 @@ export class Player {
 
     //returns name
     async getName() {
-        const playerRef = doc(db, 'players', this.id);
-        try {
-            const docSnap = await getDoc(playerRef);
-
-            if (docSnap.exists()) {
-                this.#name = docSnap.data().name;
-                return this.#name;
-            } else {
-                console.log('No document');
-            }
-        } catch (error) {
-            console.error('Error', error);
-        }
+        return this.#name;
     }
     //sets calledMeeting to true
     async callMeeting() {
@@ -136,19 +176,7 @@ export class Player {
 
     //returns meeting status of player
     async getMeetingStatus() {
-        const playerRef = doc(db, 'players', this.id);
-        try {
-            const docSnap = await getDoc(playerRef);
-
-            if (docSnap.exists()) {
-                this.#calledMeeting = docSnap.data().calledMeeting;
-                return this.#calledMeeting;
-            } else {
-                console.log('No document');
-            }
-        } catch (error) {
-            console.error('Error', error);
-        }
+        return this.#calledMeeting;
     }
 
     //sets the room code for player
@@ -164,19 +192,7 @@ export class Player {
 
     //gets the room code for player, returns roomCode
     async getRoomCode() {
-        const playerRef = doc(db, 'players', this.id);
-        try {
-            const docSnap = await getDoc(playerRef);
-
-            if (docSnap.exists()) {
-                this.#roomCode = docSnap.data().roomCode;
-                return this.#roomCode;
-            } else {
-                console.log('No document');
-            }
-        } catch (error) {
-            console.error('Error', error);
-        }
+        return this.#roomCode;
     }
 
     //sets player status to dead
@@ -192,19 +208,7 @@ export class Player {
 
     //returns player status
     async getStatus() {
-        const playerRef = doc(db, 'players', this.id);
-        try {
-            const docSnap = await getDoc(playerRef);
-
-            if (docSnap.exists()) {
-                this.#status = docSnap.data().status;
-                return this.#status;
-            } else {
-                console.log('No document');
-            }
-        } catch (error) {
-            console.error('Error', error);
-        }
+        return this.#status;
     }
 
     //set the number of votes the player received in meeting
@@ -220,19 +224,7 @@ export class Player {
 
     //get the number of votes the player received in meeting
     async getVotesReceived() {
-        const playerRef = doc(db, 'players', this.id);
-        try {
-            const docSnap = await getDoc(playerRef);
-
-            if (docSnap.exists()) {
-                this.#numVotesReceived = docSnap.data().numVotesReceived;
-                return this.#numVotesReceived;
-            } else {
-                console.log('No document');
-            }
-        } catch (error) {
-            console.error('Error', error);
-        }
+        return this.#numVotesReceived;
     }
 
     //sets player to be voted out, voteToCast set to true
@@ -248,19 +240,7 @@ export class Player {
 
     //returns vote status, true means player has been voted out
     async getVoteStatus() {
-        const playerRef = doc(db, 'players', this.id);
-        try {
-            const docSnap = await getDoc(playerRef);
-
-            if (docSnap.exists()) {
-                this.#voteToCast = docSnap.data().voteToCast;
-                return this.#voteToCast;
-            } else {
-                console.log('No document');
-            }
-        } catch (error) {
-            console.error('Error', error);
-        }
+        return this.#voteToCast;
     }
 
     //sets the players task list
@@ -275,18 +255,7 @@ export class Player {
     }
 
     async getTaskList() {
-        const playerRef = doc(db, 'players', this.id);
-        try {
-            const docSnap = await getDoc(playerRef);
-
-            if (docSnap.exists()) {
-                this.#taskList = docSnap.data().taskList;
-                return this.#taskList;
-            } else {
-                console.log('No document');
-            }
-        } catch (error) {
-            console.error('Error', error);
-        }
+        return this.#taskList;
     }
+
 }
