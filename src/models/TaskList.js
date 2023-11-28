@@ -1,7 +1,8 @@
 export class Task {
-    constructor(description) {
+    constructor(description, visible) {
         this.description = description;
         this.completed = false;
+        this.visible = visible;
     }
  
     // Method to mark the task as completed
@@ -38,3 +39,31 @@ export class TaskList {
         console.log("num of tasks of deleting: " + this.tasks.length);
     }
 }
+
+/**
+ * Firestore converter for TaskList. 
+ */
+export const taskListConverter = {
+    toFirestore(taskList) {
+        const tasks = taskList.tasks.map((task) => {
+            return {
+                taskDescription: task.description,
+                complete: task.completed,
+                visible: task.visible,
+            };
+        });
+  
+        return {
+            name: taskList.name,
+            tasks: tasks,
+        };
+    },
+    fromFirestore(snapshot) {
+        const data = snapshot.data();
+        const tasks = data.tasks.map((taskData) => {
+            return new Task(taskData.description, taskData.complete, taskData.visible);
+        });
+        
+        return new TaskList(data.name, tasks);
+    },
+};
