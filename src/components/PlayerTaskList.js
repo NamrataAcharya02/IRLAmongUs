@@ -48,7 +48,7 @@ function PlayerTaskList() {
 
     //displays the list of tasks and updates them
 	return( 
-        <ul>
+        <ul className="centered-lists">
 		    {tasks.map((task) => (task.visible && (
                 <div className="task">
                     <h3>
