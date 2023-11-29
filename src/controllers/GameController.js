@@ -1,6 +1,6 @@
 import { Room } from "../models/Room";
 
-export default class RoomController {
+export default class GameController {
     room;   // Room object
     user;   // TODO: User object (user would be super to Admin and Player)
     observerCallback;   // "callback" function

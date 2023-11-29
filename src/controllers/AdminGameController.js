@@ -1,6 +1,6 @@
-import RoomController from "./RoomController";
+import GameController from "./GameController";
 
-export default class AdminRoomController extends RoomController {
+export default class AdminGameController extends GameController {
     admin;  // actual Admin object
     players; // actual list of Player objects that are watched by admin
             // each player must have a listener added

@@ -1,6 +1,6 @@
-import RoomController from "./RoomController";
+import GameController from "./GameController";
 
-export default class PlayerRoomController extends RoomController {
+export default class PlayerGameController extends GameController {
     player; // Player object
 
     constructor() {
@@ -10,6 +10,13 @@ export default class PlayerRoomController extends RoomController {
     joinRoom(roomCode) {
         // set user room to roomCode
         // set room from the return of calling Room.joinRoom
+    }
+
+    setTasks() {
+        // generate from room.tasklist.tasks a randomized list of 
+        // N = room.numTasksToComplete tasks.
+
+        // update player object with the generated list
     }
 
     leaveRoom() {
