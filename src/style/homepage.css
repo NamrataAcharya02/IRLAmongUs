@@ -267,10 +267,6 @@ main {
     display: flex;
     justify-content: space-between;
     background-color: #555e6bbc;
-    padding-top: 5px;
-    padding-bottom: 5px;
-    padding-left: 5px;
-    padding-right: 5px;
     position: relative;
     margin-bottom: 8px;
     margin-left: 0px;
@@ -315,6 +311,7 @@ main {
     position:fixed;
     width:100%;
     height:100%;
+    overflow-y: scroll;
     top:0px;
     left:0px;
     z-index:1000;
@@ -327,3 +324,11 @@ progress{
     border:2px solid rgb(255, 255, 255);
 
 }
+
+.centered-lists{
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+

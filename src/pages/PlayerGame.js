@@ -3,16 +3,21 @@ import {Link} from "react-router-dom";
 import { useSelector } from 'react-redux'
 import background from "../images/stars-background.jpg";
 import PlayerTaskList from "../components/PlayerTaskList";
+import VoteScreen from "../components/VoteScreen";
+import useSound from 'use-sound';
+import meetingSound from '../sounds/meetingSFX.mp3'
 
 function PlayerGame(){
     const [isEmergencyScreen, setEmergencyScreen] = useState(false);
     const [isMeetingRoom, setMeetingRoom] = useState(false);
     const [currentComplete, setComplete] = useState(0);
     const [toComplete, setToComplete] = useState(20);
+    const [playSound] = useSound(meetingSound);
 
     //function for toggling emergency screen to use (can also directly set emergency screen)
     const toggleEmergencyScreen = () => {
         setEmergencyScreen(!isEmergencyScreen);
+        playSound();
     };
     //function for toggling emergency meeting room screen
     const toggleMeetingRoom = () => {
@@ -52,6 +57,7 @@ function PlayerGame(){
                         {isMeetingRoom && (
                             <div className="overlay-meeting">
                                 <h1>EMERGENCY MEETING ROOM</h1>
+                                <VoteScreen></VoteScreen>
                                 <div className="center">
                                     <button onClick={leaveMeetingRoom}>Leave Meeting Room</button>
                                 </div>
