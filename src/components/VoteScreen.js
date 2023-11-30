@@ -26,29 +26,31 @@ function VoteScreen() {
 	return( 
         <div className="center">
             {/* lists live players */}
-            {!voted && (
-                <div className="center">                   
-                    <ul className="centered-lists">
-                        {players.map((player) => (
-                            <div>
-                                <button onClick={() => setSelectedPlayer(player)}>
-                                    {player.name}
-                                </button>
-                            </div>
-                        ))}
-                    </ul>
-                    <h1>Vote for: {selectedPlayer ? selectedPlayer.name : "N/A"}</h1>
-                    {selectedPlayer && (<button onClick={() => submitVote(selectedPlayer.playerId)}>Submit Vote</button>)}
-                </div>
-            )}
-            {voted && (
-                <div className="center">
-                    <div>
-                        <h1>You voted for</h1>
-                        <h1>{selectedPlayer.name}</h1>
-                    </div>              
-                </div>                
-            )}
+            <div className="voteScreenBox">
+                {!voted && (
+                    <div className="center">                   
+                        <ul className="centered-lists">
+                            {players.map((player) => (
+                                <div>
+                                    <button onClick={() => setSelectedPlayer(player)}>
+                                        {player.name}
+                                    </button>
+                                </div>
+                            ))}
+                        </ul>
+                        <h2 className="whiteh2">Vote for: {selectedPlayer ? selectedPlayer.name : "N/A"}</h2>
+                        {selectedPlayer && (<button onClick={() => submitVote(selectedPlayer.playerId)}>Submit Vote</button>)}
+                    </div>
+                )}
+                {voted && (
+                    <div className="center">
+                        <div>
+                            <h1>You voted for</h1>
+                            <h1>{selectedPlayer.name}</h1>
+                        </div>              
+                    </div>                
+                )}
+            </div>
         </div>
     );
 } 
