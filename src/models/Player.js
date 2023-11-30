@@ -29,6 +29,7 @@ export class Player {
     #taskList; // how to associate tasklist with player
     #isImposter;
     #calledMeeting;
+    #numTasksCompleted;
 
     #callback;
 
@@ -39,9 +40,10 @@ export class Player {
         this.#numVotesReceived = 0;
         this.#voteToCast = false;
         this.#roomCode = roomCode;
-        this.#taskList = [];
+        this.#taskList;
         this.#isImposter = false;
         this.#calledMeeting = false;
+        this.#numTasksCompleted = 0;
 
         this.#callback = null;
 
@@ -52,6 +54,15 @@ export class Player {
         console.log("player adding callback");
         this.#callback = callback;
     }
+
+    playerID(id){this.#id = id;}
+    playerStatus(status){this.#status = status;}
+    playerNumVotesReceived(votes){this.#numVotesReceived = votes;}
+    playerVoteToCast(status){this.#voteToCast = status;}
+    playerTaskList(taskList){this.#taskList = taskList;}
+    playerIsImposter(status){this.#isImposter = status;}
+    playerCalledMeeting(status){this.#calledMeeting = status;}
+    playerNumTasksCompleted(num){this.#numTasksCompleted = num;}
 
     #__updateFromSnapshot(snapData) {
         console.log("updating");
@@ -99,7 +110,8 @@ export class Player {
             roomCode: this.#roomCode,
             taskList: this.#taskList,
             isImposter: this.#isImposter,
-            calledMeeting: this.#calledMeeting
+            calledMeeting: this.#calledMeeting,
+            numTasksCompleted: this.#numTasksCompleted
         });
         
 
@@ -118,11 +130,11 @@ export class Player {
 
 
     //sets player as imposter
-    async setAsImposter(){
+    async setImposterStatus(status){
         const playerRef = doc(db, "players", this.#id);
         try{
-            await updateDoc(playerRef, { isImposter: true });
-            this.#isImposter = true;
+            await updateDoc(playerRef, { isImposter: status });
+            this.#isImposter = status;
         } catch (error) {
             console.error('Error', error);            
         }
@@ -144,8 +156,22 @@ export class Player {
           //  console.error('Error', error);
         //}
     //}
-    async gettImposterStatus() {
+    async getImposterStatus() {
         return this.#isImposter;
+    }
+
+    async setId(idCode) {
+        const playerRef = doc(db, "players", this.#id);
+        try{
+            await updateDoc(playerRef, { id: idCode });
+            this.#id = idCode;
+        } catch (error) {
+            console.error('Error', error);            
+        }
+    }
+
+    async getId(){
+        return this.#id;
     }
 
     //changes name for player
@@ -164,11 +190,11 @@ export class Player {
         return this.#name;
     }
     //sets calledMeeting to true
-    async callMeeting() {
+    async setCallMeetingStatus(status) {
         const playerRef = doc(db, "players", this.#id);
         try{
-            await updateDoc(playerRef, { calledMeeting: true });
-            this.#calledMeeting = true;
+            await updateDoc(playerRef, { calledMeeting: status });
+            this.#calledMeeting = status;
         } catch (error) {
             console.error('Error', error);            
         }
@@ -196,11 +222,11 @@ export class Player {
     }
 
     //sets player status to dead
-    async setDead() {
+    async setAliveStatus(status) {
         const playerRef = doc(db, 'players', this.id);
         try {
-            await updateDoc(playerRef, {status: "dead"});
-            this.#status = "dead";
+            await updateDoc(playerRef, {status: status});
+            this.#status = status;
         } catch (error) {
             console.error('Error', error);
         }
@@ -228,11 +254,11 @@ export class Player {
     }
 
     //sets player to be voted out, voteToCast set to true
-    async voteOut() {
+    async setVoteOut(status) {
         const playerRef = doc(db, 'players', this.id);
         try {
-            await updateDoc(playerRef, {voteToCast: true});
-            this.#voteToCast = true;
+            await updateDoc(playerRef, {voteToCast: status});
+            this.#voteToCast = status;
         } catch (error) {
             console.error('Error', error);
         }
@@ -258,4 +284,42 @@ export class Player {
         return this.#taskList;
     }
 
+    
+
+    async getNumTasksCompleted(){
+        return this.#numTasksCompleted;
+    }
+
 }
+
+const playerConverter = {
+    toFirestore: (player) => {
+        return {
+            id: player.getName(),
+            name: player.getName(),
+            status: player.getStatus(),
+            numVotesReceived: player.getVotesReceived(),
+            voteToCast: player.getVoteStatus(),
+            roomCode: player.getRoomCode(),
+            taskList: player.getTaskList(), 
+            isImposter: player.getImposterStatus(),
+            calledMeeting: player.getMeetingStatus(),
+            numTasksCompleted: player.getNumTasksCompleted(),
+            };
+    },
+    fromFirestore: (snapshot, options) => {
+        const data = snapshot.data(options);
+        let player = new Player(data.name, data.roomCode);
+        
+        player.playerID(data.id);
+        player.playerStatus(data.status);
+        player.playerNumVotesReceived(data.numVotesReceived);
+        player.playerVoteToCast(data.voteToCast);
+        player.playerTaskList(data.taskList);
+        player.playerIsImposter(data.isImposter);
+        player.playerCalledMeeting(data.calledMeeting);
+        player.numTasksCompleted(data.numTasksCompleted);
+                
+        return player;
+    }
+};
