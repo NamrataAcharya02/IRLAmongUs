@@ -154,6 +154,7 @@ export class Room {
         // create a room code that doesn't conflict with existing documents in the db
         let i = 0;
         if (!this.createRoom.called) {
+            console.log(`createRoom setting this.createRoom.called to true`);
             this.createRoom.called = true;
             while(i < 3) {
                 try {
@@ -279,7 +280,8 @@ export class Room {
             room = await Room.getRoom(roomCode);
         } catch (error) {
             if (error instanceof RoomNotExistError) {
-                room = Room.createRoom(adminId, tasklistObj, numImposters, numTasksToDo);
+                console.log(`Room with code ${roomCode} does not exist`);
+                room = await Room.createRoom(adminId, tasklistObj, numImposters, numTasksToDo);
                 console.log("getOrCreateRoom created room with id: " + room.getRoomCode());
             } else if (error instanceof MoreThanOneRoomError) {
                 throw error;

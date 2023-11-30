@@ -83,8 +83,8 @@ const AdminPage = () => {
       let adminId = "30000000"; // Dummy for dev purposes
       let roomCode = '1234';
       const newRoom = await Room.getOrCreateRoom(
-        adminId,
         roomCode,
+        adminId,
         tasklistObj,
         numImposters,
         numTasksToDo
