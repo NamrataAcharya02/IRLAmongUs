@@ -37,8 +37,8 @@ function VoteScreen() {
                             </div>
                         ))}
                     </ul>
-                    <h1>Currently Selected: {selectedPlayer ? selectedPlayer.name : "N/A"}</h1>
-                    <button onClick={() => submitVote(selectedPlayer.playerId)}>Submit Vote</button>
+                    <h1>Vote for: {selectedPlayer ? selectedPlayer.name : "N/A"}</h1>
+                    {selectedPlayer && (<button onClick={() => submitVote(selectedPlayer.playerId)}>Submit Vote</button>)}
                 </div>
             )}
             {voted && (
