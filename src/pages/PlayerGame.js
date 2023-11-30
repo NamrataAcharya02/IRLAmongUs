@@ -6,6 +6,7 @@ import PlayerTaskList from "../components/PlayerTaskList";
 import VoteScreen from "../components/VoteScreen";
 import useSound from 'use-sound';
 import meetingSound from '../sounds/meetingSFX.mp3'
+import meetingBackground from "../images/stars-background.jpg";
 
 function PlayerGame(){
     const [isEmergencyScreen, setEmergencyScreen] = useState(false);
@@ -55,8 +56,8 @@ function PlayerGame(){
                     <div className="center">
                         {/* emergency meeting room screen */}
                         {isMeetingRoom && (
-                            <div className="overlay-meeting">
-                                <h1>EMERGENCY MEETING ROOM</h1>
+                            <div className="overlay-meeting" style={{ backgroundImage: `url(${meetingBackground})` }}  >
+                                <h1>Who is the imposter?</h1>
                                 <VoteScreen></VoteScreen>
                                 <div className="center">
                                     <button onClick={leaveMeetingRoom}>Leave Meeting Room</button>
@@ -67,7 +68,7 @@ function PlayerGame(){
                     </div>
                 </div>
             )}
-            <button onClick={toggleEmergencyScreen}>Toggle Emergency Screen</button>
+            <button onClick={toggleEmergencyScreen}>Call Emergency Meeting</button>
         </div>
     );
 }

@@ -51,7 +51,7 @@ h2{
     font-size: xx-large;
 }
 
-.waitingRoomh2{
+.whiteh2{
     color: white;
 }
 
@@ -144,6 +144,8 @@ h1{
     font-family: 'Amatic SC', sans-serif;
     font-weight: 900;
     font-size: 80px;
+    margin-top: 50px;
+    margin-bottom: 10px;
 }
 
 .Pages{
@@ -290,13 +292,14 @@ main {
 }
 
 .checkbox {
-    margin: 2px;
+    margin-left: 10px;
+    margin-right: 10px;
     width: 20px;
 }
 
 .overlay{
     /* opacity:0.9; */
-    background-color:#ff4f4b;
+    background-color:#b90e0a;
     position:fixed;
     width:100%;
     height:100%;
@@ -317,6 +320,23 @@ main {
     z-index:1000;
 }
 
+.voteScreenBox{
+    display: flex;
+    background-color: #555e6bbc;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    padding-left: 5px;
+    padding-right: 5px;
+    position: relative;
+    margin-bottom: 8px;
+    margin-left: 0px;
+    min-height: 30px;
+    width: 600px;
+    align-items: center;
+    border: 2px solid white;
+    color: white;
+}
+
 progress{
     appearance: none;
     width: 300px;
@@ -329,6 +349,10 @@ progress{
     list-style: none;
     padding: 0;
     margin: 0;
+}
+
+.centered-lists h3{
+    color: white;
 }
 
 .task-container {
