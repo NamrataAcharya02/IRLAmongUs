@@ -30,7 +30,8 @@ export class Task {
 }
 
 export class TaskList {
-    constructor(list) { 
+    constructor(name, list) { 
+        this.name = name
         this.tasks = list
     }
 
@@ -71,6 +72,6 @@ export class TaskList {
         for (const taskDictionary of taskListDictionaries) {
             tasks.push(Task.deserialize(taskDictionary));
         }
-        return new TaskList(tasks);
+        return new TaskList('My Task List', tasks);
     }
 }
