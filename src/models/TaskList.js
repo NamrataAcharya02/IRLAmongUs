@@ -1,6 +1,6 @@
 export class Task {
-    constructor(description, visible) {
-        this.description = description;
+    constructor(name, visible) {
+        this.name = name;
         this.completed = false;
         this.visible = visible;
     }
@@ -10,14 +10,27 @@ export class Task {
         this.completed = true;
     }
     // Method to update task description.
-    updateTask(newDescription) {
-        this.description = newDescription;
+    updateTask(newName) {
+        this.name = newName;
+    }
+
+    // Static method to serialize a Task object into a dictionary
+    static serialize(task) {
+        return {
+            name: task.name,
+            completed: task.completed,
+            visible: task.visible,
+        };
+    }
+
+    // Static method to deserialize a dictionary into a Task object
+    static deserialize(taskData) {
+        return new Task(taskData.name, taskData.visible, taskData.completed);
     }
 }
 
 export class TaskList {
-    constructor(name, list) { 
-        this.name = name;
+    constructor(list) { 
         this.tasks = list
     }
 
@@ -38,32 +51,26 @@ export class TaskList {
         }
         console.log("num of tasks of deleting: " + this.tasks.length);
     }
-}
 
-/**
- * Firestore converter for TaskList. 
- */
-export const taskListConverter = {
-    toFirestore(taskList) {
-        const tasks = taskList.tasks.map((task) => {
-            return {
-                taskDescription: task.description,
-                complete: task.completed,
+    // Static method to serialize a TaskList object into a list of dictionaries
+    static serialize(taskList) {
+        const taskDictionaries = [];
+        for (const task of taskList.tasks) {
+            taskDictionaries.push({
+                name: task.name,
+                completed: task.completed,
                 visible: task.visible,
-            };
-        });
-  
-        return {
-            name: taskList.name,
-            tasks: tasks,
-        };
-    },
-    fromFirestore(snapshot) {
-        const data = snapshot.data();
-        const tasks = data.tasks.map((taskData) => {
-            return new Task(taskData.description, taskData.complete, taskData.visible);
-        });
-        
-        return new TaskList(data.name, tasks);
-    },
-};
+            });
+        }
+        return taskDictionaries;
+    }
+
+    // Static method to deserialize a list of dictionaries into a TaskList object
+    static deserialize(taskListDictionaries) {
+        const tasks = [];
+        for (const taskDictionary of taskListDictionaries) {
+            tasks.push(Task.deserialize(taskDictionary));
+        }
+        return new TaskList(tasks);
+    }
+}
