@@ -40,7 +40,7 @@ export class Player {
         this.#numVotesReceived = 0;
         this.#voteToCast = false;
         this.#roomCode = roomCode;
-        this.#taskList;
+        this.#taskList = [];
         this.#isImposter = false;
         this.#calledMeeting = false;
         this.#numTasksCompleted = 0;
@@ -319,7 +319,7 @@ const playerConverter = {
         player.playerIsImposter(data.isImposter);
         player.playerCalledMeeting(data.calledMeeting);
         player.numTasksCompleted(data.numTasksCompleted);
-                
+
         return player;
     }
 };
