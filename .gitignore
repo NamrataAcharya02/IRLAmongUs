@@ -10,6 +10,7 @@
 
 # production
 /build
+/build-current
 
 # misc
 .DS_Store
@@ -27,3 +28,6 @@ ui-debug.log*
 
 # Firebase
 .firebase
+
+# Firestore emulator seed
+/dir
