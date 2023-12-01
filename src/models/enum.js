@@ -1,7 +1,5 @@
 // Adapted from https://github.com/rauschma/enumify/blob/master/ts/src/index.ts
 
-// "use strict";
-// Object.defineProperty(exports, "__esModule", { value: true });
 export class Enum {
     static closeEnum() {
         const enumKeys = [];
@@ -33,4 +31,10 @@ export class Enum {
         return this.constructor.name + '.' + this.enumKey;
     }
 }
-// exports.Enumify = Enumify;
+
+export class RoomStatus extends Enum {
+    static new = new RoomStatus();
+    static wait = new RoomStatus();
+    static inProgress = new RoomStatus();
+    static _ = this.closeEnum(); // TypeScript: Color.closeEnum()
+}

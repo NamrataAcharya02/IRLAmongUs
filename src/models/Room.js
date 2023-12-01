@@ -13,7 +13,7 @@ import {
     Firestore
 } from "firebase/firestore";
 
-import {Enum} from './enum';
+import { RoomStatus } from './enum';
 
 import { db } from "../firebase";
 import { RoomNotExistError, MoreThanOneRoomError, InvalidRoomCodeError } from "../errors/roomError";
@@ -28,12 +28,6 @@ const ROOM_CODE_LENGTH = 4;
 const ROOM_CODE_CHARACTER_SET = '0123456789';
 const ROOM_CODE_CHARACTER_SET_LENGTH = ROOM_CODE_CHARACTER_SET.length;
 
-export class RoomStatus extends Enum {
-    static new = new RoomStatus();
-    static wait = new RoomStatus();
-    static inProgress = new RoomStatus();
-    static _ = this.closeEnum(); // TypeScript: Color.closeEnum()
-}
 
 export class Room {
     status;
