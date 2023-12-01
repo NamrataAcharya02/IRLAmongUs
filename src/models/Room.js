@@ -1,62 +1,3 @@
-/************************************************************
- * Room.js
- * 
- * Below is a snippit that can be used in a react element
- ************************************************************
-  
-  import {Room} from "../models/Room";
-  
-  let room = null;
-
-  // use for Example 1
-  const taskListObjs = [{
-    name: "frontend set task list",
-    tasks: {
-        0: "frontend_set_task1",
-        1: "frontend_set_task2",
-        2: "frontend_set_task3",
-    }
-  },
-  {
-    name: "New list",
-    tasks: {
-        0: "new task 1",
-        1: "new task 2",
-        2: "new task 3",
-    }
-  }]
-  
-  const tasklistObj = taskListObjs[1];
-  const numImposters = 1;
-  const numTasksToDo = 2;
-
-  // Use for Example: 2
-  let roomCodes = {
-    'exists': "7380",
-    'not_exists': "NotE"
-  }
-  let playerIds = ["h8j9k0", "m3n2j4", "p1l3f2"];
-
-  useEffect(() => {
-    (async function () {
-      let adminId = "30000000";     // Dummy for dev purposes
-      try {
-        // Example 1: call to getOrCreateRoom
-        room = await Room.getOrCreateRoom(adminId, tasklistObj, numImposters, numTasksToDo);
-        await room.updateRoom(tasklistObj, numImposters, numTasksToDo)
-        console.log(room);
-
-        // Example 2: call to joinRoom
-        room = await Room.joinRoom(roomCodes['exists'], playerIds[1]);
-        console.log(room);
-      } catch (error) { 
-        console.log(error); 
-        room = null;
-      }
-    })();
-  }, []); // end useEffect()
- */
-
 import { 
     QuerySnapshot,
     arrayUnion,
@@ -74,6 +15,8 @@ import {
     where
 } from "firebase/firestore";
 
+import { RoomStatus } from './enum';
+
 import { db } from "../firebase";
 import { RoomNotExistError, MoreThanOneRoomError, InvalidRoomCodeError } from "../errors/roomError";
 import { FirebaseError } from "firebase/app";
@@ -87,7 +30,9 @@ const ROOM_CODE_LENGTH = 4;
 const ROOM_CODE_CHARACTER_SET = '0123456789';
 const ROOM_CODE_CHARACTER_SET_LENGTH = ROOM_CODE_CHARACTER_SET.length;
 
+
 export class Room {
+    status;
     #id;
     #adminId;
     #code;
@@ -100,6 +45,7 @@ export class Room {
     
     #callback;
     constructor(id, adminId, code, createdAt, tasklistObj, numImposters, numTasksToDo) { 
+        this.status = RoomStatus.new;
         this.#id = id;
         this.#adminId = adminId;
         this.#code = code;
@@ -123,8 +69,8 @@ export class Room {
     getNumImposters() { return this.#numImposters; }
     getNumTasksToDo() { return this.#numTasksToDo; }
     getPlayers() { return this.#players; }
-    getPlayerIds() { return this.#playerIds; }
-    
+    getStatus() {return this.status; }
+
     setRoomId(id) { this.#id = id; }
     setAdminId(adminId) { this.#adminId = adminId; }
     setRoomCode(code) { this.#code = code; }
@@ -133,28 +79,7 @@ export class Room {
     setNumImposters(numImposters) { this.#numImposters = numImposters; }
     setNumTasksToDo(numTasksToDo) { this.#numTasksToDo = numTasksToDo; }
     setPlayers(players) { this.#players = players; }
-    setPlayerIds(playerIds) { this.#playerIds = playerIds; }
-
-    /**
-     * A hacky way to trigger frontend component updates taken from 
-     * https://stackoverflow.com/questions/53215285/how-can-i-force-a-component-to-re-render-with-hooks-in-react/53215514#53215514
-     * 
-     * This callback should be written in the front end as:
-     * 
-     * const forceUpdate = React.useReducer(() => ({}))[1];
-     * 
-     * Note: This callback is not secure, as it passes a function from the frontend to
-     * the backend that is run during a database update. This feels like it
-     * has latent security risks, so we want to find a way around this hack,
-     * but for the time being, we yield in the name of getting the project out
-     * the gate.
-     *  
-     * @param {React.Reducer} callback Method used to re-render the front end component
-     */
-    addCallback(callback) {
-        console.log("room adding callback");
-        this.#callback = callback;
-    }
+    setStatus(status) { this.status = status; }
 
     addPlayer(player) { this.#players.push(player); }
 
@@ -280,6 +205,7 @@ export class Room {
                         console.log("creating room doc " + roomCode);
                         
                         const room = new Room(roomCode, adminId, roomCode, null, tasklistObj, numImposters, numTasksToDo);
+                        room.setStatus(RoomStatus.new);
                         await setDoc(docRef, room);
                         return room;
                     }
@@ -509,6 +435,7 @@ export class Room {
 const roomConverter = {
     toFirestore: (room) => {
         return {
+            staus: room.getStatus(),
             id: room.getRoomId(),
             adminId: room.getAdminId(),
             code: room.getRoomCode(),
@@ -527,7 +454,9 @@ const roomConverter = {
             tasks: data.tasklist
         }
         let room = new Room(data.id, data.adminId, data.code, data.createdAt, tasklistObj, data.numImposters, data.numTasksToDo);
-        room.setPlayerIds(data.playerIds);
+        room.setPlayers(data.players);
+        console.log(`fromFirestore: data.status: ${data.status}`);
+        room.setStatus(RoomStatus.enumValueOf(data.status));
         return room;
     }
 };
