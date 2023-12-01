@@ -274,6 +274,7 @@ export class Room {
      * @returns A Room object corresponding to the adminId
      */
     static async getOrCreateRoom(roomCode, adminId, tasklistObj, numImposters, numTasksToDo) {
+        // debugger;
         let room = null;
         try {
             console.log('getOrCreateRoom: getting room: ' + roomCode);
@@ -281,8 +282,7 @@ export class Room {
         } catch (error) {
             if (error instanceof RoomNotExistError) {
                 console.log(`Room with code ${roomCode} does not exist`);
-                room = await Room.createRoom(adminId, tasklistObj, numImposters, numTasksToDo);
-                console.log("getOrCreateRoom created room with id: " + room.getRoomCode());
+                room = Room.createRoom(adminId, tasklistObj, numImposters, numTasksToDo);
             } else if (error instanceof MoreThanOneRoomError) {
                 throw error;
             } else {

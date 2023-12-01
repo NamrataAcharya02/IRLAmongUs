@@ -80,8 +80,8 @@ const AdminPage = () => {
   //function to create a room
   const startRoom = async () => {
     try {
-      let adminId = "30000000"; // Dummy for dev purposes
-      let roomCode = '1234';
+      let adminId = "1234"; // Dummy for dev purposes
+      let roomCode = '30000000';
       const newRoom = await Room.getOrCreateRoom(
         roomCode,
         adminId,
