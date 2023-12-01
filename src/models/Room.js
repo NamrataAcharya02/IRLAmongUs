@@ -373,10 +373,10 @@ const roomConverter = {
         }
         let room = new Room(data.id, data.adminId, data.code, data.createdAt, tasklistObj, data.numImposters, data.numTasksToDo);
         room.setPlayerIds(data.playerIds);
-        console.log(`fromFirestore: data.status: ${data.status}`);
+        // console.log(`fromFirestore: data.status: ${data.status}`);
         room.setStatus(RoomStatus.enumValueOf(data.status));
-        console.log(`fromFirestore: room.getStatus(): ${room.getStatus()}`);
-        console.log(`fromFirestore: room.getNumImposters(): ${room.getNumImposters()}`);
+        // console.log(`fromFirestore: room.getStatus(): ${room.getStatus()}`);
+        // console.log(`fromFirestore: room.getNumImposters(): ${room.getNumImposters()}`);
         return room;
     }
 };
