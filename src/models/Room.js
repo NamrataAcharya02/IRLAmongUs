@@ -13,6 +13,8 @@ import {
     Firestore
 } from "firebase/firestore";
 
+import { Mutex } from 'async-mutex';
+
 import { RoomStatus } from './enum';
 
 import { db } from "../firebase";
@@ -28,6 +30,7 @@ const ROOM_CODE_LENGTH = 4;
 const ROOM_CODE_CHARACTER_SET = '0123456789';
 const ROOM_CODE_CHARACTER_SET_LENGTH = ROOM_CODE_CHARACTER_SET.length;
 
+const mutex = new Mutex();
 
 export class Room {
     status;
@@ -94,16 +97,16 @@ export class Room {
      */
     static async createRoom(adminId, tasklistObj, numImposters, numTasksToDo) {
         // only run this method once
-        if (typeof this.createRoom.called == 'undefined') {
-            this.createRoom.called = false;
-        }
+        // if (typeof this.createRoom.called == 'undefined') {
+        //     this.createRoom.called = false;
+        // }
         console.log("create Room");
         
         // create a room code that doesn't conflict with existing documents in the db
         let i = 0;
-        if (!this.createRoom.called) {
-            console.log(`createRoom setting this.createRoom.called to true`);
-            this.createRoom.called = true;
+        // if (!this.createRoom.called) {
+            // console.log(`createRoom setting this.createRoom.called to true`);
+            // this.createRoom.called = true;
             while(i < 3) {
                 try {
                     i++; // fail safe to prevent infinite loops
@@ -123,7 +126,7 @@ export class Room {
     
                     const docRef = this.#_roomRefForRoomCode(roomCode);
                     if (!(await getDoc(docRef)).exists()) {
-                        
+                        Room._roomCode = roomCode;
                         console.log("creating room doc " + roomCode);
                         
                         const room = new Room(roomCode, adminId, roomCode, null, tasklistObj, numImposters, numTasksToDo);
@@ -139,7 +142,7 @@ export class Room {
                     }
                 }
             }
-        }
+        // }
     }
 
     /**
@@ -223,11 +226,15 @@ export class Room {
      * @returns A Room object corresponding to the adminId
      */
     static async getOrCreateRoom(roomCode, adminId, tasklistObj, numImposters, numTasksToDo) {
+        // this function is critical.
+        const release = await mutex.acquire();
+
         // debugger;
         let room = null;
         try {
             console.log('getOrCreateRoom: getting room: ' + roomCode);
             room = await Room.getRoom(roomCode);
+            Room._roomCode = room.getRoomCode();
         } catch (error) {
             if (error instanceof RoomNotExistError) {
                 console.log(`Room with code ${roomCode} does not exist`);
@@ -237,6 +244,8 @@ export class Room {
             } else {
                 console.log("error" + error);
             }
+        } finally {
+            release();
         }
         return room;
     }
