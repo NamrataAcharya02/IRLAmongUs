@@ -360,7 +360,7 @@ const roomConverter = {
             tasklist: room.getTaskList().tasks,
             numImposters: room.getNumImposters(),
             numTasksToDo: room.getNumTasksToDo(),
-            players: room.getPlayerIds(),
+            playerIds: room.getPlayerIds(),
             };
     },
     fromFirestore: (snapshot, options) => {
@@ -370,7 +370,7 @@ const roomConverter = {
             tasks: data.tasklist
         }
         let room = new Room(data.id, data.adminId, data.code, data.createdAt, tasklistObj, data.numImposters, data.numTasksToDo);
-        room.setPlayerIds(data.players);
+        room.setPlayerIds(data.playerIds);
         console.log(`fromFirestore: data.status: ${data.status}`);
         room.setStatus(RoomStatus.enumValueOf(data.status));
         return room;
