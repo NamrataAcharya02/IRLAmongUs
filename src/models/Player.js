@@ -14,8 +14,9 @@ import {
 } from "firebase/firestore";
 
 import { db } from "../firebase";
-//
 
+import Task from "./TaskList";
+import TaskList from "./TaskList";
 
 export class Player {
     #id;
