@@ -89,7 +89,8 @@ const AdminPage = () => {
         numImposters,
         numTasksToDo
       );
-      await newRoom.updateRoom(tasklistObj, numImposters, numTasksToDo);
+      // await newRoom.updateRoom(tasklistObj, numImposters, numTasksToDo);
+      console.log(`newRoom.getNumImposters(): ${newRoom.getNumImposters()}`);
       setRoom(newRoom);
       navigate("/room");
     } catch (error) {

@@ -38,7 +38,7 @@ export class Room {
     #tasklistObj;
     #numImposters;
     #numTasksToDo;
-    #players; // TODO: convert to Player
+    #playerIds; // TODO: convert to Player
     constructor(id, adminId, code, createdAt, tasklistObj, numImposters, numTasksToDo) { 
         this.status = RoomStatus.new;
         this.#id = id;
@@ -48,7 +48,7 @@ export class Room {
         this.#tasklistObj = tasklistObj;
         this.#numImposters = numImposters;
         this.#numTasksToDo = numTasksToDo;
-        this.#players = [];
+        this.#playerIds = [];
     }
 
     getRoomId() { return this.#id; }
@@ -58,7 +58,7 @@ export class Room {
     getTaskList() { return this.#tasklistObj; }
     getNumImposters() { return this.#numImposters; }
     getNumTasksToDo() { return this.#numTasksToDo; }
-    getPlayers() { return this.#players; }
+    getPlayerIds() { return this.#playerIds; }
     getStatus() {return this.status; }
 
     setRoomId(id) { this.#id = id; }
@@ -68,10 +68,10 @@ export class Room {
     setTaskList(tasklistObj) { this.#tasklistObj = tasklistObj; }
     setNumImposters(numImposters) { this.#numImposters = numImposters; }
     setNumTasksToDo(numTasksToDo) { this.#numTasksToDo = numTasksToDo; }
-    setPlayers(players) { this.#players = players; }
+    setPlayerIds(playerIds) { this.#playerIds = playerIds; }
     setStatus(status) { this.status = status; }
 
-    addPlayer(player) { this.#players.push(player); }
+    addPlayer(player) { this.#playerIds.push(player); }
 
     /**
      * Create a room for game play. This method calls _generateRoomCode and ensures 
@@ -250,7 +250,7 @@ export class Room {
      * Ideally, arglist is a dictionary who's key's correspond to Room attributes,
      * and whos values corresopnd to the new value. 
      * 
-     * @param {TaskList} tasklistObj Admin defined tasks all players who join room will receive
+     * @param {TaskList} tasklistObj Admin defined tasks all playerIds who join room will receive
      * @param {Number} numImposters Admin defined number of imposters who "kill" Crewmates
      * @param {Number} numTasksToDo Admin defined number of tasks each Crewmate must complete for game to be won
      * @returns The room object instance that called the method
@@ -279,7 +279,7 @@ export class Room {
      * @param {*} code 
      */
     static async deleteRoom(room) {
-        // remove all players from room
+        // remove all playerIds from room
 
         // then delete this instance of room from the databse
 
@@ -287,7 +287,7 @@ export class Room {
     }
 
     /**
-     * Add a player to a rooms `players` list and update firestore to reflect a
+     * Add a player to a rooms `playerIds` list and update firestore to reflect a
      * newly added added player.
      * 
      * If this method returns, it will always yield a Room object.
@@ -353,7 +353,7 @@ export class Room {
 const roomConverter = {
     toFirestore: (room) => {
         return {
-            staus: room.getStatus(),
+            staus: room.getStatus().enumKey,
             id: room.getRoomId(),
             adminId: room.getAdminId(),
             code: room.getRoomCode(),
@@ -362,7 +362,7 @@ const roomConverter = {
             tasklist: room.getTaskList().tasks,
             numImposters: room.getNumImposters(),
             numTasksToDo: room.getNumTasksToDo(),
-            players: room.getPlayers(),
+            playerIds: room.getPlayerIds(),
             };
     },
     fromFirestore: (snapshot, options) => {
@@ -372,9 +372,11 @@ const roomConverter = {
             tasks: data.tasklist
         }
         let room = new Room(data.id, data.adminId, data.code, data.createdAt, tasklistObj, data.numImposters, data.numTasksToDo);
-        room.setPlayers(data.players);
+        room.setPlayerIds(data.playerIds);
         console.log(`fromFirestore: data.status: ${data.status}`);
         room.setStatus(RoomStatus.enumValueOf(data.status));
+        console.log(`fromFirestore: room.getStatus(): ${room.getStatus()}`);
+        console.log(`fromFirestore: room.getNumImposters(): ${room.getNumImposters()}`);
         return room;
     }
 };

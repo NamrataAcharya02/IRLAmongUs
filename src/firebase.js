@@ -20,15 +20,15 @@ let firebaseConfig = {
   measurementId: "G-1SS9R7WKDG"
 };
 
-// // eslint-disable-next-line no-restricted-globals
-// if (location.hostname === 'localhost') {
-//   firebaseConfig = {
-//     projectId: 'irl-among-us-d5453',
-//     appId: 'test',
-//     apiKey: 'AIzaSyC8_TMAHAg-9Fzq4kIBDzf9_veCPdqUHGY',
-//     authDomain: 'irl-among-us-d5453.firebaseapp.com'
-//   }
-// }
+// eslint-disable-next-line no-restricted-globals
+if (location.hostname === 'localhost') {
+  firebaseConfig = {
+    projectId: 'irl-among-us-d5453',
+    appId: 'test',
+    apiKey: 'AIzaSyC8_TMAHAg-9Fzq4kIBDzf9_veCPdqUHGY',
+    authDomain: 'irl-among-us-d5453.firebaseapp.com'
+  }
+}
 
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
@@ -41,6 +41,10 @@ export const googleAuthProvider = new GoogleAuthProvider();
 const db = getFirestore(app);
 const auth = getAuth(app);
 
-
+// eslint-disable-next-line no-restricted-globals
+if (location.hostname === 'localhost') {
+  connectFirestoreEmulator(db, "127.0.0.1", 8080);
+  // connectAuthEmulator(auth, "127.0.0.1", 9099);
+}
 
 export { db, auth };
