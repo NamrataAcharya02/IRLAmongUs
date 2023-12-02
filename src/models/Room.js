@@ -352,6 +352,7 @@ const roomConverter = {
             adminId: room.getAdminId(),
             code: room.getRoomCode(),
             createdAt: serverTimestamp(),
+            tasklist: room.getTaskList(),
             numImposters: room.getNumImposters(),
             numTasksToDo: room.getNumTasksToDo(),
             playerIds: room.getPlayerIds(),
