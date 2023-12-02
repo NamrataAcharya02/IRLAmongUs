@@ -39,20 +39,20 @@ export class Room {
     #adminId;
     #code;
     #createdAt;
-    #tasklistObj;
+    #tasklist;
     #numImposters;
     #numTasksToDo;
-    #players; // TODO: convert to Player
+    #playerIds; // TODO: convert to Player
     #playerIds;
 
     #callback;
-    constructor(id, adminId, code, createdAt, tasklistObj, numImposters, numTasksToDo) { 
+    constructor(id, adminId, code, createdAt, tasklist, numImposters, numTasksToDo) {
         this.status = RoomStatus.new;
         this.#id = id;
         this.#adminId = adminId;
         this.#code = code;
         this.#createdAt = createdAt;
-        this.#tasklistObj = tasklistObj;
+        this.#tasklist = tasklist;
         this.#numImposters = numImposters;
         this.#numTasksToDo = numTasksToDo;
         this.#players = [];
@@ -67,23 +67,23 @@ export class Room {
     getAdminId() { return this.#adminId; }
     getRoomCode() { return this.#code; }
     getCreatedAt() { return this.#createdAt; }
-    getTaskList() { return this.#tasklistObj; }
+    getTaskList() { return this.#tasklist; }
     getNumImposters() { return this.#numImposters; }
     getNumTasksToDo() { return this.#numTasksToDo; }
-    getPlayers() { return this.#players; }
+    getPlayerIds() { return this.#playerIds; }
     getStatus() {return this.status; }
 
     setRoomId(id) { this.#id = id; }
     setAdminId(adminId) { this.#adminId = adminId; }
     setRoomCode(code) { this.#code = code; }
     setCreatedAt(createdAt) { this.#createdAt = createdAt; }
-    setTaskList(tasklistObj) { this.#tasklistObj = tasklistObj; }
+    setTaskList(tasklist) { this.#tasklist = tasklist; }
     setNumImposters(numImposters) { this.#numImposters = numImposters; }
     setNumTasksToDo(numTasksToDo) { this.#numTasksToDo = numTasksToDo; }
-    setPlayers(players) { this.#players = players; }
+    setPlayerIds(players) { this.#playerIds = players; }
     setStatus(status) { this.status = status; }
 
-    addPlayer(player) { this.#players.push(player); }
+    addPlayer(playerId) { this.#playerIds.push(playerId); }
 
     addCallback(callback) {
         console.log("room adding callback");
@@ -143,16 +143,16 @@ export class Room {
      * This method throws two errors that can be caught by external callers, namely:
      * - InvalidNumberOfImposters thrown when numImposters is <= 0
      * - InvalidNumberOfTasksToDo thrown when numTasksToDo <= 0 
-     *          or tasklistObj.tasks.lenth < numTasksToDo
+     *          or tasklist.tasks.lenth < numTasksToDo
      * 
      * @param {String} adminId unique alphanumeric string provided via firebase
-     * @param {Object} tasklistObj the tasks associated with this gameplay room.
+     * @param {Array} tasklist the tasks associated with this gameplay room.
      * @param {Number} numImposters The number of characters who will be imposters
      * @param {Number} numTasksToDo The number of tasks each Crewmate is required 
      *                              to complete to win the game
      * @returns {Room} A concrete room that has been added to the database.
      */
-    static async createRoom(adminId, tasklistObj, numImposters, numTasksToDo) {
+    static async createRoom(adminId, tasklist, numImposters, numTasksToDo) {
         // only run this method once
         if (typeof this.createRoom.called == 'undefined') {
             this.createRoom.called = false;
@@ -176,16 +176,12 @@ export class Room {
                     const roomCode = this.#_generateRoomCode(ROOM_CODE_LENGTH);
                     console.log("createRoom: " + roomCode);
     
-                    // TODO: validate numImposters to be greater than zero, and less than XX??
-    
-                    // TODO: validate numTasksToDo to be greater than zero, and less than tasklistObj.tasks.length
-    
                     const docRef = this.#_roomRefForRoomCode(roomCode);
                     if (!(await getDoc(docRef)).exists()) {
                         
                         console.log("creating room doc " + roomCode);
                         
-                        const room = new Room(roomCode, adminId, roomCode, null, tasklistObj, numImposters, numTasksToDo);
+                        const room = new Room(roomCode, adminId, roomCode, null, tasklist, numImposters, numTasksToDo);
                         room.setStatus(RoomStatus.new);
                         await setDoc(docRef, room);
                         return room;
@@ -260,14 +256,14 @@ export class Room {
      * This method first trys to find a room (via `this.getRoom(...)`). If the room exists in the
      * database, a Room object will be returned with all information as fetched from the database.
      * That is, it is the callers responsibility to ensure that the returned Room object has the 
-     * desired tasklistObj. 
+     * desired tasklist. 
      * 
      * If the Room retrieved via the getRoom method has different tasklistObject, numImposters, or 
      * numTasksToDo than is passed in by the corresponding parameters, it is the responsibility 
      * of the caller to discover and rectify the discrepancies.
      * 
      * Upon recieving a `RoomNotExistError`, the method will attempt to create a room using 
-     * `this.create(...)`. The Room returned by this method will have the tasklistObj
+     * `this.create(...)`. The Room returned by this method will have the tasklist
      * 
      * This method handles all Errors thrown by `getRoom()` and `createRoom()`. This method will
      * rethrow the following two errors:
@@ -275,13 +271,13 @@ export class Room {
      * - InvalidNumberOfTasksToDo
      * 
      * @param {String} adminId The unique identifier provided by firebase
-     * @param {Object} tasklistObj the tasks to be associated with this gameplay room.
+     * @param {Array} tasklist the task descriptions associated with this gameplay room.
      * @param {Number} numImposters The number of characters who will be imposters
      * @param {Number} numTasksToDo The number of tasks each Crewmate is required 
      *                              to complete to win the game
      * @returns A Room object corresponding to the adminId
      */
-    static async getOrCreateRoom(roomCode, adminId, tasklistObj, numImposters, numTasksToDo) {
+    static async getOrCreateRoom(roomCode, adminId, tasklist, numImposters, numTasksToDo) {
         let room = null;
         try {
             console.log('getOrCreateRoom: getting room: ' + roomCode);
@@ -308,22 +304,22 @@ export class Room {
      * Ideally, arglist is a dictionary who's key's correspond to Room attributes,
      * and whos values corresopnd to the new value. 
      * 
-     * @param {TaskList} tasklistObj Admin defined tasks all players who join room will receive
+     * @param {Array} tasklist Admin defined tasks all players who join room will receive
      * @param {Number} numImposters Admin defined number of imposters who "kill" Crewmates
      * @param {Number} numTasksToDo Admin defined number of tasks each Crewmate must complete for game to be won
      * @returns The room object instance that called the method
      */
-    async updateRoom(tasklistObj, numImposters, numTasksToDo) {
-        if (JSON.stringify(this.getTaskList()) !== JSON.stringify(tasklistObj)  ||
+    async updateRoom(tasklist, numImposters, numTasksToDo) {
+        if (JSON.stringify(this.getTaskList()) !== JSON.stringify(tasklist)  ||
             this.getNumImposters() !== numImposters                             ||
             this.getNumTasksToDo() !== numTasksToDo) 
         {
             const docRef = Room.#_roomRefForRoomCode(this.getRoomCode());
-            this.setTaskList(tasklistObj);
+            this.setTaskList(tasklist);
             this.setNumImposters(numImposters);
             this.setNumTasksToDo(numTasksToDo);
             await updateDoc(docRef, {
-                tasklist: tasklistObj,
+                tasklist: tasklist,
                 numImposters: numImposters,
                 numTasksToDo: numTasksToDo
             });
@@ -365,7 +361,7 @@ export class Room {
             let room = await Room.getRoom(roomCode);
             
             // only add the player to this rooms `players` list if it doesn't exist in it
-            if (room.getPlayers().includes(playerId)) {
+            if (room.getPlayerIds().includes(playerId)) {
                 console.log("Player " + playerId + " already in room " + roomCode);
                 return room;
             }
@@ -411,26 +407,20 @@ export class Room {
 const roomConverter = {
     toFirestore: (room) => {
         return {
-            staus: room.getStatus(),
+            staus: room.getStatus().enumKey,
             id: room.getRoomId(),
             adminId: room.getAdminId(),
             code: room.getRoomCode(),
             createdAt: serverTimestamp(),
-            taskListName: room.getTaskList().name,
-            tasklist: room.getTaskList().tasks,
             numImposters: room.getNumImposters(),
             numTasksToDo: room.getNumTasksToDo(),
-            players: room.getPlayers(),
+            playerIds: room.getPlayerIds(),
             };
     },
     fromFirestore: (snapshot, options) => {
         const data = snapshot.data(options);
-        const tasklistObj = {
-            name: data.taskListName,
-            tasks: data.tasklist
-        }
-        let room = new Room(data.id, data.adminId, data.code, data.createdAt, tasklistObj, data.numImposters, data.numTasksToDo);
-        room.setPlayers(data.players);
+        let room = new Room(data.id, data.adminId, data.code, data.createdAt, data.tasklist, data.numImposters, data.numTasksToDo);
+        room.setPlayerIds(data.playerIds);
         console.log(`fromFirestore: data.status: ${data.status}`);
         room.setStatus(RoomStatus.enumValueOf(data.status));
         return room;

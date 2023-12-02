@@ -55,15 +55,7 @@ export class TaskList {
 
     // Static method to serialize a TaskList object into a list of dictionaries
     static serialize(taskList) {
-        const taskDictionaries = [];
-        for (const task of taskList.tasks) {
-            taskDictionaries.push({
-                name: task.name,
-                completed: task.completed,
-                visible: task.visible,
-            });
-        }
-        return taskDictionaries;
+        return taskList.tasks.map((task) => Task.serialize(task));
     }
 
     // Static method to deserialize a list of dictionaries into a TaskList object
