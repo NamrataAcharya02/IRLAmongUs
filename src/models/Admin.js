@@ -115,6 +115,19 @@ export class Admin {
         return this;
     }
 
+    async updateAdminRoomCode(roomCode) {
+        if (JSON.stringify(this.getRoomCode()) !== JSON.stringify(roomCode))  
+        {
+            const docRef = doc(db, "admins", this.getAdminId()).withConverter(adminConverter);
+            this.setRoomCode(roomCode);
+            await updateDoc(docRef, {
+                roomCode: roomCode
+            });
+            console.log("successfully updated admin with room code " + this.getRoomCode());
+        }
+        return this;
+    }
+
     /* Note: Need frontend input to get the taskDescription, like user types in the description 
              in the text field, and taps `add task` button. Then this method should be triggered to 
              generate the Task from the taskDescription and add to the taskList.

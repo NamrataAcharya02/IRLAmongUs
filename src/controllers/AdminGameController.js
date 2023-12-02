@@ -9,26 +9,47 @@ export default class AdminGameController extends GameController {
     adminId;  // actual Admin object
     players; // actual list of Player objects that are watched by admin
             // each player must have a listener added
-    roomCode;
+    roomCode = 0;
     tasklist;
     numImposters;
     numTasksToComplete;
     adminObject = null;
 
-    constructor(adminId, tasklist, numImposters, numTasksToComplete) {
+    //remove tasklist from constructor (and the other things, keep only adminId)
+    constructor(adminId) {
         super();
         this.adminId = adminId;
         this.roomCode = 0;
         this.players = [];
-        this.tasklist = tasklist;
-        this.numImposters = numImposters;
-        this.numTasksToComplete = numTasksToComplete;
+        this.tasklist = [];
+        
+       // this.tasklist = tasklist;
+       // this.numImposters = numImposters;
+       // this.numTasksToComplete = numTasksToComplete;
+        this.adminObject = Admin.getOrCreateAdmin(adminId, ['task'] );
+        //create admin object here
     }
 
     async getTaskList() {
         let admin = await this.getAdmin();
         this.tasklist = await admin.getTaskList();
         return this.tasklist;
+    }
+
+    setNumImposters(numImposters) {
+        this.numImposters = numImposters;
+    }
+
+    getNumImposters() {
+        return this.numImposters;
+    }
+
+    setNumTasksToComplete(numTasksToComplete) {
+        this.numTasksToComplete = numTasksToComplete;
+    }
+
+    getNumTasksToComplete() {   
+        return this.numTasksToComplete;
     }
 
     static async createAdmin(adminId, tasklist) {
@@ -43,7 +64,7 @@ export default class AdminGameController extends GameController {
 
     async getAdmin() {
         if (this.adminObject == null) {
-            this.adminObject = AdminGameController.createAdmin(this.adminId);
+            this.adminObject = Admin.getOrCreateAdmin(this.adminId, ['task']);
         }
         return this.adminObject;
     }
@@ -80,8 +101,12 @@ export default class AdminGameController extends GameController {
         }
         return result;
     }
+
     addCallback(callback) {
         console.log("room adding callback");
+
+
+
        // this.#callback = callback;
     }
 
@@ -94,13 +119,11 @@ export default class AdminGameController extends GameController {
         this.setRoomCode(roomCode);
         console.log("roomCode: " + roomCode);
 
-        let room = await Room.getOrCreateRoom(this.adminId, this.roomCode, tasklist, this.numImposters, this.numTasksToComplete);
+        let room = await Room.getOrCreateRoom(this.roomCode, this.adminId, tasklist, this.numImposters, this.numTasksToComplete);
 
         console.log("room: " + room);
+        return room;
         //room.addCallback() in front end 
-        
-
-
 
     }
 

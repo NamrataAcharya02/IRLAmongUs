@@ -13,6 +13,7 @@ import AdminGameController from "../controllers/AdminGameController.js";
 import {auth, googleAuthProvider} from "../firebase";
 
 let room = null;
+let AdminController = null;
 
 const AdminPage = () => {
   const [data, setData] = useState(0);
@@ -68,6 +69,7 @@ const AdminPage = () => {
 
     let controller = new AdminGameController(auth.currentUser.uid, null, null);
     controller.saveTasklist(tasklist)
+    
     //await admin.updateAdminTasklists(tasklistObj);
 
     console.log(tasklistObj);
@@ -120,11 +122,14 @@ const AdminPage = () => {
     let list = [...tasklist];
    // try {
       let adminId = auth.currentUser.uid; // Dummy for dev purposes
-      let controller = new AdminGameController(adminId, list, numImposters, numTasksToDo);
+      let controller = new AdminGameController(adminId);
+      controller.setNumImposters(numImposters);
+      controller.setNumTasksToComplete(numTasksToDo);
+      //controller.saveTasklist(list);
+
       let newroom = await controller.startRoom();
-
-
-
+      console.log(newroom);
+      navigate("/room");
 
 
       /*let roomCode = '1234';
@@ -137,7 +142,6 @@ const AdminPage = () => {
       );
       await newRoom.updateRoom(tasklistObject, numImposters, numTasksToDo);
       setRoom(newRoom);
-      navigate("/room");
     } catch (error) {
       console.error(error);
       setRoom(null);
