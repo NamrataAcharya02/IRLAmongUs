@@ -3,16 +3,22 @@ import {Link} from "react-router-dom";
 import { useSelector } from 'react-redux'
 import background from "../images/stars-background.jpg";
 import PlayerTaskList from "../components/PlayerTaskList";
+import VoteScreen from "../components/VoteScreen";
+import useSound from 'use-sound';
+import meetingSound from '../sounds/meetingSFX.mp3'
+import meetingBackground from "../images/stars-background.jpg";
 
 function PlayerGame(){
     const [isEmergencyScreen, setEmergencyScreen] = useState(false);
     const [isMeetingRoom, setMeetingRoom] = useState(false);
     const [currentComplete, setComplete] = useState(0);
     const [toComplete, setToComplete] = useState(20);
+    const [playSound] = useSound(meetingSound);
 
     //function for toggling emergency screen to use (can also directly set emergency screen)
     const toggleEmergencyScreen = () => {
         setEmergencyScreen(!isEmergencyScreen);
+        playSound();
     };
     //function for toggling emergency meeting room screen
     const toggleMeetingRoom = () => {
@@ -39,7 +45,7 @@ function PlayerGame(){
             <h4>Total Tasks Completed</h4>
             <progress value={currentComplete} max={toComplete}></progress>
             <button onClick={completeATask}>Complete a Task</button>
-
+            {/* <button onClick={playSound}>Beep</button> */}
             {/* Player's task list */}
             <PlayerTaskList></PlayerTaskList>
 
@@ -50,8 +56,9 @@ function PlayerGame(){
                     <div className="center">
                         {/* emergency meeting room screen */}
                         {isMeetingRoom && (
-                            <div className="overlay-meeting">
-                                <h1>EMERGENCY MEETING ROOM</h1>
+                            <div className="overlay-meeting" style={{ backgroundImage: `url(${meetingBackground})` }}  >
+                                <h1>Who is the imposter?</h1>
+                                <VoteScreen></VoteScreen>
                                 <div className="center">
                                     <button onClick={leaveMeetingRoom}>Leave Meeting Room</button>
                                 </div>
@@ -61,7 +68,7 @@ function PlayerGame(){
                     </div>
                 </div>
             )}
-            <button onClick={toggleEmergencyScreen}>Toggle Emergency Screen</button>
+            <button onClick={toggleEmergencyScreen}>Call Emergency Meeting</button>
         </div>
     );
 }

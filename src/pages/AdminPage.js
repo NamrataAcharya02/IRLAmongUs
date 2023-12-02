@@ -7,6 +7,7 @@ import { Room } from "../models/Room";
 import { Task, TaskList } from "../models/TaskList.js";
 import background from "../images/stars-background.jpg";
 import { useNavigate } from 'react-router-dom';
+import {auth} from "../firebase.js";
 
 let room = null;
 
@@ -14,11 +15,44 @@ const AdminPage = () => {
   const [data, setData] = useState(0);
   const [tasklist, setTasklist] = useState([]) //object that stores tasklist
   const [listName, setListName] = useState("") //name of tasklist
+  const navigate = useNavigate();
   console.log(tasklist)
+  
+
+  //don't exceed number of tasks
+  const hasEmptyTask = tasklist.some((singleTask, index) => {
+    if (singleTask.description == "") {
+      return true;
+    }
+    return false;
+  });
+
+  useEffect(() => {
+    // Check if the user is logged into Firebase when the page opens
+    const checkUser = async () => {
+      const user = auth.currentUser;
+
+      if (!user) {
+        // If the user is not logged in, navigate to the login page or another appropriate route
+        navigate("/");
+      }
+    };
+
+    // Call the checkUser function when the component mounts
+    checkUser();
+  });
 
   //handle adding a task, adds an extra input field and new task object to tasklist
   const handleAddTask = () => {
-    setTasklist([...tasklist, new Task("")]);
+    if(!hasEmptyTask){
+      setTasklist((prevTasklist) => [...prevTasklist, new Task("")]);
+    }
+  }
+  
+  const deleteItem = (index) => {
+    const updatedTasklist = [...tasklist];
+    updatedTasklist.splice(index, 1);
+    setTasklist(updatedTasklist);
   }
 
   //handle task name change in textbox. Updates task object as changes are being made
@@ -52,7 +86,7 @@ const AdminPage = () => {
   }
   //---------------------- Room Creation ----------------------------------------
   const [room, setRoom] = useState(null);
-  const navigate = useNavigate();
+  
   // Temporary Task Lists
   const taskListObjs = [{
     name: "frontend set task list",
@@ -82,9 +116,9 @@ const AdminPage = () => {
     try {
       let adminId = "30000000"; // Dummy for dev purposes
       let roomCode = '1234';
-      const newRoom = await Room.getOrCreateRoom(
-        adminId,
+      const newRoom = await Room.getOrCreateRoom(       
         roomCode,
+        adminId,
         tasklistObj,
         numImposters,
         numTasksToDo
@@ -110,18 +144,15 @@ const AdminPage = () => {
       <Link to="/">
         <button className="back">Back</button>
       </Link>
-
       {/* TaskList:: */}
       <div className="text-in-box">
-        <h2>Task list name:</h2>
-        <input value={listName} onChange={(e) => setListName(e.target.value)} />
-
-        <h2>Task list</h2>
+        <input className="tasklist-title" placeholder="Name of Task List" value={listName} onChange={(e) => setListName(e.target.value)} />
+        <div className="space-divider"></div>
         {tasklist.map((singleTask, index) => (
-          <div>
-            <input className="task" required type="text" placeholder="Task Description" value={singleTask.task} name="task" onChange={(e) => (handleTaskChange(e, index))} />
-            {index == tasklist.length - 1}
-
+          <div className='task-container' key={index}>
+            <input className="task" required type="text" placeholder="Task Description" value={singleTask.description} name="task" onChange={(e) => (handleTaskChange(e, index))} />
+            <button className="delete-x" onClick={() => deleteItem(index)}>&#10006;</button>
+            {/* {index == tasklist.length - 1}             */}
           </div>
 
         ))

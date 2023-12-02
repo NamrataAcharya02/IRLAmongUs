@@ -51,7 +51,7 @@ h2{
     font-size: xx-large;
 }
 
-.waitingRoomh2{
+.whiteh2{
     color: white;
 }
 
@@ -144,6 +144,8 @@ h1{
     font-family: 'Amatic SC', sans-serif;
     font-weight: 900;
     font-size: 80px;
+    margin-top: 50px;
+    margin-bottom: 10px;
 }
 
 .Pages{
@@ -168,7 +170,7 @@ main {
 
 .text-in-box{
     width: 320px;
-    border: 2px solid white;
+    /* border: 2px solid white; */
     padding: 10px;
     margin-top: 50px;
 }
@@ -253,7 +255,7 @@ main {
     margin-bottom: 8px;
     margin-left: 0px;
     min-height: 30px;
-    width: 300px;
+    width: 280px;
     align-items: center;
     border: 1.5px solid rgb(0, 0, 0);
     box-shadow: inset 0 0 5px #000000;
@@ -267,10 +269,6 @@ main {
     display: flex;
     justify-content: space-between;
     background-color: #555e6bbc;
-    padding-top: 5px;
-    padding-bottom: 5px;
-    padding-left: 5px;
-    padding-right: 5px;
     position: relative;
     margin-bottom: 8px;
     margin-left: 0px;
@@ -294,13 +292,14 @@ main {
 }
 
 .checkbox {
-    margin: 2px;
+    margin-left: 10px;
+    margin-right: 10px;
     width: 20px;
 }
 
 .overlay{
     /* opacity:0.9; */
-    background-color:#ff4f4b;
+    background-color:#b90e0a;
     position:fixed;
     width:100%;
     height:100%;
@@ -315,9 +314,27 @@ main {
     position:fixed;
     width:100%;
     height:100%;
+    overflow-y: scroll;
     top:0px;
     left:0px;
     z-index:1000;
+}
+
+.voteScreenBox{
+    display: flex;
+    background-color: #555e6bbc;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    padding-left: 5px;
+    padding-right: 5px;
+    position: relative;
+    margin-bottom: 8px;
+    margin-left: 0px;
+    min-height: 30px;
+    width: 600px;
+    align-items: center;
+    border: 2px solid white;
+    color: white;
 }
 
 progress{
@@ -327,3 +344,45 @@ progress{
     border:2px solid rgb(255, 255, 255);
 
 }
+
+.centered-lists{
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.centered-lists h3{
+    color: white;
+}
+
+.task-container {
+    display: flex;
+    align-items: center;
+}
+
+.delete-x{
+    width: 10px;
+    height: 30px;
+    margin-left: 5px;
+    margin-top: 0px;
+    color: red;
+    padding: 0px;
+    border: none;
+    background: none;
+    flex-wrap: wrap;
+}
+.delete-x:hover{
+    color: rgb(95, 0, 0);
+    border: none;
+    background: none;
+}
+
+.tasklist-title{
+    width: 300px;
+}
+
+
+.space-divider{
+    height: 10px;
+}
+
