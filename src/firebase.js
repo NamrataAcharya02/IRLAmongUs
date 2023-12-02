@@ -5,11 +5,14 @@ import { initializeApp } from "firebase/app";
 import { getAuth, GoogleAuthProvider, connectAuthEmulator } from "firebase/auth";
 import { getFirestore, connectFirestoreEmulator } from "firebase/firestore";
 
+const DEBUG=true
+
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
 
 // Your web app's Firebase configuration
 // For Firebase JS SDK v7.20.0 and later, measurementId is optional
+
 let firebaseConfig = {
   apiKey: "AIzaSyC8_TMAHAg-9Fzq4kIBDzf9_veCPdqUHGY",
   authDomain: "irl-among-us-d5453.firebaseapp.com",
@@ -22,11 +25,13 @@ let firebaseConfig = {
 
 // eslint-disable-next-line no-restricted-globals
 if (location.hostname === 'localhost') {
-  firebaseConfig = {
-    projectId: 'irl-among-us-d5453',
-    appId: 'test',
-    apiKey: 'AIzaSyC8_TMAHAg-9Fzq4kIBDzf9_veCPdqUHGY',
-    authDomain: 'irl-among-us-d5453.firebaseapp.com'
+  if (DEBUG) {
+    firebaseConfig = {
+      projectId: 'irl-among-us-d5453',
+      appId: 'test',
+      apiKey: 'AIzaSyC8_TMAHAg-9Fzq4kIBDzf9_veCPdqUHGY',
+      authDomain: 'irl-among-us-d5453.firebaseapp.com'
+    }
   }
 }
 
@@ -43,8 +48,10 @@ const auth = getAuth(app);
 
 // eslint-disable-next-line no-restricted-globals
 if (location.hostname === 'localhost') {
-  connectFirestoreEmulator(db, "127.0.0.1", 8080);
-  // connectAuthEmulator(auth, "127.0.0.1", 9099);
+  if (DEBUG) {
+    connectFirestoreEmulator(db, "127.0.0.1", 8080);
+    // connectAuthEmulator(auth, "127.0.0.1", 9099);
+  }
 }
 
 export { db, auth };
