@@ -39,7 +39,7 @@ export class Room {
     #numImposters;
     #numTasksToDo;
     #playerIds; // TODO: convert to Player
-    constructor(id, adminId, code, createdAt, tasklist, numImposters, numTasksToDo) { 
+    constructor(id, adminId, code, createdAt, tasklist, numImposters, numTasksToDo) {
         this.status = RoomStatus.new;
         this.#id = id;
         this.#adminId = adminId;
@@ -115,10 +115,6 @@ export class Room {
 
                     const roomCode = this.#_generateRoomCode(ROOM_CODE_LENGTH);
                     console.log("createRoom: " + roomCode);
-    
-                    // TODO: validate numImposters to be greater than zero, and less than XX??
-    
-                    // TODO: validate numTasksToDo to be greater than zero, and less than tasklist.tasks.length
     
                     const docRef = this.#_roomRefForRoomCode(roomCode);
                     if (!(await getDoc(docRef)).exists()) {
@@ -356,8 +352,6 @@ const roomConverter = {
             adminId: room.getAdminId(),
             code: room.getRoomCode(),
             createdAt: serverTimestamp(),
-            taskListName: room.getTaskList().name,
-            tasklist: room.getTaskList().tasks,
             numImposters: room.getNumImposters(),
             numTasksToDo: room.getNumTasksToDo(),
             playerIds: room.getPlayerIds(),
@@ -365,11 +359,7 @@ const roomConverter = {
     },
     fromFirestore: (snapshot, options) => {
         const data = snapshot.data(options);
-        const tasklist = {
-            name: data.taskListName,
-            tasks: data.tasklist
-        }
-        let room = new Room(data.id, data.adminId, data.code, data.createdAt, tasklist, data.numImposters, data.numTasksToDo);
+        let room = new Room(data.id, data.adminId, data.code, data.createdAt, data.tasklist, data.numImposters, data.numTasksToDo);
         room.setPlayerIds(data.playerIds);
         console.log(`fromFirestore: data.status: ${data.status}`);
         room.setStatus(RoomStatus.enumValueOf(data.status));
