@@ -86,7 +86,7 @@ export class Room {
      *          or tasklist.tasks.lenth < numTasksToDo
      * 
      * @param {String} adminId unique alphanumeric string provided via firebase
-     * @param {Object} tasklist the tasks associated with this gameplay room.
+     * @param {Array} tasklist the tasks associated with this gameplay room.
      * @param {Number} numImposters The number of characters who will be imposters
      * @param {Number} numTasksToDo The number of tasks each Crewmate is required 
      *                              to complete to win the game
@@ -211,7 +211,7 @@ export class Room {
      * - InvalidNumberOfTasksToDo
      * 
      * @param {String} adminId The unique identifier provided by firebase
-     * @param {Object} tasklist the tasks to be associated with this gameplay room.
+     * @param {Array} tasklist the task descriptions associated with this gameplay room.
      * @param {Number} numImposters The number of characters who will be imposters
      * @param {Number} numTasksToDo The number of tasks each Crewmate is required 
      *                              to complete to win the game
@@ -244,7 +244,7 @@ export class Room {
      * Ideally, arglist is a dictionary who's key's correspond to Room attributes,
      * and whos values corresopnd to the new value. 
      * 
-     * @param {TaskList} tasklist Admin defined tasks all players who join room will receive
+     * @param {Array} tasklist Admin defined tasks all players who join room will receive
      * @param {Number} numImposters Admin defined number of imposters who "kill" Crewmates
      * @param {Number} numTasksToDo Admin defined number of tasks each Crewmate must complete for game to be won
      * @returns The room object instance that called the method
