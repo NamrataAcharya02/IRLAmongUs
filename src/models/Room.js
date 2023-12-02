@@ -20,18 +20,8 @@ import {
 import { RoomStatus } from './enum';
 
 import { db } from "../firebase";
-import { RoomNotExistError, MoreThanOneRoomError, InvalidRoomCodeError } from "../errors/roomError";
+import { RoomNotExistError, MoreThanOneRoomError, DuplicateRoomCodeError } from "../errors/roomError";
 import { FirebaseError } from "firebase/app";
-
-/**
- * Configuration settings for Room.
- * 
- * TODO: Would be good to yank these out into some config file.
- */
-const ROOM_CODE_LENGTH = 4;
-const ROOM_CODE_CHARACTER_SET = '0123456789';
-const ROOM_CODE_CHARACTER_SET_LENGTH = ROOM_CODE_CHARACTER_SET.length;
-
 
 export class Room {
     status;
@@ -152,14 +142,14 @@ export class Room {
      */
     static async createRoom(roomCode, adminId, tasklist, numImposters, numTasksToDo) {
         // only run this method once
-        if (typeof this.createRoom.called == 'undefined') {
-            this.createRoom.called = false;
-        }
+        // if (typeof this.createRoom.called == 'undefined') {
+        //     this.createRoom.called = false;
+        // }
         console.log("create Room");
         
         // create a room code that doesn't conflict with existing documents in the db
-        if (!this.createRoom.called) {
-            this.createRoom.called = true;
+        // if (!this.createRoom.called) {
+            // this.createRoom.called = true;
             /** TODO: store all room doc.id in a list, generate a room code
              *  until the generated code isn't in the list. Perform one last
              * check in the rooms collection (as shown below with the !(...exists())) 
@@ -168,18 +158,33 @@ export class Room {
 
             const docRef = this.#_roomRefForRoomCode(roomCode);
             
-            if (!(await getDoc(docRef)).exists()) {
-                
-                console.log("creating room doc " + roomCode);
-                
-                const room = new Room(roomCode, adminId, roomCode, null, tasklist, numImposters, numTasksToDo);
-                room.setStatus(RoomStatus.new);
-                await setDoc(docRef, room);
-                return room;
-            } else {
-                throw new DuplicateRoomCodeError(`Attempting to create a room with the same id: ${roomCode}`);
-            }
+        if (!(await getDoc(docRef)).exists()) {
+            
+            console.log("creating room doc " + roomCode);
+            
+            const room = new Room(roomCode, adminId, roomCode, null, tasklist, numImposters, numTasksToDo);
+            room.setStatus(RoomStatus.new);
+            await setDoc(docRef, room);
+            return room;
+        } else {
+            throw new DuplicateRoomCodeError(`Attempting to create a room with the same id: ${roomCode}`);
         }
+        // }
+    }
+
+    /**
+     * Generate a random string of characters from ROOM_CODE_CHARACTER_SET. the string
+     * will have a length defined be it's only parameter, length.
+     * 
+     * @param {Number} length Length of the string that should be generated
+     * @returns A string of lenght `length` generated from ROOM_CODE_CHARACTER_SET
+     */
+    static #_generateRoomCode(length) {
+        let result = '';
+        for (let i = 0; i < length; i++) {
+            result += ROOM_CODE_CHARACTER_SET.charAt(Math.floor(Math.random() * ROOM_CODE_CHARACTER_SET_LENGTH));
+        }
+        return result;
     }
 
     static #_roomRefForRoomCode(roomCode) {
