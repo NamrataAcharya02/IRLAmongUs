@@ -271,11 +271,12 @@ export class Player {
     }
 
     //sets the players task list
-    async setTaskList(tasks) {
+    async setTaskList(taskList) {
+
         const playerRef = doc(db, 'players', this.id);
         try {
-            await updateDoc(playerRef, {taskList: tasks});
-            this.#taskList = tasks;
+            await updateDoc(playerRef, {taskList: taskList});
+            this.#taskList = taskList;
         } catch (error) {
             console.error('Error', error);
         }
@@ -289,6 +290,12 @@ export class Player {
 
     async getNumTasksCompleted(){
         return this.#numTasksCompleted;
+    }
+
+    async setTaskComplete(task)
+    {
+        //index = this.#taskList.findIndex(task => task.name)
+        //this.#taskList.indexOf(task).completeTask();
     }
 
 }

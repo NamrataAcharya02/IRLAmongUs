@@ -1,15 +1,20 @@
 import GameController from "./GameController";
+import Player from "../models/Player";
+import Room from "../models/Room";
+
 
 export default class PlayerGameController extends GameController {
     player; // Player object
 
-    constructor() {
-        super();
+    constructor(room, observerCallback, playerIdNameList, player) {
+        super(room, observerCallback, playerIdNameList);
+        this.player = player;
     }
 
     joinRoom(roomCode) {
         // set user room to roomCode
         // set room from the return of calling Room.joinRoom
+        this.player.setRoomCode(roomCode);
     }
 
     setTasks() {
@@ -17,11 +22,19 @@ export default class PlayerGameController extends GameController {
         // N = room.numTasksToComplete tasks.
 
         // update player object with the generated list
+        stringArray = this.room.getTaskList();
+        taskList = new TaskList("player list", []);
+        //add stuff still
+
+        this.player.setTaskList(taskList);
     }
 
     leaveRoom() {
         // remove player id from room.playerids
         // delete player db instance
+
+        id = player.getId();
+        this.room.leaveRoom(id);
     }
 
     callMeeting() {
@@ -37,9 +50,13 @@ export default class PlayerGameController extends GameController {
     markSelfDead() {
         // if player is crewmate,
         // then update player status
+        if(!this.player.getImposterStatus()){
+            this.player.setAliveStatus('dead');
+        }
+
     }
 
-    markTaskComplete(taskId) {
+    markTaskComplete(description) {
         // update player tasklists task to completed
     }
 
