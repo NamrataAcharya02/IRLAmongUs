@@ -1,7 +1,7 @@
 // The landing page for an admin
 // Admin may modify lists, customize a game, and start a room
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useReducer } from "react";
 import { Link } from "react-router-dom";
 import { Room } from "../models/Room";
 import { Task, TaskList } from "../models/TaskList.js";
@@ -19,6 +19,7 @@ const AdminPage = () => {
   const [data, setData] = useState(0);
   const [tasklist, setTasklist] = useState([]) //object that stores tasklist
   const [listName, setListName] = useState("") //name of tasklist
+  const [, forceUpdate] = useReducer(x => x + 1, 0);
   let list = [];
   var tasklistObject = null;
   console.log(tasklist)
@@ -30,6 +31,7 @@ const AdminPage = () => {
         let admin  = await Admin.getAdmin(auth.currentUser.uid);
         list = admin.getTaskList();
         setTasklist(list);
+        forceUpdate();
         }
       //setTasklist(list);
 
@@ -165,8 +167,8 @@ const AdminPage = () => {
       {/* TaskList:: */}
 
       <div className="text-in-box">
-        <h2>Task list name:</h2>
-        <input value={listName} onChange={(e) => setListName(e.target.value)} />
+        {/*<h2>Task list name:</h2>
+        <input value={listName} onChange={(e) => setListName(e.target.value)} />*/}
 
         <h2>Task list</h2>
         {tasklist.map((singleTask, index) => (

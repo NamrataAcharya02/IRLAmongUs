@@ -20,18 +20,8 @@ import {
 import { RoomStatus } from './enum';
 
 import { db } from "../firebase";
-import { RoomNotExistError, MoreThanOneRoomError, InvalidRoomCodeError } from "../errors/roomError";
+import { RoomNotExistError, MoreThanOneRoomError, DuplicateRoomCodeError } from "../errors/roomError";
 import { FirebaseError } from "firebase/app";
-
-/**
- * Configuration settings for Room.
- * 
- * TODO: Would be good to yank these out into some config file.
- */
-const ROOM_CODE_LENGTH = 4;
-const ROOM_CODE_CHARACTER_SET = '0123456789';
-const ROOM_CODE_CHARACTER_SET_LENGTH = ROOM_CODE_CHARACTER_SET.length;
-
 
 export class Room {
     status;
@@ -79,7 +69,13 @@ export class Room {
     setNumImposters(numImposters) { this.#numImposters = numImposters; }
     setNumTasksToDo(numTasksToDo) { this.#numTasksToDo = numTasksToDo; }
     setPlayerIds(players) { this.#playerIds = players; }
-    setStatus(status) { this.status = status; }
+    setStatus(status) { 
+        if (status instanceof RoomStatus){
+            this.status = status; 
+        } else {
+            throw TypeError(`status must be of type RoomStatus`);
+        }
+    }
 
     addPlayer(playerId) { this.#playerIds.push(playerId); }
 
@@ -150,49 +146,36 @@ export class Room {
      *                              to complete to win the game
      * @returns {Room} A concrete room that has been added to the database.
      */
-    static async createRoom(adminId, tasklist, numImposters, numTasksToDo) {
+    static async createRoom(roomCode, adminId, tasklist, numImposters, numTasksToDo) {
         // only run this method once
-        if (typeof this.createRoom.called == 'undefined') {
-            this.createRoom.called = false;
-        }
+        // if (typeof this.createRoom.called == 'undefined') {
+        //     this.createRoom.called = false;
+        // }
         console.log("create Room");
         
         // create a room code that doesn't conflict with existing documents in the db
-        let i = 0;
-        if (!this.createRoom.called) {
-            this.createRoom.called = true;
-            while(i < 3) {
-                try {
-                    i++; // fail safe to prevent infinite loops
-                    
-                    /** TODO: store all room doc.id in a list, generate a room code
-                     *  until the generated code isn't in the list. Perform one last
-                     * check in the rooms collection (as shown below with the !(...exists())) 
-                     * to ensure a code hasn't been added, then use that code. 
-                     * */
+        // if (!this.createRoom.called) {
+            // this.createRoom.called = true;
+            /** TODO: store all room doc.id in a list, generate a room code
+             *  until the generated code isn't in the list. Perform one last
+             * check in the rooms collection (as shown below with the !(...exists())) 
+             * to ensure a code hasn't been added, then use that code. 
+             * */
 
-                    const roomCode = this.#_generateRoomCode(ROOM_CODE_LENGTH);
-                    console.log("createRoom: " + roomCode);
-    
-                    const docRef = this.#_roomRefForRoomCode(roomCode);
-                    if (!(await getDoc(docRef)).exists()) {
-                        
-                        console.log("creating room doc " + roomCode);
-                        
-                        const room = new Room(roomCode, adminId, roomCode, null, tasklist, numImposters, numTasksToDo);
-                        room.setStatus(RoomStatus.new);
-                        await setDoc(docRef, room);
-                        return room;
-                    }
-                    
-                } catch (error) {
-                    if (error instanceof FirebaseError) {
-                        console.log("caught FirebaseError: " + error + ". Rethrowing!");
-                        throw error;
-                    }
-                }
-            }
+            const docRef = this.#_roomRefForRoomCode(roomCode);
+            
+        if (!(await getDoc(docRef)).exists()) {
+            
+            console.log("creating room doc " + roomCode);
+            
+            const room = new Room(roomCode, adminId, roomCode, null, tasklist, numImposters, numTasksToDo);
+            room.setStatus(RoomStatus.new);
+            await setDoc(docRef, room);
+            return room;
+        } else {
+            throw new DuplicateRoomCodeError(`Attempting to create a room with the same id: ${roomCode}`);
         }
+        // }
     }
 
     /**
@@ -213,10 +196,6 @@ export class Room {
     static #_roomRefForRoomCode(roomCode) {
         return doc(db, "rooms", roomCode).withConverter(roomConverter);
     }
-
-    // static #_roomsQueryForCode(roomCode) {
-    //     return query(collection(db, "rooms"), where("code", "==", roomCode)).withConverter(roomConverter);
-    // }
 
     /**
      * Query the database for the unique room belonging to the admin as defined by
@@ -372,7 +351,7 @@ export class Room {
             await updateDoc(roomDocRef, {
                 players: arrayUnion(playerId)
             });
-            console.log("performed array union");
+
             return room;
 
             
@@ -410,6 +389,7 @@ const roomConverter = {
             adminId: room.getAdminId(),
             code: room.getRoomCode(),
             createdAt: serverTimestamp(),
+            tasklist: room.getTaskList(),
             numImposters: room.getNumImposters(),
             numTasksToDo: room.getNumTasksToDo(),
             playerIds: room.getPlayerIds(),
