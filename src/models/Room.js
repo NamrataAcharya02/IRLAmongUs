@@ -69,7 +69,13 @@ export class Room {
     setNumImposters(numImposters) { this.#numImposters = numImposters; }
     setNumTasksToDo(numTasksToDo) { this.#numTasksToDo = numTasksToDo; }
     setPlayerIds(players) { this.#playerIds = players; }
-    setStatus(status) { this.status = status; }
+    setStatus(status) { 
+        if (status instanceof RoomStatus){
+            this.status = status; 
+        } else {
+            throw TypeError(`status must be of type RoomStatus`);
+        }
+    }
 
     addPlayer(playerId) { this.#playerIds.push(playerId); }
 
