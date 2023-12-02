@@ -63,6 +63,19 @@ h4{
     color:white;
 }
 
+.helpList{
+    margin-top: 0;
+    color: white;
+}
+
+li{
+    color: white;
+    margin-left: 0;
+    padding-bottom: 10px;
+    list-style-type: decimal;
+    list-style-position: outside;
+}
+
 output{
     color:white;
 }
@@ -131,6 +144,18 @@ input{
     margin: 0px;
 }
 
+.helpButton{
+    position: absolute;
+    top: 1vh;
+    right: 1vh;
+    width: 60px;
+    font-family: 'Amatic SC', sans-serif;
+    font-weight: 700;
+    font-size: large;
+    padding: 5px 5px;
+    margin: 0px;
+}
+
 .inputdiv{
     height: 40px;
     width: 300px;
@@ -171,6 +196,20 @@ main {
     border: 2px solid white;
     padding: 10px;
     margin-top: 50px;
+}
+
+.help-in-box{
+    width: 375px;
+    border: 2px solid white;
+    padding: 10px;
+    margin-top: 0px;
+    margin-bottom: 50px;
+    display: flex;
+    flex-direction: column; /* To center vertically */
+    justify-content: center; /* Center vertically */
+    align-items: center; /* Center horizontally */
+    /* margin: auto; */
+    height: auto;
 }
 
 .player-lobby{
@@ -318,6 +357,19 @@ main {
     top:0px;
     left:0px;
     z-index:1000;
+}
+
+.overlay-help{
+    background-color:darkslategrey;
+    position:fixed;
+    width:75%;
+    height:75%;
+    top:50%;
+    left:50%;
+    transform:translate(-50%, -50%);
+    z-index:1000;
+    overflow-y: auto;
+    border:2px solid rgb(255, 255, 255);
 }
 
 progress{
