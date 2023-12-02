@@ -3,7 +3,8 @@
 import React, {useState, useId} from "react";
 import Popup from 'reactjs-popup';
 import PlayerWaiting from "./PlayerWaiting.js";
-// import { Admin } from "../models/Admin.js";
+import { Admin } from "../models/Admin.js";
+import AdminController from "../controllers/AdminGameController.js";
 import { useSelector, useDispatch } from 'react-redux'
 import { setValue } from '../components/counter/counterSlice.js'
 import background from "../images/stars-background.jpg";
@@ -47,9 +48,13 @@ function Pages(){
         });
     }
 
-    onAuthStateChanged(auth, function(user) {
+    onAuthStateChanged(auth, async function(user) {
         if (user) {
-            Admin.getOrCreateAdmin(auth.currentUser.uid, {"taskList": ["test"]});
+            //let controller = new AdminController(auth.currentUser.uid, ["task"], null, null);
+            await AdminController.createAdmin(auth.currentUser.uid, ["task"]);
+            console.log("CREATED ADMIN");
+
+            //Admin.getOrCreateAdmin(auth.currentUser.uid, ["task"]);
           // User is signed in.
         } else {
           // No user is signed in.

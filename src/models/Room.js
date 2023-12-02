@@ -58,6 +58,8 @@
  */
 
 import { 
+
+    QuerySnapshot,
     arrayUnion,
     collection,
     doc,
@@ -68,6 +70,8 @@ import {
     setDoc,
     updateDoc, 
     where,
+    onSnapshot,
+    documentId,
 
     Firestore
 } from "firebase/firestore";
@@ -94,6 +98,9 @@ export class Room {
     #numImposters;
     #numTasksToDo;
     #players; // TODO: convert to Player
+    #playerIds;
+
+    #callback;
     constructor(id, adminId, code, createdAt, tasklistObj, numImposters, numTasksToDo) { 
         this.#id = id;
         this.#adminId = adminId;
@@ -103,6 +110,11 @@ export class Room {
         this.#numImposters = numImposters;
         this.#numTasksToDo = numTasksToDo;
         this.#players = [];
+        this.#playerIds = [];
+
+        this.#callback = null;
+
+        this.#addDocSnapshotListener();
     }
 
     getRoomId() { return this.#id; }
@@ -125,6 +137,54 @@ export class Room {
 
     addPlayer(player) { this.#players.push(player); }
 
+    addCallback(callback) {
+        console.log("room adding callback");
+        this.#callback = callback;
+    }
+
+    #__updateFromSnapshot(snapData) {
+        console.log("updating");
+        this.#id = snapData.id;
+        this.#adminId = snapData.adminId;
+        this.#code = snapData.code;
+        this.#createdAt = snapData.createdAt;
+        this.#tasklistObj = snapData.tasklistObj;
+        this.#numImposters = snapData.numImposters;
+        this.#numTasksToDo = snapData.numTasksToDo;
+        this.#playerIds = snapData.players;
+        if (this.#callback != null) {
+            console.log("running callback in room");
+            this.#callback();
+        }
+        console.log("finished");
+    }
+
+    #addDocSnapshotListener() {
+        console.log("registering DocSnapshotListener for Room " + this.getRoomCode());
+        const docQuery = query(collection(db, "rooms"), where(documentId(), "==", this.getRoomCode()));
+
+        this.unsub = onSnapshot(docQuery, 
+            snapshot => {
+                console.log("onSnapshot triggered");
+                snapshot.docChanges().forEach((change) => {
+                    if (change.type === "added") {
+                        console.log("New room: ", change.doc.data());
+                    }
+                    if (change.type === "modified") {
+                        const docData = change.doc.data();
+                        console.log("Modified room: ", docData.id);
+                        this.#__updateFromSnapshot(docData);
+                    }
+                    if (change.type === "removed") {
+                        console.log("Removed room: ", change.doc.data());
+                    }
+                  });
+            },
+            (err) => {
+                console.log("error while handling snapshot: " + err);
+            }
+            );
+    }
     /**
      * Create a room for game play. This method calls _generateRoomCode and ensures 
      * code uniqueness. It verifies that the number of tasks asked to be completed
@@ -280,7 +340,7 @@ export class Room {
         } catch (error) {
             if (error instanceof RoomNotExistError) {
                 room = Room.createRoom(adminId, tasklistObj, numImposters, numTasksToDo);
-                console.log("getOrCreateRoom created room with id: " + room.getRoomCode());
+               // console.log("getOrCreateRoom created room with id: " + room.getRoomCode());
             } else if (error instanceof MoreThanOneRoomError) {
                 throw error;
             } else {

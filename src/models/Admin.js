@@ -12,25 +12,36 @@ import {
 export class Admin {
     adminId;
     name;
-    taskLists;
+    tasklist;
+    roomCode = 0;
 
 
-    constructor(adminId, name, taskLists) {
+    constructor(adminId, name, tasklist, roomCode) {
         this.adminId = adminId;
         this.name = name;
-        this.taskLists = taskLists;
+        this.tasklist = tasklist;
+        this.roomCode = roomCode;
+
     }
 
     getAdminId() {
         return this.adminId;
     }
 
-    getTaskLists() {
-        return this.taskLists;
+    getTaskList() {
+        return this.tasklist;
     }
 
     getName() { 
         return this.name;
+    }
+
+    setRoomCode(roomCode) {
+        this.roomCode = roomCode;
+    }
+
+    getRoomCode() { 
+        return this.roomCode;
     }
 
     static async getAdmin(adminId) {
@@ -38,6 +49,7 @@ export class Admin {
         const docSnap = await getDoc(docRef);
         if (docSnap.exists()) {
             console.log("Document data:", docSnap.data());
+            console.log("adminId: " + docSnap.data().getAdminId());
             return docSnap.data();
         }
         return false;
@@ -53,7 +65,7 @@ export class Admin {
         } */
         console.log(taskLists)
        // await setDoc(docRef, admindoc);
-        await setDoc(docRef, new Admin(adminId, "ABCD", taskLists));
+        await setDoc(docRef, new Admin(adminId, "ABCD", taskLists, 0));
 
         console.log("Admin created");
         return this.getAdmin(adminId);
@@ -85,18 +97,18 @@ export class Admin {
         return admin;
     }
 
-    async updateAdminTasklists(tasklistObj) { 
+    async updateAdminTasklist(tasklist) { 
         //double check
         
         const docRef = doc(db, "admins", this.getAdminId()).withConverter(adminConverter);
-        let taskLists = this.getTaskLists();
-        console.log(taskLists)
+        //let taskLists = this.getTaskList();
+        //console.log(taskLists)
 
-        taskLists.push(tasklistObj);
-        console.log(taskLists)
+        //taskLists.push(tasklist);
+        //console.log(taskLists)
 
         await updateDoc(docRef, {
-            taskLists: taskLists,
+            tasklist: tasklist,
         });
         
         console.log("Admin updated");
@@ -121,6 +133,11 @@ export class Admin {
         this.taskList.deleteTask(task);
     }
 
+    createVoteDoc() {
+        // create a vote document in the database
+
+    }
+
     /*
     There should be more methods to craete room, assign tasks, end game, etc.
     */
@@ -132,11 +149,12 @@ const adminConverter = {
         return {
             adminId: admin.getAdminId(),
             name: admin.getName(),
-            taskLists: admin.getTaskLists(),
+            tasklist: admin.getTaskList(),
+            roomCode: admin.getRoomCode(),
             };
     },
     fromFirestore: (snapshot, options) => {
         const data = snapshot.data(options);
-        return new Admin(data.adminId,data.name, data.taskLists);
+        return new Admin(data.adminId,data.name, data.tasklist, data.roomCode);
     }
 };
