@@ -42,7 +42,6 @@ export class Room {
     #tasklist;
     #numImposters;
     #numTasksToDo;
-    #playerIds; // TODO: convert to Player
     #playerIds;
 
     #callback;
@@ -55,7 +54,6 @@ export class Room {
         this.#tasklist = tasklist;
         this.#numImposters = numImposters;
         this.#numTasksToDo = numTasksToDo;
-        this.#players = [];
         this.#playerIds = [];
 
         this.#callback = null;
@@ -96,7 +94,7 @@ export class Room {
         this.#adminId = snapData.adminId;
         this.#code = snapData.code;
         this.#createdAt = snapData.createdAt;
-        this.#tasklistObj = snapData.tasklistObj;
+        this.#tasklist = snapData.tasklist;
         this.#numImposters = snapData.numImposters;
         this.#numTasksToDo = snapData.numTasksToDo;
         this.#playerIds = snapData.players;
@@ -258,7 +256,7 @@ export class Room {
      * That is, it is the callers responsibility to ensure that the returned Room object has the 
      * desired tasklist. 
      * 
-     * If the Room retrieved via the getRoom method has different tasklistObject, numImposters, or 
+     * If the Room retrieved via the getRoom method has different tasklistect, numImposters, or 
      * numTasksToDo than is passed in by the corresponding parameters, it is the responsibility 
      * of the caller to discover and rectify the discrepancies.
      * 
@@ -284,7 +282,7 @@ export class Room {
             room = await Room.getRoom(roomCode);
         } catch (error) {
             if (error instanceof RoomNotExistError) {
-                room = Room.createRoom(adminId, tasklistObj, numImposters, numTasksToDo);
+                room = Room.createRoom(adminId, tasklist, numImposters, numTasksToDo);
                // console.log("getOrCreateRoom created room with id: " + room.getRoomCode());
             } else if (error instanceof MoreThanOneRoomError) {
                 throw error;
