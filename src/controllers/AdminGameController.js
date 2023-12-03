@@ -16,6 +16,7 @@ export default class AdminGameController extends GameController {
     numTasksToComplete;
     adminObject = null;
     callback;
+    room;
 
     //remove tasklist from constructor (and the other things, keep only adminId)
     constructor(adminId, callback) {
@@ -25,6 +26,7 @@ export default class AdminGameController extends GameController {
         this.roomCode = 0;
         this.players = [];
         this.tasklist = [];
+        this.room = null;
         
        // this.tasklist = tasklist;
        // this.numImposters = numImposters;
@@ -84,6 +86,7 @@ export default class AdminGameController extends GameController {
         // get the room object from the database
         // return the room object
         let room = await Room.getRoom(roomCode.toString());
+        this.room = room;
         return room;
     }
 
@@ -126,7 +129,7 @@ export default class AdminGameController extends GameController {
         this.callback = callback;
     }
 
-    async startRoom(numImposters, numTasksToComplete) {
+    async startRoom() {
         //create a room object
         console.log("startRoom");
         let admin = await this.getAdmin();
@@ -158,11 +161,12 @@ export default class AdminGameController extends GameController {
 
                 console.log("roomCode: " + roomCode);
 
-                let room = await Room.getOrCreateRoom(roomCode, this.adminId, tasklist, numImposters, numTasksToComplete);
+                let room = await Room.getOrCreateRoom(roomCode, this.adminId, tasklist, 0, 0);
                 console.log("im skipping over this");
                 if (room) {
                     console.log("room created, setting roomCode")
                     await this.setRoomCode(roomCode);
+                    this.room = room;
 
                     console.log("roomCode: " + roomCode);
 
@@ -230,7 +234,7 @@ export default class AdminGameController extends GameController {
 
     }
 
-    startGame() {
+    async startGame(numImposters, numTasksToComplete) {
         // update Room Status to "inGame"
 
         // NOTE: somewhere in the rendering of the React component,
@@ -238,6 +242,31 @@ export default class AdminGameController extends GameController {
         // every time a player object changes to determine if the 
         // whether the game has been won, that is, whether all the tasks
         // have been completed.
+        console.log("startGame");
+        console.log("room object: " + this.room);
+
+        //update room status to inGame and update numImposters and numTasksToComplete
+        await this.room.updateRoomStatus(Room.Status.inGame);
+        await this.room.updateRoomNumImposters(numImposters);
+        await this.room.updateRoomNumTasksToComplete(numTasksToComplete);
+
+        this.players = this.room.getPlayerIds();
+        console.log("players: " + this.players);
+
+
+        /*// create player objs
+        _createPlayers();
+        this.room.updateRoomStatus(RoomStatus.inProgress);
+    }
+
+    _createPlayer() {
+        this.players = this.room.getPlayerIds().forEach(pid => {
+            const p = new Player(this.room.getRoomCode(), ...); // I don't know how Player is implemented
+            p.addCallback(this.callback);
+            return p;
+        }); */
+
+
     }
 
     displayGameCode() {
