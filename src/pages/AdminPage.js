@@ -129,7 +129,7 @@ const AdminPage = () => {
       controller.setNumTasksToComplete(numTasksToDo);
       //controller.saveTasklist(list);
 
-      let newroom = await controller.startRoom();
+      let newroom = await controller.startRoom(numImposters, numTasksToDo);
       console.log(newroom);
       navigate("/room");
 

@@ -1,14 +1,20 @@
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { Room } from "../models/Room";
-
+import {auth, googleAuthProvider} from "../firebase";
+import AdminGameController from "../controllers/AdminGameController";
 function AdminRoom() {
   const [room, setRoom] = useState(null);
 
+  const forceUpdate = React.useReducer(() => ({}))[1];
+
   useEffect(() => {
     (async function () {
-      let adminId = "30000000"; // dummy for testing
-      let roomCode = ["3528", "9019", "7654"];
+      let adminId = auth.currentUser.uid; // dummy for testing
+      let controller = new AdminGameController(adminId, forceUpdate);
+
+      let roomCode = await controller.getRoomCode();
+      let adminObject = await controller.getAdmin();
       try {
         const taskListObjs = [{
           name: "frontend set task list",
@@ -33,7 +39,8 @@ function AdminRoom() {
 
         // const retrievedRoom = await Room.getRoom(roomCode[0]);
         // const retrievedRoom = await Room.createRoom(adminId, tasklistObj, numImposters, numTasksToDo);
-        const retrievedRoom = await Room.getOrCreateRoom(roomCode[2], adminId, tasklistObj, numImposters, numTasksToDo);
+        const retrievedRoom = await AdminGameController.getRoomObject(roomCode);
+        retrievedRoom.addCallback(forceUpdate)
 
         setRoom(retrievedRoom);
 
@@ -53,9 +60,11 @@ function AdminRoom() {
       </Link>
       {room ? (
         <h1>Room Code {room.getRoomCode()}</h1>
+        
       ) : (
         <p>No room found for the admin.</p>
       )}
+      {room? room.getPlayerIds().map((playerId) => (<p>{playerId}</p>)): 'no players'}
     </div>
   );
 }

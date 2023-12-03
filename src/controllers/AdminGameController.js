@@ -1,6 +1,7 @@
 import GameController from "./GameController";
 import { Admin } from "../models/Admin";
 import { Room } from "../models/Room";
+import { DuplicateRoomCodeError } from "../errors/roomError";
 const ROOM_CODE_CHARACTER_SET = '0123456789';
 const ROOM_CODE_CHARACTER_SET_LENGTH = ROOM_CODE_CHARACTER_SET.length;
 const ROOM_CODE_LENGTH = 4;
@@ -14,11 +15,13 @@ export default class AdminGameController extends GameController {
     numImposters;
     numTasksToComplete;
     adminObject = null;
+    callback;
 
     //remove tasklist from constructor (and the other things, keep only adminId)
-    constructor(adminId) {
+    constructor(adminId, callback) {
         super();
         this.adminId = adminId;
+        this.callback = callback;
         this.roomCode = 0;
         this.players = [];
         this.tasklist = [];
@@ -77,12 +80,25 @@ export default class AdminGameController extends GameController {
 
     }
 
+    static async getRoomObject(roomCode) {
+        // get the room object from the database
+        // return the room object
+        let room = await Room.getRoom(roomCode);
+        return room;
+    }
+
     async setRoomCode(roomCode) {
         this.roomCode = roomCode;
         let admin = await this.getAdmin();
         this.roomCode = roomCode;
         console.log(admin);
-        admin.setRoomCode(roomCode);
+        admin.updateAdminRoomCode(roomCode);
+    }
+
+    async getRoomCode() {
+        let admin = await this.getAdmin();
+        this.roomCode = await admin.getRoomCode();
+        return this.roomCode;
     }
     async saveTasklist(tasklist) {
         // update admin.tasklist
@@ -110,19 +126,47 @@ export default class AdminGameController extends GameController {
        // this.#callback = callback;
     }
 
-    async startRoom() {
+    async startRoom(numImposters, numTasksToComplete) {
         //create a room object
         let admin = await this.getAdmin();
         let tasklist = admin.getTaskList();
         console.log("tasklist: " + tasklist);
-        let roomCode = AdminGameController.generateRoomCode(ROOM_CODE_LENGTH);
-        this.setRoomCode(roomCode);
-        console.log("roomCode: " + roomCode);
+        //NEED TO ADD CHECK FOR EXISTING ROOM CODE HERE
+         // create a room code that doesn't conflict with existing documents in the db
+        let i = 0;
+        while(i < 3) {
+            try {
+                i++; // fail safe to prevent infinite loops
+                     
+                     /** TODO: store all room doc.id in a list, generate a room code
+                      *  until the generated code isn't in the list. Perform one last
+                      * check in the rooms collection (as shown below with the !(...exists())) 
+                      * to ensure a code hasn't been added, then use that code. 
+                      * */
+ 
+                let roomCode = AdminGameController.generateRoomCode(ROOM_CODE_LENGTH);
 
-        let room = await Room.getOrCreateRoom(this.roomCode, this.adminId, tasklist, this.numImposters, this.numTasksToComplete);
+                console.log("roomCode: " + roomCode);     
+                let room = await Room.getOrCreateRoom(roomCode, this.adminId, tasklist, numImposters, numTasksToComplete);
+                this.setRoomCode(roomCode);
 
-        console.log("room: " + room);
-        return room;
+                console.log("roomCode: " + roomCode);
+
+                //room.addCallback(this.callback);
+
+                console.log("room: " + room);
+                return room;
+            } catch (error) {
+                     if (error instanceof DuplicateRoomCodeError) {
+                         console.log("Duplicate roomCode: " + error);
+                         throw error;
+                     }
+            }
+        }
+
+
+
+        
         //room.addCallback() in front end 
 
     }
