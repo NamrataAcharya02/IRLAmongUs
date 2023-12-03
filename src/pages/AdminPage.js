@@ -86,44 +86,12 @@ const AdminPage = () => {
   }
   //---------------------- Room Creation ----------------------------------------
   const [room, setRoom] = useState(null);
-  
-  // Temporary Task Lists
-  const taskListObjs = [{
-    name: "frontend set task list",
-    tasks: {
-      0: "frontend_set_task1",
-      1: "frontend_set_task2",
-      2: "frontend_set_task3",
-    }
-  },
-  {
-    name: "New list",
-    tasks: {
-      0: "new task 1",
-      1: "new task 2",
-      2: "new task 3",
-    }
-  }]
-
-  //Room configurations
-  const tasklistObj = taskListObjs[1];
-  const numImposters = 1;
-  const numTasksToDo = 2;
 
 
   //function to create a room
-  const startRoom = async () => {
+  const startRoom = async () => {  
     try {
-      let adminId = "30000000"; // Dummy for dev purposes
-      let roomCode = '1234';
-      const newRoom = await Room.getOrCreateRoom(       
-        roomCode,
-        adminId,
-        tasklistObj,
-        numImposters,
-        numTasksToDo
-      );
-      await newRoom.updateRoom(tasklistObj, numImposters, numTasksToDo);
+      const newRoom = await Room.getRoom("1966");
       setRoom(newRoom);
       navigate("/room");
     } catch (error) {
