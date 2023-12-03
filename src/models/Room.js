@@ -86,7 +86,7 @@ export class Room {
         this.#__update({numImposters: numImposters});
     }
     async updateNumTasksToDo(numTasksToDo) { 
-        this.updateNumTasksToDo(numTasksToDo);
+        this.setNumTasksToDo(numTasksToDo);
         this.#__update({numTasksToDo: numTasksToDo});
     }
     async updateStatus(status) { 
