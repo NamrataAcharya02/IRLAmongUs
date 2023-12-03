@@ -279,7 +279,7 @@ export class Player {
     //sets the players task list
     async setTaskList(taskList) {
 
-        
+
         const playerRef = doc(db, 'players', this.id);
         try {
             await updateDoc(playerRef, {taskList: taskList});
@@ -299,10 +299,27 @@ export class Player {
         return this.#numTasksCompleted;
     }
 
-    async setTaskComplete(task)
+    async setTaskComplete(description)
     {
         //index = this.#taskList.findIndex(task => task.name)
         //this.#taskList.indexOf(task).completeTask();
+        let i = 0;
+        for(i = 0; i < this.taskList.length; i++)
+        {
+            if(description == this.taskList[i])
+            {
+                this.#numTasksCompleted++;
+                this.#taskList.splice(i, 1);
+            }
+        }
+
+        if(this.#taskList.length > 3)
+        {
+            this.#taskList[3].visible = true;
+        }
+
+        this.setTaskList(this.#taskList);
+
     }
 
 }

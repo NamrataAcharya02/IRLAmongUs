@@ -16,7 +16,6 @@ export default class PlayerGameController extends GameController {
         this.roomCode = room.getRoomCode();
         this.player = Player.createPlayer(name, roomCode);
 
-        this.roomCode = 0;
         this.taskList = [];
         this.visibleTasks = [];
         this.callback = callback;
@@ -86,21 +85,7 @@ export default class PlayerGameController extends GameController {
     markTaskComplete(description) {
         // update player tasklists task to completed
        this.player = Player.getPlayer(this.player.getId());
-       this.taskList = player.getTaskList();
-       this.player.setTaskComplete();
-
-
-        let i = 0;
-       for(i = 0; i < this.tasklist.length; i++)
-       {
-        if(description == this.taskList[i].name)
-        {
-            this.taskList[i].completed = true;
-            this.taskList[i].visible = false;
-            this.player.setTaskComplete(description);
-        }
-       }
-
+       this.player.setTaskComplete(description);
     }
 
     castVote(playerId) {
@@ -131,5 +116,6 @@ export default class PlayerGameController extends GameController {
 
     getTasklistStatus() {
         // return (number of tasks complete, number of tasks requred)
+        
     }
 }
