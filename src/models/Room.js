@@ -208,20 +208,6 @@ export class Room {
         // }
     }
 
-    /**
-     * Generate a random string of characters from ROOM_CODE_CHARACTER_SET. the string
-     * will have a length defined be it's only parameter, length.
-     * 
-     * @param {Number} length Length of the string that should be generated
-     * @returns A string of lenght `length` generated from ROOM_CODE_CHARACTER_SET
-     */
-    static #_generateRoomCode(length) {
-        let result = '';
-        for (let i = 0; i < length; i++) {
-            result += ROOM_CODE_CHARACTER_SET.charAt(Math.floor(Math.random() * ROOM_CODE_CHARACTER_SET_LENGTH));
-        }
-        return result;
-    }
 
     static #_roomRefForRoomCode(roomCode) {
         return doc(db, "rooms", roomCode).withConverter(roomConverter);
