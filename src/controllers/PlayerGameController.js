@@ -1,14 +1,23 @@
 import GameController from "./GameController";
 import Player from "../models/Player";
 import Room from "../models/Room";
-
+import shuffler from "../models/utils";
 
 export default class PlayerGameController extends GameController {
     player; // Player object
+    tasklist;
+    callback;
 
-    constructor(room, observerCallback, playerIdNameList, player) {
-        super(room, observerCallback, playerIdNameList);
+    constructor(callback) {
         this.player = player;
+        this.player.createPlayer();
+
+        this.tasklist = [];
+        this.callback = callback;
+        
+        
+        super();
+       
     }
 
     joinRoom(roomCode) {
@@ -23,7 +32,8 @@ export default class PlayerGameController extends GameController {
 
         // update player object with the generated list
         stringArray = this.room.getTaskList();
-        taskList = new TaskList("player list", []);
+        shuffArray = shuffler(stringArray);
+        
         //add stuff still
 
         this.player.setTaskList(taskList);

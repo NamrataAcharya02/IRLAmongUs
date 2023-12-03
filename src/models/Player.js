@@ -34,17 +34,19 @@ export class Player {
 
     #callback;
 
-    constructor( name, roomCode) {
-        this.#id = "0";
+    constructor(id, name, status, numVotesReceived, 
+        voteToCast, roomCode, taskList, isImposter, 
+        calledMeeting, numTasksCompleted) {
+        this.#id = id;
         this.#name = name;
-        this.#status = "alive";
-        this.#numVotesReceived = 0;
-        this.#voteToCast = false;
+        this.#status = status;
+        this.#numVotesReceived = numVotesReceived;
+        this.#voteToCast = voteToCast;
         this.#roomCode = roomCode;
-        this.#taskList = [];
-        this.#isImposter = false;
-        this.#calledMeeting = false;
-        this.#numTasksCompleted = 0;
+        this.#taskList = taskList;
+        this.#isImposter = isImposter;
+        this.#calledMeeting = calledMeeting;
+        this.#numTasksCompleted = numTasksCompleted;
 
         this.#callback = null;
 
@@ -97,23 +99,27 @@ export class Player {
         });
     }
 
+    static async getPlayer(playerId){
+        const playerRef = doc(db, 'plaers', playerId).withConverter(playerConverter);
+        const docSnap = await getDoc(docRef);
+        if(docSnap.exists())
+        {
+            return docSnapt.data();
+        }
+
+        return false;
+
+    }
+
     //creates a player in the players collection
-    async createPlayer() {
+    static async createPlayer(name, roomCode) {
         const playerRef = doc(collection(db, "players"));
-        this.#id = playerRef.id; // Set the player id to the Firestore-generated id
-    
-        await setDoc(playerRef, {
-            id: this.#id,
-            name: this.#name,
-            status: this.#status,
-            numVotesReceived: this.#numVotesReceived,
-            voteToCast: this.#voteToCast,
-            roomCode: this.#roomCode,
-            taskList: this.#taskList,
-            isImposter: this.#isImposter,
-            calledMeeting: this.#calledMeeting,
-            numTasksCompleted: this.#numTasksCompleted
-        });
+       
+        const player = new Player(playerRef, name, "alive", 0, false, roomCode, [], false, false, 0)
+
+        await setDoc(playerRef, player)
+        
+        return this.getPlayer(playerRef);
         
 
     }
