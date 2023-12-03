@@ -5,13 +5,17 @@ import {auth, googleAuthProvider} from "../firebase";
 import AdminGameController from "../controllers/AdminGameController";
 function AdminRoom() {
   const [room, setRoom] = useState(null);
+  console.log("AdminRoom(): room: " + room);
+  const [players, setPlayers] = useState([]);
 
-  const forceUpdate = React.useReducer(() => ({}))[1];
+  //const forceUpdate = React.useReducer(() => ({}))[1];
+  const [_, forceUpdate] = React.useReducer((x) => x + 1, 0);
+  let adminId = auth.currentUser.uid; // dummy for testing
+  let controller = new AdminGameController(adminId, forceUpdate);
 
   useEffect(() => {
     (async function () {
-      let adminId = auth.currentUser.uid; // dummy for testing
-      let controller = new AdminGameController(adminId, forceUpdate);
+      
 
       let roomCode = await controller.getRoomCode();
       let adminObject = await controller.getAdmin();
@@ -40,9 +44,11 @@ function AdminRoom() {
         // const retrievedRoom = await Room.getRoom(roomCode[0]);
         // const retrievedRoom = await Room.createRoom(adminId, tasklistObj, numImposters, numTasksToDo);
         const retrievedRoom = await AdminGameController.getRoomObject(roomCode);
+        console.log(retrievedRoom);
         retrievedRoom.addCallback(forceUpdate)
 
         setRoom(retrievedRoom);
+        setPlayers(retrievedRoom.getPlayerIds());
 
         console.log("AdminRoom(): retrievedRoom: " + retrievedRoom.getRoomCode());
         console.log("AdminRoom(): retrievedRoom: " + retrievedRoom.getRoomCode() + " adminId: " + retrievedRoom.getAdminId() + " tasklist: " + retrievedRoom.getTaskList());
@@ -51,7 +57,8 @@ function AdminRoom() {
         setRoom(null);
       }
     })();
-  }, []);
+  }, []); //      
+
 
   return (
     <div className="center">
@@ -64,7 +71,7 @@ function AdminRoom() {
       ) : (
         <p>No room found for the admin.</p>
       )}
-      {room? room.getPlayerIds().map((playerId) => (<p>{playerId}</p>)): 'no players'}
+      {room ? (room.getPlayerIds()?.map((playerId) => (<p>{playerId}</p>))): ('no players')}
     </div>
   );
 }

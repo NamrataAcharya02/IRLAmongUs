@@ -123,7 +123,7 @@ export class Room {
         this.#tasklist = snapData.tasklist;
         this.#numImposters = snapData.numImposters;
         this.#numTasksToDo = snapData.numTasksToDo;
-        this.#playerIds = snapData.players;
+        this.#playerIds = snapData.playerIds;
         if (this.#callback != null) {
             console.log("running callback in room");
             this.#callback();
@@ -277,7 +277,9 @@ export class Room {
             room = await Room.getRoom(roomCode);
         } catch (error) {
             if (error instanceof RoomNotExistError) {
+                console.log("willcreate");
                 room = Room.createRoom(roomCode, adminId, tasklist, numImposters, numTasksToDo);
+                console.log("have apparently created")
                 console.log("getOrCreateRoom created room with id: " + room.getRoomCode());
             } else if (error instanceof MoreThanOneRoomError) {
                 throw error;

@@ -29,7 +29,7 @@ export default class AdminGameController extends GameController {
        // this.tasklist = tasklist;
        // this.numImposters = numImposters;
        // this.numTasksToComplete = numTasksToComplete;
-        this.adminObject = Admin.getOrCreateAdmin(adminId, ['task'] );
+        //this.adminObject = Admin.getOrCreateAdmin(adminId, ['task'] );
         //create admin object here
     }
 
@@ -67,7 +67,7 @@ export default class AdminGameController extends GameController {
 
     async getAdmin() {
         if (this.adminObject == null) {
-            this.adminObject = Admin.getOrCreateAdmin(this.adminId, ['task']);
+            this.adminObject = await Admin.getOrCreateAdmin(this.adminId, ['task']);
         }
         return this.adminObject;
     }
@@ -88,10 +88,10 @@ export default class AdminGameController extends GameController {
     }
 
     async setRoomCode(roomCode) {
-        this.roomCode = roomCode;
+        /*let admin = await this.getAdmin();
+        this.roomCode = roomCode;*/
+        //console.log(admin);
         let admin = await this.getAdmin();
-        this.roomCode = roomCode;
-        console.log(admin);
         admin.updateAdminRoomCode(roomCode);
     }
 
@@ -119,16 +119,18 @@ export default class AdminGameController extends GameController {
     }
 
     addCallback(callback) {
-        console.log("room adding callback");
+        console.log("admincontroller noting callback");
 
 
 
-       // this.#callback = callback;
+        this.callback = callback;
     }
 
     async startRoom(numImposters, numTasksToComplete) {
         //create a room object
+        console.log("startRoom");
         let admin = await this.getAdmin();
+        console.log("admin: " + admin);
         let tasklist = admin.getTaskList();
         console.log("tasklist: " + tasklist);
         //NEED TO ADD CHECK FOR EXISTING ROOM CODE HERE
@@ -154,20 +156,30 @@ export default class AdminGameController extends GameController {
  
                 let roomCode = AdminGameController.generateRoomCode(ROOM_CODE_LENGTH);
 
-                console.log("roomCode: " + roomCode);     
-                let room = await Room.getOrCreateRoom(roomCode, this.adminId, tasklist, numImposters, numTasksToComplete);
-                this.setRoomCode(roomCode);
-
                 console.log("roomCode: " + roomCode);
+
+                let room = await Room.getOrCreateRoom(roomCode, this.adminId, tasklist, numImposters, numTasksToComplete);
+                console.log("im skipping over this");
+                if (room) {
+                    console.log("room created, setting roomCode")
+                    await this.setRoomCode(roomCode);
+
+                    console.log("roomCode: " + roomCode);
 
                 //room.addCallback(this.callback);
 
-                console.log("room: " + room);
-                return room;
+                    console.log("room: " + room);
+                    return room;
+
+                }
+                
             } catch (error) {
                      if (error instanceof DuplicateRoomCodeError) {
                          console.log("Duplicate roomCode: " + error);
                          throw error;
+                     }
+                     else {
+                        console.log("error" + error);
                      }
             }
         }

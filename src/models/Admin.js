@@ -118,10 +118,12 @@ export class Admin {
     async updateAdminRoomCode(roomCode) {
         if (JSON.stringify(this.getRoomCode()) !== JSON.stringify(roomCode))  
         {
+            console.log(roomCode)
             const docRef = doc(db, "admins", this.getAdminId()).withConverter(adminConverter);
             this.setRoomCode(roomCode);
+            console.log("updating admin with room code " + this.getRoomCode());
             await updateDoc(docRef, {
-                roomCode: roomCode
+                roomCode: this.getRoomCode(),
             });
             console.log("successfully updated admin with room code " + this.getRoomCode());
         }

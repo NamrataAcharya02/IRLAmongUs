@@ -13,17 +13,22 @@ import AdminGameController from "../controllers/AdminGameController.js";
 import {auth, googleAuthProvider} from "../firebase";
 
 let room = null;
-let AdminController = null;
+
+let controller = null;
 
 const AdminPage = () => {
   const [data, setData] = useState(0);
+  const [, forceUpdate] = useReducer(x => x + 1, 0);
+  const [controller, setController] = useState(null);
+
+
+
   const [tasklist, setTasklist] = useState([]) //object that stores tasklist
   const [listName, setListName] = useState("") //name of tasklist
-  const [, forceUpdate] = useReducer(x => x + 1, 0);
   let list = [];
   var tasklistObject = null;
   const navigate = useNavigate();
-  console.log(tasklist)
+  //console.log(tasklist)
   
 
   //don't exceed number of tasks
@@ -42,6 +47,12 @@ const AdminPage = () => {
       if (!user) {
         // If the user is not logged in, navigate to the login page or another appropriate route
         navigate("/");
+      } else {
+        if (controller == null) {
+          setController(new AdminGameController(auth.currentUser.uid, forceUpdate));
+
+
+        }
       }
     };
 
@@ -102,8 +113,8 @@ const AdminPage = () => {
     let admin = await Admin.getAdmin(auth.currentUser.uid);
     console.log(admin)*/
 
-    let controller = new AdminGameController(auth.currentUser.uid, null, null);
-    controller.saveTasklist(tasklist)
+    //let controller = new AdminGameController(auth.currentUser.uid, null, null);
+    controller.saveTasklist(list);
     
     //await admin.updateAdminTasklists(tasklistObj);
 
@@ -155,16 +166,25 @@ const AdminPage = () => {
   const startRoom = async () => {
     console.log("Current user", auth.currentUser.uid);
     let list = [...tasklist];
-   // try {
-      let adminId = auth.currentUser.uid; // Dummy for dev purposes
-      let controller = new AdminGameController(adminId);
-      controller.setNumImposters(numImposters);
-      controller.setNumTasksToComplete(numTasksToDo);
+    try {
+      //let adminId = auth.currentUser.uid; // Dummy for dev purposes
+      //let controller = new AdminGameController(adminId);
+     // controller.setNumImposters(numImposters);
+      //controller.setNumTasksToComplete(numTasksToDo);
       //controller.saveTasklist(list);
 
       let newroom = await controller.startRoom(numImposters, numTasksToDo);
+      //let roomCode = AdminGameController.generateRoomCode(4);
+      //let newroom = await Room.getOrCreateRoom(roomCode, adminId, list, numImposters, numTasksToDo);
+      //await controller.setRoomCode(roomCode);
+
+      setRoom(newroom);
       console.log(newroom);
       navigate("/room");
+    } catch (error) {
+      console.error(error);
+      setRoom(null);
+    }
 
 
       /*let roomCode = '1234';
@@ -205,7 +225,7 @@ const AdminPage = () => {
         <div className="space-divider"></div>
         {tasklist.map((singleTask, index) => (
           <div className='task-container' key={index}>
-            <input className="task" required type="text" placeholder="Task Description" value={singleTask.description} name="task" onChange={(e) => (handleTaskChange(e, index))} />
+            <input className="task" required type="text" placeholder="Task Description" value={singleTask} name="task" onChange={(e) => (handleTaskChange(e, index))} />
             <button className="delete-x" onClick={() => deleteItem(index)}>&#10006;</button>
             {/* {index == tasklist.length - 1}             */}
           </div>
