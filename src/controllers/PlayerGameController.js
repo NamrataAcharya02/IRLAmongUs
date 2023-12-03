@@ -8,7 +8,7 @@ import { RoomNotExistError } from "../errors/roomError";
 // export default class PlayerGameController extends GameController {
 export default class PlayerGameController {
     room;
-    player; // Player object
+    // player; // Player object
     taskList;
     visibleTasks;
     listener;
@@ -99,9 +99,9 @@ export default class PlayerGameController {
         this.player = Player.getPlayer(this.player.getId());
         this.player.setCallMeetingStatus(true);
 
-        
-        // create a subcollection of room for meetings, to keep track of all 
-        // meeting results.
+
+        // Jacob, I should add a function to room: createEmergencySubcollection
+
         // update room status
     }
 
