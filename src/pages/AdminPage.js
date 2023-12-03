@@ -8,6 +8,7 @@ import { Task, TaskList } from "../models/TaskList.js";
 import background from "../images/stars-background.jpg";
 import { useNavigate } from 'react-router-dom';
 import {auth} from "../firebase.js";
+import AdminHowTo from "../components/AdminHowTo.js";
 
 let room = null;
 
@@ -17,7 +18,6 @@ const AdminPage = () => {
   const [listName, setListName] = useState("") //name of tasklist
   const navigate = useNavigate();
   console.log(tasklist)
-  
 
   //don't exceed number of tasks
   const hasEmptyTask = tasklist.some((singleTask, index) => {
@@ -144,6 +144,9 @@ const AdminPage = () => {
       <Link to="/">
         <button className="back">Back</button>
       </Link>
+      {/* "How to Play" pop-up overlay for Players */}
+      <AdminHowTo></AdminHowTo>
+
       {/* TaskList:: */}
       <div className="text-in-box">
         <input className="tasklist-title" placeholder="Name of Task List" value={listName} onChange={(e) => setListName(e.target.value)} />
