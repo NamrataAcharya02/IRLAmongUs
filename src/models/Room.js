@@ -232,10 +232,6 @@ export class Room {
         return doc(db, "rooms", roomCode).withConverter(roomConverter);
     }
 
-    // static #_roomsQueryForCode(roomCode) {
-    //     return query(collection(db, "rooms"), where("code", "==", roomCode)).withConverter(roomConverter);
-    // }
-
     /**
      * Query the database for the unique room belonging to the admin as defined by
      * the parameter `adminId`.
@@ -300,7 +296,7 @@ export class Room {
             room = await Room.getRoom(roomCode);
         } catch (error) {
             if (error instanceof RoomNotExistError) {
-                room = Room.createRoom(adminId, tasklist, numImposters, numTasksToDo);
+                room = Room.createRoom(roomCode, adminId, tasklist, numImposters, numTasksToDo);
                 console.log("getOrCreateRoom created room with id: " + room.getRoomCode());
             } else if (error instanceof MoreThanOneRoomError) {
                 throw error;
@@ -428,7 +424,11 @@ export class Room {
 const roomConverter = {
     toFirestore: (room) => {
         return {
+<<<<<<< HEAD
             staus: room.getStatus(),
+=======
+            status: room.getStatus().enumKey,
+>>>>>>> bfaf162 (fix bugs except __updateFromSnapshot, since not on main)
             id: room.getRoomId(),
             adminId: room.getAdminId(),
             code: room.getRoomCode(),
@@ -442,7 +442,6 @@ const roomConverter = {
         const data = snapshot.data(options);
         let room = new Room(data.id, data.adminId, data.code, data.createdAt, data.tasklist, data.numImposters, data.numTasksToDo);
         room.setPlayerIds(data.playerIds);
-        console.log(`fromFirestore: data.status: ${data.status}`);
         room.setStatus(RoomStatus.enumValueOf(data.status));
         return room;
     }
