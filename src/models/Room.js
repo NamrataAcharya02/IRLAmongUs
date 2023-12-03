@@ -41,6 +41,7 @@ export class Room {
     #numImposters;
     #numTasksToDo;
     #playerIds; // TODO: convert to Player
+    #callback;
     constructor(id, adminId, code, createdAt, tasklist, numImposters, numTasksToDo) {
         this.status = RoomStatus.new;
         this.#id = id;
@@ -50,7 +51,6 @@ export class Room {
         this.#tasklist = tasklist;
         this.#numImposters = numImposters;
         this.#numTasksToDo = numTasksToDo;
-        this.#players = [];
         this.#playerIds = [];
 
         this.#callback = null;
@@ -65,7 +65,7 @@ export class Room {
     getTaskList() { return this.#tasklist; }
     getNumImposters() { return this.#numImposters; }
     getNumTasksToDo() { return this.#numTasksToDo; }
-    getPlayers() { return this.#players; }
+    getPlayerIds() { return this.#playerIds; }
     getStatus() {return this.status; }
 
     setRoomId(id) { this.#id = id; }
@@ -75,10 +75,10 @@ export class Room {
     setTaskList(tasklist) { this.#tasklist = tasklist; }
     setNumImposters(numImposters) { this.#numImposters = numImposters; }
     setNumTasksToDo(numTasksToDo) { this.#numTasksToDo = numTasksToDo; }
-    setPlayers(players) { this.#players = players; }
+    setPlayerIds(players) { this.#playerIds = players; }
     setStatus(status) { this.status = status; }
 
-    addPlayer(player) { this.#players.push(player); }
+    addPlayer(playerId) { this.#playerIds.push(playerId); }
 
     #__updateFromSnapshot(snapData) {
         console.log("updating");
@@ -86,7 +86,7 @@ export class Room {
         this.#adminId = snapData.adminId;
         this.#code = snapData.code;
         this.#createdAt = snapData.createdAt;
-        this.#tasklistObj = snapData.tasklistObj;
+        this.#tasklist = snapData.tasklistObj;
         this.#numImposters = snapData.numImposters;
         this.#numTasksToDo = snapData.numTasksToDo;
         this.#playerIds = snapData.players;
@@ -424,15 +424,12 @@ export class Room {
 const roomConverter = {
     toFirestore: (room) => {
         return {
-<<<<<<< HEAD
-            staus: room.getStatus(),
-=======
             status: room.getStatus().enumKey,
->>>>>>> bfaf162 (fix bugs except __updateFromSnapshot, since not on main)
             id: room.getRoomId(),
             adminId: room.getAdminId(),
             code: room.getRoomCode(),
             createdAt: serverTimestamp(),
+            tasklist: room.getTaskList(),
             numImposters: room.getNumImposters(),
             numTasksToDo: room.getNumTasksToDo(),
             playerIds: room.getPlayerIds(),
