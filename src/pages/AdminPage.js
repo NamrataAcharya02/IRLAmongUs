@@ -22,7 +22,32 @@ const AdminPage = () => {
   const [, forceUpdate] = useReducer(x => x + 1, 0);
   let list = [];
   var tasklistObject = null;
+  const navigate = useNavigate();
   console.log(tasklist)
+  
+
+  //don't exceed number of tasks
+  const hasEmptyTask = tasklist.some((singleTask, index) => {
+    if (singleTask.description == "") {
+      return true;
+    }
+    return false;
+  });
+
+  useEffect(() => {
+    // Check if the user is logged into Firebase when the page opens
+    const checkUser = async () => {
+      const user = auth.currentUser;
+
+      if (!user) {
+        // If the user is not logged in, navigate to the login page or another appropriate route
+        navigate("/");
+      }
+    };
+
+    // Call the checkUser function when the component mounts
+    checkUser();
+  });
 
   useEffect(() => {
     (async function () {
@@ -45,7 +70,15 @@ const AdminPage = () => {
 
   //handle adding a task, adds an extra input field and new task object to tasklist
   const handleAddTask = () => {
-    setTasklist([...tasklist, ""]);
+    if(!hasEmptyTask){
+      setTasklist((prevTasklist) => [...prevTasklist, new Task("")]);
+    }
+  }
+  
+  const deleteItem = (index) => {
+    const updatedTasklist = [...tasklist];
+    updatedTasklist.splice(index, 1);
+    setTasklist(updatedTasklist);
   }
 
   //handle task name change in textbox. Updates task object as changes are being made
@@ -91,7 +124,7 @@ const AdminPage = () => {
   }
   //---------------------- Room Creation ----------------------------------------
   const [room, setRoom] = useState(null);
-  const navigate = useNavigate();
+  
   // Temporary Task Lists
   const taskListObjs = [{
     name: "frontend set task list",
@@ -138,6 +171,7 @@ const AdminPage = () => {
       const newRoom = await Room.getOrCreateRoom(
         adminId,
         roomCode,
+        adminId,
         tasklistObj,
         numImposters,
         numTasksToDo
@@ -167,15 +201,13 @@ const AdminPage = () => {
       {/* TaskList:: */}
 
       <div className="text-in-box">
-        {/*<h2>Task list name:</h2>
-        <input value={listName} onChange={(e) => setListName(e.target.value)} />*/}
-
-        <h2>Task list</h2>
+        <input className="tasklist-title" placeholder="Name of Task List" value={listName} onChange={(e) => setListName(e.target.value)} />
+        <div className="space-divider"></div>
         {tasklist.map((singleTask, index) => (
-          <div>
-            <input className="task" required type="text" placeholder="Task Description" value={singleTask} name="task" onChange={(e) => (handleTaskChange(e, index))} />
-            {index == tasklist.length - 1}
-
+          <div className='task-container' key={index}>
+            <input className="task" required type="text" placeholder="Task Description" value={singleTask.description} name="task" onChange={(e) => (handleTaskChange(e, index))} />
+            <button className="delete-x" onClick={() => deleteItem(index)}>&#10006;</button>
+            {/* {index == tasklist.length - 1}             */}
           </div>
 
         ))

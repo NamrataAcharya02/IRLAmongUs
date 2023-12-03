@@ -291,8 +291,8 @@ export class Room {
             room = await Room.getRoom(roomCode);
         } catch (error) {
             if (error instanceof RoomNotExistError) {
-                room = Room.createRoom(adminId, tasklist, numImposters, numTasksToDo);
-               // console.log("getOrCreateRoom created room with id: " + room.getRoomCode());
+                room = Room.createRoom(roomCode, adminId, tasklist, numImposters, numTasksToDo);
+                console.log("getOrCreateRoom created room with id: " + room.getRoomCode());
             } else if (error instanceof MoreThanOneRoomError) {
                 throw error;
             } else {
@@ -414,7 +414,7 @@ export class Room {
 const roomConverter = {
     toFirestore: (room) => {
         return {
-            staus: room.getStatus().enumKey,
+            status: room.getStatus().enumKey,
             id: room.getRoomId(),
             adminId: room.getAdminId(),
             code: room.getRoomCode(),
@@ -429,7 +429,6 @@ const roomConverter = {
         const data = snapshot.data(options);
         let room = new Room(data.id, data.adminId, data.code, data.createdAt, data.tasklist, data.numImposters, data.numTasksToDo);
         room.setPlayerIds(data.playerIds);
-        console.log(`fromFirestore: data.status: ${data.status}`);
         room.setStatus(RoomStatus.enumValueOf(data.status));
         return room;
     }
