@@ -6,7 +6,6 @@ import {
     query,
     where } from "firebase/firestore";
 import { db } from "../firebase";
-import React from "react";
 
 export const cleanupDbCollectionDocs = async (collectionName, IDsToOmit) => {
 
