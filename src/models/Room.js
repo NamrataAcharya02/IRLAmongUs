@@ -233,7 +233,7 @@ export class Room {
         }
         // Currently, support admin having only one room.
         // const docRef = doc(db, "rooms", adminId).withConverter(roomConverter);
-        const docRef = this.#_roomRefForRoomCode(roomCode);
+        const docRef = this.#_roomRefForRoomCode(roomCode.toString());
         const docSnap = await getDoc(docRef);
         if (docSnap.size > 1) {
             throw new MoreThanOneRoomError("More than one roome with code " + roomCode + ". Contact system adminstrator for help.");
@@ -278,7 +278,7 @@ export class Room {
         } catch (error) {
             if (error instanceof RoomNotExistError) {
                 console.log("willcreate");
-                room = Room.createRoom(roomCode, adminId, tasklist, numImposters, numTasksToDo);
+                room = await Room.createRoom(roomCode, adminId, tasklist, numImposters, numTasksToDo);
                 console.log("have apparently created")
                 console.log("getOrCreateRoom created room with id: " + room.getRoomCode());
             } else if (error instanceof MoreThanOneRoomError) {

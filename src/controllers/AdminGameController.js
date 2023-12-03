@@ -83,7 +83,7 @@ export default class AdminGameController extends GameController {
     static async getRoomObject(roomCode) {
         // get the room object from the database
         // return the room object
-        let room = await Room.getRoom(roomCode);
+        let room = await Room.getRoom(roomCode.toString());
         return room;
     }
 
@@ -154,7 +154,7 @@ export default class AdminGameController extends GameController {
                       * to ensure a code hasn't been added, then use that code. 
                       * */
  
-                let roomCode = AdminGameController.generateRoomCode(ROOM_CODE_LENGTH);
+                let roomCode = AdminGameController.generateRoomCode(ROOM_CODE_LENGTH).toString();
 
                 console.log("roomCode: " + roomCode);
 
