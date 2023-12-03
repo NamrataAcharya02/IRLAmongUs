@@ -2,6 +2,8 @@ import GameController from "./GameController";
 import { Admin } from "../models/Admin";
 import { Room } from "../models/Room";
 import { DuplicateRoomCodeError } from "../errors/roomError";
+import { RoomStatus } from '../models/enum';
+
 const ROOM_CODE_CHARACTER_SET = '0123456789';
 const ROOM_CODE_CHARACTER_SET_LENGTH = ROOM_CODE_CHARACTER_SET.length;
 const ROOM_CODE_LENGTH = 4;
@@ -27,12 +29,6 @@ export default class AdminGameController extends GameController {
         this.players = [];
         this.tasklist = [];
         this.room = null;
-        
-       // this.tasklist = tasklist;
-       // this.numImposters = numImposters;
-       // this.numTasksToComplete = numTasksToComplete;
-        //this.adminObject = Admin.getOrCreateAdmin(adminId, ['task'] );
-        //create admin object here
     }
 
     async getTaskList() {
@@ -82,11 +78,20 @@ export default class AdminGameController extends GameController {
 
     }
 
-    static async getRoomObject(roomCode) {
-        // get the room object from the database
-        // return the room object
-        let room = await Room.getRoom(roomCode.toString());
+    getRoomObject() {
+        return this.room;
+    }
+
+    setRoomObject(room) {
         this.room = room;
+    }
+
+    async getRoomDB(roomCode) {
+        // get the room object from the database
+        let room = await Room.getRoom(roomCode.toString());
+        console.log("CHALU KYA HAI", room)
+        this.setRoomObject(room);
+        console.log("CHALU KYA HAIiiiiiiiiiiiiii", this.room)
         return room;
     }
 
@@ -123,9 +128,6 @@ export default class AdminGameController extends GameController {
 
     addCallback(callback) {
         console.log("admincontroller noting callback");
-
-
-
         this.callback = callback;
     }
 
@@ -166,7 +168,7 @@ export default class AdminGameController extends GameController {
                 if (room) {
                     console.log("room created, setting roomCode")
                     await this.setRoomCode(roomCode);
-                    this.room = room;
+                    this.setRoomObject(room);
 
                     console.log("roomCode: " + roomCode);
 
@@ -187,12 +189,6 @@ export default class AdminGameController extends GameController {
                      }
             }
         }
-
-
-
-        
-        //room.addCallback() in front end 
-
     }
 
     validateNumImposters(n) {
@@ -244,11 +240,12 @@ export default class AdminGameController extends GameController {
         // have been completed.
         console.log("startGame");
         console.log("room object: " + this.room);
+        let room = this.getRoomObject();
 
         //update room status to inGame and update numImposters and numTasksToComplete
-        await this.room.updateRoomStatus(Room.Status.inGame);
-        await this.room.updateRoomNumImposters(numImposters);
-        await this.room.updateRoomNumTasksToComplete(numTasksToComplete);
+        await room.updateStatus(RoomStatus.inProgress);
+        await room.updateNumImposters(numImposters);
+        await room.updateNumTasksToDo(numTasksToComplete);
 
         this.players = this.room.getPlayerIds();
         console.log("players: " + this.players);
