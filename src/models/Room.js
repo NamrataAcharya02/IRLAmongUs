@@ -80,6 +80,11 @@ export class Room {
 
     addPlayer(playerId) { this.#playerIds.push(playerId); }
 
+    addCallback(callback) {
+        console.log("player adding callback");
+        this.#callback = callback;
+    }
+
     #__updateFromSnapshot(snapData) {
         console.log("updating");
         this.#id = snapData.id;
