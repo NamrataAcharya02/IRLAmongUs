@@ -386,3 +386,8 @@ progress{
     height: 10px;
 }
 
+
+p{
+    font-family: 'Amatic SC', sans-serif;
+    font-size: larger;
+}

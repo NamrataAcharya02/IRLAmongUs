@@ -17,7 +17,7 @@ let room = null;
 let controller = null;
 
 const AdminPage = () => {
-  const [data, setData] = useState(0);
+  
   const [, forceUpdate] = useReducer(x => x + 1, 0);
   const [controller, setController] = useState(null);
 
@@ -237,13 +237,6 @@ const AdminPage = () => {
         <div>
           <button onClick={handleAddTask} > Add Task </button>
           <button onClick={handleSaveTasklist}> Save List</button>
-        </div>
-        <h3>Game customizations here</h3>
-        {/* <input type="range" min="1" max="100"/> */}
-        <p>Here's a slider wow:</p>
-        <div className="slider-parent">
-          <input className={data > 50 ? 'heigh' : 'less'} type="range" min="0" max="20" step="1" value={data} onChange={(e) => setData(e.target.value)} />
-          <p>{data}</p>
         </div>
       </div>
       {/* Game customizations other than task list: */}
