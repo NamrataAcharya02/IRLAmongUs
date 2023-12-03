@@ -133,6 +133,14 @@ export default class AdminGameController extends GameController {
         console.log("tasklist: " + tasklist);
         //NEED TO ADD CHECK FOR EXISTING ROOM CODE HERE
          // create a room code that doesn't conflict with existing documents in the db
+
+        // lock this region
+        // get roomcode from admin.getRoomCode();
+        // try to get a room with that code. If the room exists, ensure that room.getAdminId() === admin.getId(). 
+        // If the id's match, good. If not, generate new code, attempt to create a room. loop until unique room created.
+        
+        // finally {unlock region}
+
         let i = 0;
         while(i < 3) {
             try {

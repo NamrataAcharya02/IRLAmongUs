@@ -3,7 +3,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Room } from '../models/Room';
 //import { Player } from '../models/Player';
 
-//import { cleanupDbCollectionDocs } from '../models/utils';
+import { cleanupDbCollectionDocs } from '../models/utils';
 
 //import { faker } from '@faker-js/faker';
 // const { faker } = require('@faker-js/faker');
@@ -36,7 +36,7 @@ function DevRoomComponent () {
     }
 
     const removeExtraRooms = async () =>{
-        //await cleanupDbCollectionDocs("rooms", ALLOWED_ROOM_IDS);
+        await cleanupDbCollectionDocs("rooms", ALLOWED_ROOM_IDS);
     }
 
     const removeExtraPlayers = async () => {
