@@ -76,12 +76,42 @@ export class Room {
             throw TypeError(`status must be of type RoomStatus`);
         }
     }
+    
+    async updateTaskList(tasklist) { 
+        this.setTaskList(tasklist);
+        this.#__update({tasklist: tasklist});
+    }
+    async updateNumImposters(numImposters) { 
+        this.setNumImposters(numImposters); 
+        this.#__update({numImposters: numImposters});
+    }
+    async updateNumTasksToDo(numTasksToDo) { 
+        this.updateNumTasksToDo(numTasksToDo);
+        this.#__update({numTasksToDo: numTasksToDo});
+    }
+    async updateStatus(status) { 
+        if (status instanceof RoomStatus){
+            this.setStatus(status); 
+            this.#__update({status: status.enumKey});
+        } else {
+            throw TypeError(`status must be of type RoomStatus`);
+        }
+    }
 
-    addPlayer(playerId) { this.#playerIds.push(playerId); }
+    async addPlayer(playerId) { 
+        if (!(this.getPlayerIds().includes(playerId))) {
+            this.#playerIds.push(playerId); 
+            this.#__update({playerId: arrayUnion(playerId)});
+        }
+    }
 
     addCallback(callback) {
         console.log("room adding callback");
         this.#callback = callback;
+    }
+
+    async #__update(field) {
+        await updateDoc(Room.#_roomRefForRoomCode(this.getRoomCode()), field);
     }
 
     #__updateFromSnapshot(snapData) {

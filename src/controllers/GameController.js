@@ -8,7 +8,7 @@ export default class GameController {
     // user;   // TODO: User object (user would be super to Admin and Player)
     listener;   // "callback" function
     playerIdNameList;    // list of Player objects formed from room
-    constructor(room, lisener) {
+    constructor(room, listener) {
         this.room = room;
         // this.user = user;
         this.listener = listener;
