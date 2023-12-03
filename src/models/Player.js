@@ -15,9 +15,6 @@ import {
 
 import { db } from "../firebase";
 
-import Task from "./TaskList";
-import TaskList from "./TaskList";
-
 export class Player {
     #id;
     #name;
@@ -278,11 +275,9 @@ export class Player {
 
     //sets the players task list
     async setTaskList(taskList) {
-
-
         const playerRef = doc(db, 'players', this.id);
         try {
-            await updateDoc(playerRef, {taskList: taskList});
+            await updateDoc(playerRef, {taskList: this.#taskList});
             this.#taskList = taskList;
         } catch (error) {
             console.error('Error', error);
@@ -293,7 +288,21 @@ export class Player {
         return this.#taskList;
     }
 
-    
+        //async getImposterStatus() {
+      //  const playerRef = doc(db, 'players', this.id);
+        //try {
+          //  const docSnap = await getDoc(playerRef);
+//
+  //          if (docSnap.exists()) {
+    //            this.#isImposter = docSnap.data().isImposter;
+      //          return this.#isImposter;
+        //    } else {
+          //      console.log('No document');
+            //}
+        //} catch (error) {
+          //  console.error('Error', error);
+        //}
+    //}
 
     async getNumTasksCompleted(){
         return this.#numTasksCompleted;
@@ -304,19 +313,15 @@ export class Player {
         //index = this.#taskList.findIndex(task => task.name)
         //this.#taskList.indexOf(task).completeTask();
         let i = 0;
-        for(i = 0; i < this.taskList.length; i++)
+        for(i = 0; i < this.#taskList.length; i++)
         {
-            if(description == this.taskList[i])
+            if(description == this.#taskList[i])
             {
                 this.#numTasksCompleted++;
                 this.#taskList.splice(i, 1);
             }
         }
 
-        if(this.#taskList.length > 3)
-        {
-            this.#taskList[3].visible = true;
-        }
 
         this.setTaskList(this.#taskList);
 

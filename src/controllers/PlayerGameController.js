@@ -1,6 +1,5 @@
 // import {GameController} from "./GameController";
 import {Player} from "../models/Player";
-import {Task} from "../models/TaskList";
 import {Room} from "../models/Room";
 // import {shuffler} from "../models/utils";
 import { RoomNotExistError } from "../errors/roomError";
@@ -8,7 +7,7 @@ import { RoomNotExistError } from "../errors/roomError";
 // export default class PlayerGameController extends GameController {
 export default class PlayerGameController {
     room;
-    // player; // Player object
+    player; // Player object
     taskList;
     visibleTasks;
     listener;
@@ -66,19 +65,8 @@ export default class PlayerGameController {
 
         // update player object with the generated list
         stringArray = this.room.getTaskList();
-        shuffArray = shuffler(stringArray);
-        for(let i = 0;i < shuffArray.length; i++)
-        {
-            taskDescription = shufArray[i];
+        this.taskList = shuffler(stringArray);
 
-            if(i < 4)
-            {
-                const task = new Task(taskDescription, true);
-                this.taskList.push(task);
-            }
-                this.taskList.push(new Task(taskDescription, false));
-        }
-    
         this.player.setTaskList(this.taskList);
 
     }
@@ -119,18 +107,6 @@ export default class PlayerGameController {
        this.player = Player.getPlayer(this.player.getId());
        this.taskList = this.player.getTaskList();
        this.player.setTaskComplete();
-
-
-        let i = 0;
-       for(i = 0; i < this.tasklist.length; i++)
-       {
-        if(description == this.taskList[i].name)
-        {
-            this.taskList[i].completed = true;
-            this.taskList[i].visible = false;
-            this.player.setTaskComplete(description);
-        }
-       }
 
     }
 
