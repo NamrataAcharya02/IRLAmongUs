@@ -71,6 +71,8 @@ export default class PlayerGameController extends GameController {
         // a db instance to keep track of voting
         // OR create a subcollection of room for meetings, to keep track of all 
         // meeting results.
+        this.player = Player.getPlayer(this.player.getId());
+        this.player.setCallMeetingStatus(true);
     }
 
     markSelfDead() {
