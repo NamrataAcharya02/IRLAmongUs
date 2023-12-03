@@ -118,7 +118,7 @@ export class Player {
         const player = new Player(playerRef, name, "alive", 0, false, roomCode, [], false, false, 0)
 
         await setDoc(playerRef, player)
-        
+
         return this.getPlayer(playerRef);
         
 
@@ -279,6 +279,7 @@ export class Player {
     //sets the players task list
     async setTaskList(taskList) {
 
+        
         const playerRef = doc(db, 'players', this.id);
         try {
             await updateDoc(playerRef, {taskList: taskList});

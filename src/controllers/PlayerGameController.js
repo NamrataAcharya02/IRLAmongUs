@@ -6,15 +6,19 @@ import shuffler from "../models/utils";
 
 export default class PlayerGameController extends GameController {
     player; // Player object
-    tasklist;
+    taskList;
+    visibleTasks;
     callback;
     name;
+    roomCode;
 
     constructor(name, callback) {
-        this.player = player;
-        this.player = Player.createPlayer(name, );
+        this.roomCode = room.getRoomCode();
+        this.player = Player.createPlayer(name, roomCode);
 
-        this.tasklist = [];
+        this.roomCode = 0;
+        this.taskList = [];
+        this.visibleTasks = [];
         this.callback = callback;
         
         
@@ -41,13 +45,14 @@ export default class PlayerGameController extends GameController {
 
             if(i < 4)
             {
-                this.tasklist.push(new Task(taskDescription, false));
+                const task = new Task(taskDescription, true);
+                this.taskList.push(task);
             }
-            
-            this.tasklist.push(new Task(taskDescription, false));
+
+            this.taskList.push(new Task(taskDescription, false));
         }
         
-        this.player.setTaskList(taskList);
+        this.player.setTaskList(this.taskList);
 
     }
 
@@ -80,6 +85,22 @@ export default class PlayerGameController extends GameController {
 
     markTaskComplete(description) {
         // update player tasklists task to completed
+       this.player = Player.getPlayer(this.player.getId());
+       this.taskList = player.getTaskList();
+       this.player.setTaskComplete();
+
+
+        let i = 0;
+       for(i = 0; i < this.tasklist.length; i++)
+       {
+        if(description == this.taskList[i].name)
+        {
+            this.taskList[i].completed = true;
+            this.taskList[i].visible = false;
+            this.player.setTaskComplete(description);
+        }
+       }
+
     }
 
     castVote(playerId) {
@@ -90,6 +111,22 @@ export default class PlayerGameController extends GameController {
 
     getVisibleTasks() {
         // Display up to four tasks that have not been completed.
+        this.player = Player.getPlayer(this.player.getId());
+        this.taskList = this.player.getTaskList();
+        this.visibleTasks = [];
+        if(this.taskList.length < 5){
+            return this.taskList;
+        }
+        else{
+            this.visibleTasks = [
+                this.taskList[0],
+                this.taskList[1],
+                this.taskList[2],
+                this.taskList[3]
+            ];
+        }
+       
+        return this.visibleTasks;
     }
 
     getTasklistStatus() {
