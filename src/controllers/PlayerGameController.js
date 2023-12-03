@@ -1,34 +1,63 @@
-import GameController from "./GameController";
-import Player from "../models/Player";
-import Task from "../models/TaskList";
-import Room from "../models/Room";
-import shuffler from "../models/utils";
+// import {GameController} from "./GameController";
+import {Player} from "../models/Player";
+import {Task} from "../models/TaskList";
+import {Room} from "../models/Room";
+// import {shuffler} from "../models/utils";
+import { RoomNotExistError } from "../errors/roomError";
 
-export default class PlayerGameController extends GameController {
+// export default class PlayerGameController extends GameController {
+export default class PlayerGameController {
+    room;
     player; // Player object
     taskList;
     visibleTasks;
-    callback;
-    name;
+    listener;
+    playerId;
     roomCode;
 
-    constructor(name, callback) {
-        this.roomCode = room.getRoomCode();
-        this.player = Player.createPlayer(name, roomCode);
+    constructor(playerId, listener) {
+        try {
+            this.player = Player.getPlayer(playerId);
+            console.log(`PlayerGameController:constructor this.player.getId(): ${this.player.getId()}`);
+        } catch {
+            // there is no player object with that id
+            console.log(`no player found with id ${playerId}`);
+        }
+        
 
+        this.playerId = playerId;
+        this.listener = listener;  
         this.taskList = [];
         this.visibleTasks = [];
-        this.callback = callback;
-        
-        
-        super();
-       
     }
 
-    joinRoom(roomCode) {
+    joinRoom(roomCode, name) {
+        // try to get a player object, if one exists.
+        try {
+            this.room = Room.getRoom(roomCode);
+            //TODO: add callback to room
+            // this.room.
+
+            this.player.setRoomCode(roomCode);
+
+        } catch (err) {
+            if (err instanceof RoomNotExistError) {
+                console.log(`joinRoom room ${roomCode} does not exists`);
+                return false;
+            } else {  // if no player object exists, create one.
+                const tasks = this.room.getTaskList();
+                //TODO: shuffle tasks
+
+                this.player = new Player(this.playerId, name, "alive", 0, "", roomCode, tasks, false, "", 0);
+                
+                this.room.addPlayer(this.playerId);
+                this.player.setRoomCode(roomCode);
+
+            }
+        }
+
         // set user room to roomCode
         // set room from the return of calling Room.joinRoom
-        this.player.setRoomCode(roomCode);
     }
 
     setTasks() {
@@ -47,32 +76,33 @@ export default class PlayerGameController extends GameController {
                 const task = new Task(taskDescription, true);
                 this.taskList.push(task);
             }
-
-            this.taskList.push(new Task(taskDescription, false));
+                this.taskList.push(new Task(taskDescription, false));
         }
-        
+    
         this.player.setTaskList(this.taskList);
 
     }
+
 
     leaveRoom() {
         // remove player id from room.playerids
         // delete player db instance
 
-        id = player.getId();
+        const id = this.player.getId();
         this.room.leaveRoom(id);
     }
 
     callMeeting() {
         // TODO: SOrt this out
-        // update room status
-        // create emergency room db instance with same roomCode as room
-        // OR create room.createEmergencyField() that creates
-        // a db instance to keep track of voting
-        // OR create a subcollection of room for meetings, to keep track of all 
-        // meeting results.
+        // Jacob, just use this.player.setCallMeetingStatus();
+        // Also, what does setCallMeetingStatus actually do?
         this.player = Player.getPlayer(this.player.getId());
         this.player.setCallMeetingStatus(true);
+
+        
+        // create a subcollection of room for meetings, to keep track of all 
+        // meeting results.
+        // update room status
     }
 
     markSelfDead() {
@@ -87,7 +117,21 @@ export default class PlayerGameController extends GameController {
     markTaskComplete(description) {
         // update player tasklists task to completed
        this.player = Player.getPlayer(this.player.getId());
-       this.player.setTaskComplete(description);
+       this.taskList = this.player.getTaskList();
+       this.player.setTaskComplete();
+
+
+        let i = 0;
+       for(i = 0; i < this.tasklist.length; i++)
+       {
+        if(description == this.taskList[i].name)
+        {
+            this.taskList[i].completed = true;
+            this.taskList[i].visible = false;
+            this.player.setTaskComplete(description);
+        }
+       }
+
     }
 
     castVote(playerId) {

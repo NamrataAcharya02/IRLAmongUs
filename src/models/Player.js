@@ -100,11 +100,11 @@ export class Player {
     }
 
     static async getPlayer(playerId){
-        const playerRef = doc(db, 'plaers', playerId).withConverter(playerConverter);
-        const docSnap = await getDoc(docRef);
+        const playerRef = doc(db, 'players', playerId).withConverter(playerConverter);
+        const docSnap = await getDoc(playerRef);
         if(docSnap.exists())
         {
-            return docSnapt.data();
+            return docSnap.data();
         }
 
         return false;
