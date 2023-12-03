@@ -1,5 +1,6 @@
 import GameController from "./GameController";
 import Player from "../models/Player";
+import Task from "../models/TaskList";
 import Room from "../models/Room";
 import shuffler from "../models/utils";
 
@@ -7,10 +8,11 @@ export default class PlayerGameController extends GameController {
     player; // Player object
     tasklist;
     callback;
+    name;
 
-    constructor(callback) {
+    constructor(name, callback) {
         this.player = player;
-        this.player.createPlayer();
+        this.player = Player.createPlayer(name, );
 
         this.tasklist = [];
         this.callback = callback;
@@ -33,10 +35,20 @@ export default class PlayerGameController extends GameController {
         // update player object with the generated list
         stringArray = this.room.getTaskList();
         shuffArray = shuffler(stringArray);
-        
-        //add stuff still
+        for(let i = 0;i < shuffArray.length; i++)
+        {
+            taskDescription = shufArray[i];
 
+            if(i < 4)
+            {
+                this.tasklist.push(new Task(taskDescription, false));
+            }
+            
+            this.tasklist.push(new Task(taskDescription, false));
+        }
+        
         this.player.setTaskList(taskList);
+
     }
 
     leaveRoom() {
