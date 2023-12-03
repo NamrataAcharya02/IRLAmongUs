@@ -1,7 +1,7 @@
 // import {GameController} from "./GameController";
 import {Player} from "../models/Player";
 import {Room} from "../models/Room";
-// import {shuffler} from "../models/utils";
+import {shuffler} from "../models/utils";
 import { RoomNotExistError } from "../errors/roomError";
 
 // export default class PlayerGameController extends GameController {
@@ -64,7 +64,7 @@ export default class PlayerGameController {
         // N = room.numTasksToComplete tasks.
 
         // update player object with the generated list
-        stringArray = this.room.getTaskList();
+        const stringArray = this.room.getTaskList();
         this.taskList = shuffler(stringArray);
 
         this.player.setTaskList(this.taskList);
