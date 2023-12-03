@@ -438,3 +438,46 @@ progress{
     height: 10px;
 }
 
+/* Collapsible CSS */
+.Collapsible__contentInner{
+    padding: 5px;
+    border: 1px solid lightGrey;
+    border-top: 0;
+    padding-top: 10px;
+    padding-bottom: 0px;
+}
+
+.p, .Collapsible__contentInner{
+    font-size: 14px;
+    line-height: 20px;
+}
+
+.Collapsible__trigger {
+    display: block;
+    font-weight: 400;
+    text-decoration: none;
+    position: relative;
+    border: 1px solid white;
+    padding: 10px;
+    background: black;
+    color: white;
+    font-family: 'Amatic SC', sans-serif;
+    font-size: x-large;
+}
+
+.Collapsible__trigger:hover{
+    color: cyan;
+}
+
+.Collapsible__trigger::after{
+    content: '\f107';
+    position: absolute;
+    right: 10px;
+    top: 10px;
+    display: block;
+    transition: transform 300ms;
+}
+
+.is-disabled, .Collapsible__trigger{
+    background-color: black;
+}

@@ -25,7 +25,7 @@ function PlayerWaiting(){
                             {/* Close "How to Play" pop-up */}
                             <button className="back" onClick={toggleHelpScreen}>Close</button>
                             {/* Crewmate How to Play */}
-                            <h2 className="waitingRoomh2">Crewmate</h2>
+                            <h2 className="whiteh2">Crewmate</h2>
                             <ol className="helpList">
                                 <li>
                                     To win: Complete all tasks before Imposters kill all 
@@ -56,7 +56,7 @@ function PlayerWaiting(){
                         </div>
                         {/* Imposter How to Play */}
                         <div className="help-in-box">
-                            <h2 className="waitingRoomh2">Imposter</h2>
+                            <h2 className="whiteh2">Imposter</h2>
                             <ol className="helpList">
                                 <li>
                                     To win: Kill crewmates (method to “kill” a player decided before the game starts 
