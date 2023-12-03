@@ -88,7 +88,7 @@ function PlayerWaiting(){
                     </div>
                 </div>
             )}
-            <button className="helpButton" onClick={toggleHelpScreen}>Help</button>
+            <button className="helpButton" onClick={toggleHelpScreen}>How to Play</button>
             
             <h1>Hello {nickname}!</h1>
             <h2 className="waitingRoomh2">Room Code: pretend there's a code here</h2>
