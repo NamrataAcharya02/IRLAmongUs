@@ -313,6 +313,16 @@ export class Player {
         return this.#numTasksCompleted;
     }
 
+    async setNumTasksCompleted(numTasksCompleted) {
+        const playerRef = doc(db, 'players', this.#id);
+        try {
+            await updateDoc(playerRef, {numTasksCompleted: numTasksCompleted});
+            this.#numTasksCompleted = numTasksCompleted;
+        } catch (error) {
+            console.error('Error', error);
+        }
+    }
+
     async setTaskComplete(description)
     {
         //index = this.#taskList.findIndex(task => task.name)
@@ -327,7 +337,7 @@ export class Player {
             }
         }
 
-
+        this.setNumTasksCompleted(this.#numTasksCompleted);
         this.setTaskList(this.#taskList);
 
     }
