@@ -32,6 +32,7 @@ export class Room {
     #tasklist;
     #numImposters;
     #numTasksToDo;
+    #numTasksComplete;
 
     #playerIds;
 
@@ -61,6 +62,7 @@ export class Room {
     getNumTasksToDo() { return this.#numTasksToDo; }
     getPlayerIds() { return this.#playerIds; }
     getStatus() {return this.status; }
+    getNumTasksComplete() { return this.#numTasksComplete; }
 
     setRoomId(id) { this.#id = id; }
     setAdminId(adminId) { this.#adminId = adminId; }
@@ -76,6 +78,17 @@ export class Room {
         } else {
             throw TypeError(`status must be of type RoomStatus`);
         }
+    }
+
+    /**
+     * 
+     * @param {Number} num the number of tasks to add to NumTasksComplete
+     */
+    addNumTasksComplete(num) {
+        if (!(num instanceof Number)) {
+            throw TypeError(`num "${num}" in addNumTasksComplete invalid Type`);
+        }
+        this.#numTasksComplete = this.getNumTasksComplete() + num;
     }
     
     async updateTaskList(tasklist) { 
@@ -97,6 +110,11 @@ export class Room {
         } else {
             throw TypeError(`status must be of type RoomStatus`);
         }
+    }
+
+    async updateNumTasksComplete(num) {
+        this.addNumTasksComplete(num);
+        this.#__update({numTasksComplete: this.getNumTasksComplete()});
     }
 
     async addPlayer(playerId) { 
@@ -418,6 +436,7 @@ const roomConverter = {
             tasklist: room.getTaskList(),
             numImposters: room.getNumImposters(),
             numTasksToDo: room.getNumTasksToDo(),
+            numTasksComplete: room.getNumTasksComplete(),
             playerIds: room.getPlayerIds(),
             };
     },
@@ -425,6 +444,7 @@ const roomConverter = {
         const data = snapshot.data(options);
         let room = new Room(data.id, data.adminId, data.code, data.createdAt, data.tasklist, data.numImposters, data.numTasksToDo);
         room.setPlayerIds(data.playerIds);
+        room.setNumTasksComplete(data.numTasksComplete);
         room.setStatus(RoomStatus.enumValueOf(data.status));
         return room;
     }
