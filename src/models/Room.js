@@ -61,6 +61,7 @@ export class Room {
     getTaskList() { return this.#tasklist; }
     getNumImposters() { return this.#numImposters; }
     getNumTasksToDo() { return this.#numTasksToDo; }
+    getNumPlayers() {return this.#playerIds.length; }
     getPlayerIds() { return this.#playerIds; }
     getStatus() {return this.status; }
     getNumTasksComplete() { return this.#numTasksComplete; }
@@ -88,7 +89,7 @@ export class Room {
      * @param {Number} num the number of tasks to add to NumTasksComplete
      */
     addNumTasksComplete(num) {
-        if (!(num instanceof Number)) {
+        if (!(typeof num !== Number)) {
             throw TypeError(`num "${num}" in addNumTasksComplete invalid Type`);
         }
         this.#numTasksComplete = this.getNumTasksComplete() + num;
