@@ -15,48 +15,68 @@ export default class PlayerGameController {
     roomCode;
 
     constructor(playerId, listener) {
-        try {
-            this.player = Player.getPlayer(playerId);
-            console.log(`PlayerGameController:constructor this.player.getId(): ${this.player.getId()}`);
-        } catch {
-            // there is no player object with that id
-            console.log(`no player found with id ${playerId}`);
-        }
-        
-
+        this.room = null;
+        this.player = null;
         this.playerId = playerId;
+        this.name = "";
+        this.roomCode = null;
         this.listener = listener;  
         this.taskList = [];
         this.visibleTasks = [];
     }
 
-    joinRoom(roomCode, name) {
-        // try to get a player object, if one exists.
+    async init() {
+        let player = await Player.getPlayer(this.playerId);
+        if (!player) {
+            console.log(`no player found with id ${this.playerId}...creating`);
+            // new players during PlayerGameController startup have not actually "joined" a room
+            // therefore, name or room code information has not been submitted.
+            player = await Player.createPlayer("", this.playerId, "");
+        }
+        this.player = player;
+
         try {
-            this.room = Room.getRoom(roomCode);
-            //TODO: add callback to room
-            // this.room.
-
-            this.player.setRoomCode(roomCode);
-
+            console.log(`this.player.getRoomCode(): ${this.player.getRoomCode()}`);
+            this.room = await Room.getRoom(this.player.getRoomCode()); // will either have 4-char string or ""
         } catch (err) {
             if (err instanceof RoomNotExistError) {
-                console.log(`joinRoom room ${roomCode} does not exists`);
-                return false;
-            } else {  // if no player object exists, create one.
-                const tasks = this.room.getTaskList();
-                //TODO: shuffle tasks
-
-                this.player = new Player(this.playerId, name, "alive", 0, "", roomCode, tasks, false, "", 0);
-                
-                this.room.addPlayer(this.playerId);
-                this.player.setRoomCode(roomCode);
-
+                console.log(`PlayerGameController.init() room ${this.player.getRoomCode()} not exist`);
+                this.room = null;
+            } else {
+                console.log(`some other err: ${err}`);
             }
         }
 
-        // set user room to roomCode
-        // set room from the return of calling Room.joinRoom
+
+        player.addCallback(this.listener);
+
+        return this;
+    }
+
+    async joinRoom(roomCode, name) {
+        if (!this.room) {
+            try {
+                this.room = await Room.getRoom(roomCode);
+            } catch (err) {
+                if (err instanceof RoomNotExistError) {
+                    console.log(`joinRoom room ${roomCode} does not exists`);
+                }
+                throw err;
+            }
+        }
+        
+        await this.player.setName(name);
+        await this.player.setRoomCode(roomCode);
+
+        // TODO: THIS NEEDS ROOM FROM ADMIN SIDE
+        // this.room.addPlayer(this.player.getId());
+        
+        // get tasklist from room
+        this.setTasks();
+
+        // TODO: 
+        // this.room.addCallback(this.listener);
+
     }
 
     setTasks() {

@@ -43,19 +43,27 @@ function DevPlayerComponent () {
     }
 
     const createPlayerAndJoinRoom = async () => {
-        try {
-            console.log("create player and join lobby");
 
-            // if !auth.currentUser.authenticated
-            const playerId = '309fka230fn';
-            const roomCode = '1966';
-            const controller = new PlayerGameController(playerId, roomCode, forceUpdate);
-            
-            setPlayerController(controller);
-            
-        } catch (e) {
-            console.log("DevRoomComponent.createPlayerAndJoinRoom catch (e): " + e);
-        }
+        console.log("create player and join lobby");
+
+        // if !auth.currentUser.authenticated
+        const playerId = '309fka230fn';
+        const name = 'Richard';
+        const roomCode = '1966';
+        
+        let controller = await new PlayerGameController(playerId, forceUpdate).init();
+        console.log(controller);
+        
+        // debugger;
+        
+        await controller.joinRoom(roomCode, name);
+
+        console.log(`controller.room.getRoomCode(): ${controller.room.getRoomCode()}`);
+        console.log(`controller.room.getTaskList(): ${controller.room.getTaskList()}`);
+        
+        console.log(`finally, success`);
+        
+        setPlayerController(controller); // updateState
     }
 
     // const removePlayersFromRoom = async () => {
@@ -77,7 +85,7 @@ function DevPlayerComponent () {
         <p>{room ? "numImposters: " + room.getNumImposters() : "no imposter(s)"}</p>
         <div>
 
-        <button onClick={removeExtraRooms}>Remove Rooms</button> 
+        <button onClick={removeExtraRooms}>Remove Rooms</button>
         <button onClick={removeExtraPlayers}>Remove Players</button>
         
         <button onClick={createPlayerAndJoinRoom}>Create Player and Join Room</button>
