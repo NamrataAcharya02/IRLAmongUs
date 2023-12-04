@@ -7,6 +7,7 @@ import VoteScreen from "../components/VoteScreen";
 import useSound from 'use-sound';
 import meetingSound from '../sounds/meetingSFX.mp3'
 import meetingBackground from "../images/stars-background.jpg";
+import { useNavigate } from "react-router-dom";
 
 function PlayerGame(){
     const [isEmergencyScreen, setEmergencyScreen] = useState(false);
@@ -14,6 +15,20 @@ function PlayerGame(){
     const [currentComplete, setComplete] = useState(0);
     const [toComplete, setToComplete] = useState(20);
     const [playSound] = useSound(meetingSound);
+    const [gameEnd, setGameEnd] = useState();
+    const navigate = useNavigate();
+
+    const setImposterWin = () => {
+        setGameEnd("imposterWin");
+    }
+
+    const setCrewmateWin = () => {
+        setGameEnd("crewmateWin");
+    }
+
+    const returnHome = () => {
+        navigate("/");
+    }
 
     //function for toggling emergency screen to use (can also directly set emergency screen)
     const toggleEmergencyScreen = () => {
@@ -40,7 +55,7 @@ function PlayerGame(){
     }
 
     return (
-        <div className="center" style={{paddingTop: "20px"}}>
+        <div className="center" style={{paddingTop: "20px", paddingBottom:"20px", backgroundImage: `url(${meetingBackground})`}}>
             {/* Progress bar shows how many tasks completed (currentComplete) out of total tasks (toComplete) */}
             <h4>Total Tasks Completed</h4>
             <progress value={currentComplete} max={toComplete}></progress>
@@ -68,7 +83,25 @@ function PlayerGame(){
                     </div>
                 </div>
             )}
+            {gameEnd==="imposterWin" && (
+                <div className="imposter-win">
+                    <h1>IMPOSTER VICTORY</h1>
+                    <div className="center">
+                        <button onClick={returnHome}>Return Home</button>
+                    </div>                   
+                </div>
+            )}
+            {gameEnd==="crewmateWin" && (
+                <div className="crewmate-win">
+                    <h1>CREWMATE VICTORY</h1>
+                    <div className="center">
+                        <button onClick={returnHome}>Return Home</button>
+                    </div>
+                </div>
+            )}
             <button onClick={toggleEmergencyScreen}>Call Emergency Meeting</button>
+            <button onClick={setImposterWin}>Set Imposter Victory</button>
+            <button onClick={setCrewmateWin}>Set Crewmate Victory</button>
         </div>
     );
 }
