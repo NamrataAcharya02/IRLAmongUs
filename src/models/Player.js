@@ -215,7 +215,7 @@ export class Player {
 
     //sets the room code for player
     async setRoomCode(newRoomCode) {
-        const playerRef = doc(db, 'players', this.id);
+        const playerRef = doc(db, 'players', this.#id);
         try {
             await updateDoc(playerRef, {roomCode: newRoomCode});
             this.#roomCode = newRoomCode;
@@ -231,7 +231,7 @@ export class Player {
 
     //sets player status to dead
     async setAliveStatus(status) {
-        const playerRef = doc(db, 'players', this.id);
+        const playerRef = doc(db, 'players', this.#id);
         try {
             await updateDoc(playerRef, {status: status});
             this.#status = status;
@@ -247,7 +247,7 @@ export class Player {
 
     //set the number of votes the player received in meeting
     async setVotesReceived(votes) {
-        const playerRef = doc(db, 'players', this.id);
+        const playerRef = doc(db, 'players', this.#id);
         try {
             await updateDoc(playerRef, {numVotesReceived: votes});
             this.#numVotesReceived = votes;
@@ -263,7 +263,7 @@ export class Player {
 
     //sets player to be voted out, voteToCast set to true
     async setVoteOut(status) {
-        const playerRef = doc(db, 'players', this.id);
+        const playerRef = doc(db, 'players', this.#id);
         try {
             await updateDoc(playerRef, {voteToCast: status});
             this.#voteToCast = status;
@@ -279,7 +279,7 @@ export class Player {
 
     //sets the players task list
     async setTaskList(taskList) {
-        const playerRef = doc(db, 'players', this.id);
+        const playerRef = doc(db, 'players', this.#id);
         try {
             await updateDoc(playerRef, {taskList: this.#taskList});
             this.#taskList = taskList;
