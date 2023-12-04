@@ -11,6 +11,7 @@ import { useNavigate } from 'react-router-dom';
 import DevRoomComponent from "../development-components/DevAdminComponent.js";
 import AdminGameController from "../controllers/AdminGameController.js";
 import {auth, googleAuthProvider} from "../firebase";
+import AdminHowTo from "../components/AdminHowTo.js";
 
 let room = null;
 
@@ -217,6 +218,9 @@ const AdminPage = () => {
         <button className="back">Back</button>
       </Link>
       <DevRoomComponent></DevRoomComponent>
+
+      {/* "How to Play" pop-up overlay for Players */}
+      <AdminHowTo></AdminHowTo>
 
       {/* TaskList:: */}
 
