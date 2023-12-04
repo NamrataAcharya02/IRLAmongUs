@@ -359,6 +359,28 @@ main {
     z-index:1000;
 }
 
+.imposter-win{
+    /* opacity:0.9; */
+    background-color:#250201;
+    position:fixed;
+    width:100%;
+    height:100%;
+    top:0px;
+    left:0px;
+    z-index:1001;
+}
+
+.crewmate-win{
+    /* opacity:0.9; */
+    background-color:#060221;
+    position:fixed;
+    width:100%;
+    height:100%;
+    top:0px;
+    left:0px;
+    z-index:1001;
+}
+
 .voteScreenBox{
     display: flex;
     background-color: #555e6bbc;
