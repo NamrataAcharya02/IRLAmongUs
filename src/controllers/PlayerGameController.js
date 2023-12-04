@@ -57,25 +57,33 @@ export default class PlayerGameController {
         if (!this.room) {
             try {
                 this.room = await Room.getRoom(roomCode);
+                await this.player.setRoomCode(roomCode);
+
+                this.room.addPlayer(this.player.getId());
+
+                this.setTasks();
+
+                // TODO: 
+                this.room.addCallback(this.listener);
             } catch (err) {
                 if (err instanceof RoomNotExistError) {
                     console.log(`joinRoom room ${roomCode} does not exists`);
                 }
                 throw err;
             }
+        } else {
+            // a room object already exists, so join whatever room is in that
         }
         
         await this.player.setName(name);
-        await this.player.setRoomCode(roomCode);
 
-        // TODO: THIS NEEDS ROOM FROM ADMIN SIDE
-        this.room.addPlayer(this.player.getId());
+        // this.room.addPlayer(this.player.getId());
         
         // get tasklist from room
-        this.setTasks();
+        // this.setTasks();
 
-        // TODO: 
-        this.room.addCallback(this.listener);
+        // // TODO: 
+        // this.room.addCallback(this.listener);
 
     }
 
