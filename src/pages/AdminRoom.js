@@ -5,6 +5,8 @@ import {auth, googleAuthProvider} from "../firebase";
 import { useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import AdminGameController from "../controllers/AdminGameController";
+import {RoomStatus} from "../models/enum";
+
 function AdminRoom() {
   const [room, setRoom] = useState(null);
   const [playerList, setPlayerList] = useState([
@@ -23,6 +25,12 @@ function AdminRoom() {
   const [numPlayers, setNumPlayers] = useState(6);
   const [numTasksInFullList, setNumTasksInFullList] = useState(10);
   const [endGame, setEndGame] = useState(false);
+  const [currentComplete, setComplete] = useState(0);
+  const [toComplete, setToComplete] = useState(20);
+
+
+//  let currentCompleteRef = useRef(0);
+  //let toCompleteRef = useRef(20);
   const navigate = useNavigate();
 
   //const forceUpdate = React.useReducer(() => ({}))[1];
@@ -32,17 +40,20 @@ function AdminRoom() {
 
   const [roomState, setRoomState] = useState("inGame");
 
-  function callMeeting (){
+  async function callMeeting (){
     setRoomState("meetingCalled");
-    //controller.current.updateRoomStatus("")
+    await controller.current.updateRoomStatus(RoomStatus.emergencyMeeting);
     console.log("AH");
   }
 
-  function openVoting(){
+  async function openVoting(){
+    await controller.current.updateRoomStatus(RoomStatus.voting);
     setRoomState("votingScreen");
   }
 
-  function endMeeting(){
+  async function endMeeting(){
+    await controller.current.updateRoomStatus(RoomStatus.inProgress);
+
     setRoomState("inGame");
   }
 
@@ -81,6 +92,8 @@ function AdminRoom() {
     console.log("controller.current" + controller.current.getRoomObject(), controller.current.getNumImposters());
     await controller.current.startGame(numImposters, numTasksToDo);
     setPlayers(controller.current.getPlayers());
+    setToComplete(controller.current.threshold);
+    setComplete(controller.current.getTotalNumberTasksCompleted());
   }
 
   useEffect(() => {
@@ -101,6 +114,8 @@ function AdminRoom() {
 
 
         setPlayers(controller.current.getPlayers());
+        setToComplete(controller.current.threshold);
+        setComplete(controller.current.getTotalNumberTasksCompleted());
         console.log("updated players", players);
         controller.current.setNumImposters(5);
         console.log(controller.current.checkEndGame());
@@ -129,6 +144,8 @@ function AdminRoom() {
         if (controller.current.checkEndGame() && !endGame){
           setEndGame(true);
         }
+        setToComplete(controller.current.threshold);
+        setComplete(controller.current.getTotalNumberTasksCompleted());
       
       } catch (error) {
        
@@ -169,6 +186,11 @@ function AdminRoom() {
       {gameScreen && (
         <div>
           <h1>In game</h1>
+          <progress value={controller.current.getTotalNumberTasksCompleted()} max={controller.current.threshold}></progress>
+
+          {controller.current.threshold}
+          {controller.current.getTotalNumberTasksCompleted()}
+
           {room ? (room.getPlayerIds()?.map((playerId) => (<p>{playerId}</p>))): ('no players')}
           {controller.current.getPlayers().map((player) => (<p>{player.getName()} {player.getNumTasksCompleted()
           } {player.getStatus()} Imposter? {player.getImposterStatus()}</p>))}
