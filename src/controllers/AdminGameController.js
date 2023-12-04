@@ -19,6 +19,7 @@ export default class AdminGameController extends GameController {
     adminObject = null;
     callback;
     room;
+    threshold;
 
     //remove tasklist from constructor (and the other things, keep only adminId)
     constructor(adminId, callback) {
@@ -84,6 +85,10 @@ export default class AdminGameController extends GameController {
 
     setRoomObject(room) {
         this.room = room;
+    }
+
+    getPlayers() {
+        return this.players;    
     }
 
     async getRoomDB(roomCode) {
@@ -217,8 +222,25 @@ export default class AdminGameController extends GameController {
         // return list of playerIds of assigned imposters
     }
 
-    #assignPlayerRoles() {
+    async #assignPlayerRoles() {
         // update player object
+        shufflePlayers = this.players;
+        // Shuffle array
+        const shuffled = this.players.sort(() => 0.5 - Math.random());
+
+       // Get sub-array of first n elements after shuffled
+        let imposters = shuffled.slice(0, this.numImposters);
+
+        this.players.forEach(pid => {
+            if (pid in imposters) {
+                // update player role to "Imposter"
+
+            } else {
+                // update player role to "Crewmate"
+            }
+        });
+
+
     }
 
     setGameParameters(paramsDict) {
@@ -241,6 +263,8 @@ export default class AdminGameController extends GameController {
         console.log("startGame");
         console.log("room object: " + this.room);
         let room = this.getRoomObject();
+        this.setNumImposters(numImposters);
+        this.setNumTasksToComplete(numTasksToComplete);
 
         //update room status to inGame and update numImposters and numTasksToComplete
         await room.updateStatus(RoomStatus.inProgress);
@@ -249,6 +273,7 @@ export default class AdminGameController extends GameController {
 
         this.players = this.room.getPlayerIds();
         console.log("players: " + this.players);
+
 
 
         /*// create player objs
@@ -262,6 +287,11 @@ export default class AdminGameController extends GameController {
             p.addCallback(this.callback);
             return p;
         }); */
+
+        // assign player roles
+       // await this.#assignPlayerRoles();
+        //this.threshold = this.getNumTasksToComplete(); * (len(this.players) - this.getNumImposters());
+
 
 
     }
@@ -287,10 +317,6 @@ export default class AdminGameController extends GameController {
         // set room status to ActiveVoting (in front end, if getRoomStatus() is 
         // "ActiveVoting," display voting ui to players)
         //when voting begins, create a vote doc with an array of all players who have casted a vote
-
-
-
-
     }
 
     getVotingProgress() {

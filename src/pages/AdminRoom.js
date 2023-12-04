@@ -24,10 +24,11 @@ function AdminRoom() {
   //Can also simply use 
   //      setGameScreen(true);
   //To go into in game screen
-  function toggleGameScreen(){
+  async function toggleGameScreen(){
     setGameScreen(!gameScreen);
     console.log("controller.current" + controller.current.getRoomObject(), controller.current.getNumImposters());
-    controller.current.startGame(numImposters, numTasksToDo);
+    await controller.current.startGame(numImposters, numTasksToDo);
+    setPlayers(controller.current.getPlayers());
   }
 
   useEffect(() => {
@@ -45,7 +46,7 @@ function AdminRoom() {
         retrievedRoom.addCallback(forceUpdate)
 
         setRoom(retrievedRoom);
-        setPlayers(retrievedRoom.getPlayerIds());
+        setPlayers(controller.current.getPlayers());
         controller.current.setNumImposters(5);
 
         console.log("AdminRoom(): retrievedRoom: " + retrievedRoom.getRoomCode());
@@ -55,7 +56,20 @@ function AdminRoom() {
         setRoom(null);
       }
     })();
-  }, []); //      
+  }, []); // 
+  
+  useEffect(() => {
+    (async function () {
+      try {
+        //re rendered: check if task threshold has reached. if yes, end game
+      
+      } catch (error) {
+       
+      }
+    })();
+  }, []); // 
+  
+  
 
 
   return (
