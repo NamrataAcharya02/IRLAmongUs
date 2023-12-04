@@ -100,7 +100,8 @@ export class Player {
         const playerRef = doc(db, 'players', playerId).withConverter(playerConverter);
         const docSnap = await getDoc(playerRef);
         if(docSnap.exists())
-        {
+        {   
+            console.log(docSnap.data());
             return docSnap.data();
         }
 
@@ -109,14 +110,17 @@ export class Player {
     }
 
     //creates a player in the players collection
-    static async createPlayer(name, roomCode) {
-        const playerRef = doc(collection(db, "players"));
-       
-        const player = new Player(playerRef, name, "alive", 0, false, roomCode, [], false, false, 0)
+    static async createPlayer(name, playerId, roomCode) {
+        // const playerRef = doc(collection(db, "players"), playerId).withConverter(playerConverter);
+        const playerRef = doc(db, "players", playerId).withConverter(playerConverter);
+        
+        // debugger;
+        const player = new Player(playerId, name, "alive", 0, false, roomCode, [], false, false, 0);
 
-        await setDoc(playerRef, player)
+        await setDoc(playerRef, player);
 
-        return this.getPlayer(playerRef);
+        // return this.getPlayer(playerRef);
+        return player;
         
 
     }
@@ -160,7 +164,7 @@ export class Player {
           //  console.error('Error', error);
         //}
     //}
-    async getImposterStatus() {
+    getImposterStatus() {
         return this.#isImposter;
     }
 
@@ -174,7 +178,7 @@ export class Player {
         }
     }
 
-    async getId(){
+    getId(){
         return this.#id;
     }
 
@@ -190,7 +194,7 @@ export class Player {
     }
 
     //returns name
-    async getName() {
+    getName() {
         return this.#name;
     }
     //sets calledMeeting to true
@@ -205,7 +209,7 @@ export class Player {
     }
 
     //returns meeting status of player
-    async getMeetingStatus() {
+    getMeetingStatus() {
         return this.#calledMeeting;
     }
 
@@ -221,7 +225,7 @@ export class Player {
     }
 
     //gets the room code for player, returns roomCode
-    async getRoomCode() {
+    getRoomCode() {
         return this.#roomCode;
     }
 
@@ -237,7 +241,7 @@ export class Player {
     }
 
     //returns player status
-    async getStatus() {
+    getStatus() {
         return this.#status;
     }
 
@@ -253,7 +257,7 @@ export class Player {
     }
 
     //get the number of votes the player received in meeting
-    async getVotesReceived() {
+    getVotesReceived() {
         return this.#numVotesReceived;
     }
 
@@ -269,7 +273,7 @@ export class Player {
     }
 
     //returns vote status, true means player has been voted out
-    async getVoteStatus() {
+    getVoteStatus() {
         return this.#voteToCast;
     }
 
@@ -284,7 +288,7 @@ export class Player {
         }
     }
 
-    async getTaskList() {
+    getTaskList() {
         return this.#taskList;
     }
 
@@ -304,7 +308,7 @@ export class Player {
         //}
     //}
 
-    async getNumTasksCompleted(){
+    getNumTasksCompleted(){
         return this.#numTasksCompleted;
     }
 
@@ -332,7 +336,7 @@ export class Player {
 const playerConverter = {
     toFirestore: (player) => {
         return {
-            id: player.getName(),
+            id: player.getId(),
             name: player.getName(),
             status: player.getStatus(),
             numVotesReceived: player.getVotesReceived(),
@@ -341,7 +345,7 @@ const playerConverter = {
             taskList: player.getTaskList(), 
             isImposter: player.getImposterStatus(),
             calledMeeting: player.getMeetingStatus(),
-            numTasksCompleted: player.getNumTasksCompleted(),
+            numTasksCompleted: player.getNumTasksCompleted()
             };
     },
     fromFirestore: (snapshot, options) => {
@@ -355,7 +359,7 @@ const playerConverter = {
         player.playerTaskList(data.taskList);
         player.playerIsImposter(data.isImposter);
         player.playerCalledMeeting(data.calledMeeting);
-        player.numTasksCompleted(data.numTasksCompleted);
+        player.playerNumTasksCompleted(data.numTasksCompleted);
 
         return player;
     }
