@@ -80,7 +80,7 @@ export class Admin {
         }
         else {
             console.log('creating admin')
-            admin = this.createAdmin(adminId, taskLists);
+            admin = await this.createAdmin(adminId, taskLists);
         }
         /*try {
             room = await Room.getRoom(adminId);

@@ -99,9 +99,9 @@ function AdminRoom() {
   useEffect(() => {
     (async function () {
       
+      let adminObject = await controller.current.getAdmin();
 
       let roomCode = await controller.current.getRoomCode();
-     // let adminObject = await controller.getAdmin();
       try {
         const retrievedRoom = await controller.current.getRoomDB(roomCode);
         console.log(retrievedRoom);

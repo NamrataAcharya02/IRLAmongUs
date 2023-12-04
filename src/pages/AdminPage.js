@@ -12,18 +12,17 @@ import DevRoomComponent from "../development-components/DevAdminComponent.js";
 import AdminGameController from "../controllers/AdminGameController.js";
 import {auth, googleAuthProvider} from "../firebase";
 import AdminHowTo from "../components/AdminHowTo.js";
+import { useRef } from 'react';
 
 let room = null;
 
-let controller = null;
+//let controller = null;
 
 const AdminPage = () => {
   
   const [, forceUpdate] = useReducer(x => x + 1, 0);
-  const [controller, setController] = useState(null);
-
-
-
+  //const [controller, setController] = useState(null);
+  let controller = useRef(new AdminGameController(auth.currentUser.uid, forceUpdate));
   const [tasklist, setTasklist] = useState([]) //object that stores tasklist
   const [listName, setListName] = useState("") //name of tasklist
   let list = [];
@@ -50,7 +49,7 @@ const AdminPage = () => {
         navigate("/");
       } else {
         if (controller == null) {
-          setController(new AdminGameController(auth.currentUser.uid, forceUpdate));
+         // setController(new AdminGameController(auth.currentUser.uid, forceUpdate));
 
 
         }
@@ -65,7 +64,9 @@ const AdminPage = () => {
     (async function () {
       try {
         if (tasklist == null || tasklist.length == 0) {
-        let admin  = await Admin.getAdmin(auth.currentUser.uid);
+          console.log("getting admin", auth.currentUser.uid)
+        let admin  = await Admin.getOrCreateAdmin(auth.currentUser.uid, ['task']);
+        console.log("got admin", admin)
         list = admin.getTaskList();
         setTasklist(list);
         forceUpdate();
@@ -115,7 +116,7 @@ const AdminPage = () => {
     console.log(admin)*/
 
     //let controller = new AdminGameController(auth.currentUser.uid, null, null);
-    controller.saveTasklist(list);
+    controller.current.saveTasklist(list);
     
     //await admin.updateAdminTasklists(tasklistObj);
 
@@ -174,7 +175,7 @@ const AdminPage = () => {
       //controller.setNumTasksToComplete(numTasksToDo);
       //controller.saveTasklist(list);
 
-      let newroom = await controller.startRoom(numImposters, numTasksToDo);
+      let newroom = await controller.current.startRoom(numImposters, numTasksToDo);
       //let roomCode = AdminGameController.generateRoomCode(4);
       //let newroom = await Room.getOrCreateRoom(roomCode, adminId, list, numImposters, numTasksToDo);
       //await controller.setRoomCode(roomCode);
