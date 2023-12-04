@@ -149,6 +149,6 @@ export default class PlayerGameController {
 
     getTasklistStatus() {
         // return (number of tasks complete, number of tasks requred)
-        
+        return this.player.getNumTasksCompleted();
     }
 }
