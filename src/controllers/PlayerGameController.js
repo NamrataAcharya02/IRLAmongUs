@@ -79,7 +79,7 @@ export default class PlayerGameController {
 
     }
 
-    setTasks() {
+    async setTasks() {
         // generate from room.tasklist.tasks a randomized list of 
         // N = room.numTasksToComplete tasks.
 
@@ -92,19 +92,17 @@ export default class PlayerGameController {
     }
 
 
-    leaveRoom() {
+    async leaveRoom() {
         // remove player id from room.playerids
         // delete player db instance
 
-        const id = this.player.getId();
-        this.room.leaveRoom(id);
+        this.room.leaveRoom(this.playerId);
     }
 
-    callMeeting() {
+    async callMeeting() {
         // TODO: SOrt this out
         // Jacob, just use this.player.setCallMeetingStatus();
         // Also, what does setCallMeetingStatus actually do?
-        this.player = Player.getPlayer(this.player.getId());
         this.player.setCallMeetingStatus(true);
 
 
@@ -113,7 +111,7 @@ export default class PlayerGameController {
         // update room status
     }
 
-    markSelfDead() {
+    async markSelfDead() {
         // if player is crewmate,
         // then update player status
         if(!this.player.getImposterStatus()){
@@ -122,23 +120,16 @@ export default class PlayerGameController {
 
     }
 
-    markTaskComplete(description) {
+    async markTaskComplete(description) {
         // update player tasklists task to completed
-       this.player = Player.getPlayer(this.player.getId());
        this.taskList = this.player.getTaskList();
-       this.player.setTaskComplete();
+       this.player.setTaskComplete(description);
 
     }
 
-    castVote(playerId) {
-        // If the room status is emergency meeting
-        // add a vote to the emergency room's votes list
-        // after casting a vote, ...?
-    }
 
     getVisibleTasks() {
         // Display up to four tasks that have not been completed.
-        this.player = Player.getPlayer(this.player.getId());
         this.taskList = this.player.getTaskList();
         this.visibleTasks = [];
         if(this.taskList.length < 5){
