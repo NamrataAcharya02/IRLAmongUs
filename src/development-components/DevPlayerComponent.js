@@ -77,7 +77,7 @@ function DevPlayerComponent () {
         <p>{room ? "numImposters: " + room.getNumImposters() : "no imposter(s)"}</p>
         <div>
 
-        <button onClick={removeExtraRooms}>Remove Rooms</button> */}
+        <button onClick={removeExtraRooms}>Remove Rooms</button> 
         <button onClick={removeExtraPlayers}>Remove Players</button>
         
         <button onClick={createPlayerAndJoinRoom}>Create Player and Join Room</button>
