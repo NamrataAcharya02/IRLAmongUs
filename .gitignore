@@ -29,5 +29,5 @@ src/ui-debug.log*
 # Firebase
 .firebase
 
-# Firestore
-/dir
+# Firestore Emulator
+dir/
