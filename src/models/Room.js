@@ -61,6 +61,7 @@ export class Room {
     getNumTasksToDo() { return this.#numTasksToDo; }
     getPlayerIds() { return this.#playerIds; }
     getStatus() {return this.status; }
+    getNumPlayers() {return this.#playerIds.length; }
 
     setRoomId(id) { this.#id = id; }
     setAdminId(adminId) { this.#adminId = adminId; }

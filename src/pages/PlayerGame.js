@@ -48,9 +48,9 @@ function PlayerGame(){
     }
 
     //function to add 1 to currentComplete (tracks number of completed tasks)
-    function completeATask(){
-        setComplete(currentComplete + 1);
-    }
+    // function completeATask(){
+    //     setComplete(currentComplete + 1);
+    // }
     //function to calculate total number of tasks (toComplete) based on number of crewmates and number of tasks per crewmate
     function setNumTasksToComplete(numCrewmates, numTasksPerCrewmate){
         setToComplete(numCrewmates * numTasksPerCrewmate);
@@ -74,7 +74,8 @@ function PlayerGame(){
             console.log(`controller.current.room.getTaskList(): ${controller.current.getVisibleTasks()}`);
             
             setTasks(controller.current.getVisibleTasks());
-
+            setNumTasksToComplete((controller.current.room.getNumPlayers()-controller.current.room.getNumImposters()), controller.current.room.getNumTasksToDo());
+            console.log('threshold tasks: ', (controller.current.room.getNumPlayers()-controller.current.room.getNumImposters()) * controller.current.room.getNumTasksToDo());
             })();
       }, []);
 
@@ -83,7 +84,8 @@ function PlayerGame(){
             {/* Progress bar shows how many tasks completed (currentComplete) out of total tasks (toComplete) */}
             <h4>Total Tasks Completed</h4>
             <progress value={currentComplete} max={toComplete}></progress>
-            <button onClick={completeATask}>Complete a Task</button>
+            <br></br>
+            {/* <button onClick={completeATask}>Complete a Task</button> */}
             {/* <button onClick={playSound}>Beep</button> */}
             {/* Player's task list */}
             <ul className="centered-lists">
