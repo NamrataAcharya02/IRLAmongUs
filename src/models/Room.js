@@ -3,13 +3,17 @@ import {
     QuerySnapshot,
     arrayUnion,
     collection,
+    deleteDoc,
     doc,
+    documentId,
     getDoc,
     getDocs,
+    onSnapshot,
     query,
     serverTimestamp,
     setDoc,
     updateDoc, 
+
     where,
     onSnapshot,
     documentId,
@@ -32,6 +36,7 @@ export class Room {
     #tasklist;
     #numImposters;
     #numTasksToDo;
+
     #playerIds;
 
     #callback;
@@ -114,6 +119,7 @@ export class Room {
         await updateDoc(Room.#_roomRefForRoomCode(this.getRoomCode()), field);
     }
 
+
     #__updateFromSnapshot(snapData) {
         console.log("updating");
         this.#id = snapData.id;
@@ -157,6 +163,7 @@ export class Room {
             }
             );
     }
+
     /**
      * Create a room for game play. This method calls _generateRoomCode and ensures 
      * code uniqueness. It verifies that the number of tasks asked to be completed
@@ -360,9 +367,6 @@ export class Room {
                 console.log("Player " + playerId + " already in room " + roomCode);
                 return room;
             }
-            
-            // update the room retrieved from the database
-            room.addPlayer(playerId);
 
             // update database
             const roomDocRef = this.#_roomRefForRoomCode(room.getRoomCode());
@@ -388,7 +392,15 @@ export class Room {
      * @param {*} playerId 
      */
     static async leaveRoom(code, playerId) {
-        // remove a player from an instance of a room
+        const room = await Room.getRoom(code);
+        const currPlayers = room.getPlayerIds();
+        try {
+            const updatedPlayers = currPlayers.splice(currPlayers.indexOf(playerId), 1);
+            const roomDocRef = this.#_roomRefForRoomCode(code);
+            await updateDoc(roomDocRef, {players: updatedPlayers});
+        } catch (err) {
+            console.log(err);
+        }
     }
 
 }

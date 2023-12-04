@@ -31,14 +31,6 @@ function DevRoomComponent () {
         }
     }
 
-    const getOrCreateRoom = async () => {
-        try {
-            const r = await Room.getOrCreateRoom('1234', 'adminId', [], 50, 500);
-            console.log(`DevRoomComponent.getOrCreateRoom r.getRoomCode(): ${r.getRoomCode()}`);
-        } catch (err) {
-            console.log(`DevRoomComponent.getOrCreateRoom err: ${err}`);
-        }
-    }
 
     const printRoom = () => {
         console.log(room);
@@ -89,7 +81,7 @@ function DevRoomComponent () {
         <p>{room ? "Room Code: " + room.getRoomCode() : "no room"}</p>
         <p>{room ? "numImposters: " + room.getNumImposters() : "no imposter(s)"}</p>
         <div>
-        <button onClick={getOrCreateRoom}>Get Or Create Room</button>
+
         <button onClick={printRoom}>Print Room</button>
         <button onClick={removeExtraRooms}>Remove Rooms</button>
         <button onClick={removeExtraPlayers}>Remove Players</button>
