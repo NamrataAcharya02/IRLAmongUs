@@ -17,7 +17,7 @@ import { useAuthState } from 'react-firebase-hooks/auth';
 import { useCollectionData } from 'react-firebase-hooks/firestore';
 
 import {auth, googleAuthProvider} from "../firebase";
-import { signInWithPopup, onAuthStateChanged, signOut } from "firebase/auth";
+import { signInWithPopup, signInAnonymously, onAuthStateChanged, signOut } from "firebase/auth";
 
 function SignOut() {
   return auth.currentUser && (
@@ -45,9 +45,21 @@ function Pages(){
         });
     }
 
+    const anonymousSignIn = () => {
+        signInAnonymously(auth)
+        .then(function() {
+            console.log("REDIRECTED TO LOBBY")
+            navigate('/lobby');
+        })
+        .catch((error) => {
+            console.error('Error signing in anonymously:', error);
+        });
+    }
+
     onAuthStateChanged(auth, function(user) {
         if (user) {
-          // User is signed in.
+          // User is signed in and get the id of the user.
+          const uid = user.uid;
         } else {
           // No user is signed in.
         }
@@ -101,13 +113,11 @@ function Pages(){
                                         {() => close()}>
                                             Cancel
                                     </button>
-                                    <Link to="/lobby">
-                                        <button 
-                                            className="enter2"                                            
-                                        >
-                                            Enter
-                                        </button>
-                                    </Link>
+                                    {/* <Link to="/lobby"> */}
+                                    <button className="enter2" onClick={anonymousSignIn}>
+                                        Enter
+                                    </button>
+                                    {/* </Link> */}
                                 </div>
                             </div>
                         )
