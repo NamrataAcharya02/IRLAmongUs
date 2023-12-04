@@ -69,13 +69,13 @@ export default class PlayerGameController {
         await this.player.setRoomCode(roomCode);
 
         // TODO: THIS NEEDS ROOM FROM ADMIN SIDE
-        // this.room.addPlayer(this.player.getId());
+        this.room.addPlayer(this.player.getId());
         
         // get tasklist from room
         this.setTasks();
 
         // TODO: 
-        // this.room.addCallback(this.listener);
+        this.room.addCallback(this.listener);
 
     }
 
