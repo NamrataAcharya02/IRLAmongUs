@@ -1,33 +1,27 @@
 import { 
+
+    QuerySnapshot,
     arrayUnion,
     collection,
+    deleteDoc,
     doc,
+    documentId,
     getDoc,
     getDocs,
+    onSnapshot,
     query,
     serverTimestamp,
     setDoc,
     updateDoc, 
     where,
-
     Firestore
 } from "firebase/firestore";
 
 import { RoomStatus } from './enum';
 
 import { db } from "../firebase";
-import { RoomNotExistError, MoreThanOneRoomError, InvalidRoomCodeError } from "../errors/roomError";
+import { RoomNotExistError, MoreThanOneRoomError, DuplicateRoomCodeError } from "../errors/roomError";
 import { FirebaseError } from "firebase/app";
-
-/**
- * Configuration settings for Room.
- * 
- * TODO: Would be good to yank these out into some config file.
- */
-const ROOM_CODE_LENGTH = 4;
-const ROOM_CODE_CHARACTER_SET = '0123456789';
-const ROOM_CODE_CHARACTER_SET_LENGTH = ROOM_CODE_CHARACTER_SET.length;
-
 
 export class Room {
     status;
@@ -38,7 +32,10 @@ export class Room {
     #tasklist;
     #numImposters;
     #numTasksToDo;
-    #playerIds; // TODO: convert to Player
+
+    #playerIds;
+
+    #callback;
     constructor(id, adminId, code, createdAt, tasklist, numImposters, numTasksToDo) {
         this.status = RoomStatus.new;
         this.#id = id;
@@ -49,6 +46,10 @@ export class Room {
         this.#numImposters = numImposters;
         this.#numTasksToDo = numTasksToDo;
         this.#playerIds = [];
+
+        this.#callback = null;
+
+        this.#addDocSnapshotListener();
     }
 
     getRoomId() { return this.#id; }
@@ -69,9 +70,95 @@ export class Room {
     setNumImposters(numImposters) { this.#numImposters = numImposters; }
     setNumTasksToDo(numTasksToDo) { this.#numTasksToDo = numTasksToDo; }
     setPlayerIds(players) { this.#playerIds = players; }
-    setStatus(status) { this.status = status; }
+    setStatus(status) { 
+        if (status instanceof RoomStatus){
+            this.status = status; 
+        } else {
+            throw TypeError(`status must be of type RoomStatus`);
+        }
+    }
+    
+    async updateTaskList(tasklist) { 
+        this.setTaskList(tasklist);
+        this.#__update({tasklist: tasklist});
+    }
+    async updateNumImposters(numImposters) { 
+        this.setNumImposters(numImposters); 
+        this.#__update({numImposters: numImposters});
+    }
+    async updateNumTasksToDo(numTasksToDo) { 
+        this.setNumTasksToDo(numTasksToDo);
+        this.#__update({numTasksToDo: numTasksToDo});
+    }
+    async updateStatus(status) { 
+        if (status instanceof RoomStatus){
+            this.setStatus(status); 
+            this.#__update({status: status.enumKey});
+        } else {
+            throw TypeError(`status must be of type RoomStatus`);
+        }
+    }
 
-    addPlayer(playerId) { this.#playerIds.push(playerId); }
+    async addPlayer(playerId) { 
+        if (!(this.getPlayerIds().includes(playerId))) {
+            this.#playerIds.push(playerId); 
+            this.#__update({playerId: arrayUnion(playerId)});
+        }
+    }
+
+    addCallback(callback) {
+        console.log("room adding callback");
+        this.#callback = callback;
+    }
+
+    async #__update(field) {
+        await updateDoc(Room.#_roomRefForRoomCode(this.getRoomCode()), field);
+    }
+
+
+    #__updateFromSnapshot(snapData) {
+        console.log("updating");
+        this.#id = snapData.id;
+        this.#adminId = snapData.adminId;
+        this.#code = snapData.code;
+        this.#createdAt = snapData.createdAt;
+        this.#tasklist = snapData.tasklist;
+        this.#numImposters = snapData.numImposters;
+        this.#numTasksToDo = snapData.numTasksToDo;
+        this.#playerIds = snapData.playerIds;
+        if (this.#callback != null) {
+            console.log("running callback in room");
+            this.#callback();
+        }
+        console.log("finished");
+    }
+
+    #addDocSnapshotListener() {
+        console.log("registering DocSnapshotListener for Room " + this.getRoomCode());
+        const docQuery = query(collection(db, "rooms"), where(documentId(), "==", this.getRoomCode()));
+
+        this.unsub = onSnapshot(docQuery, 
+            snapshot => {
+                console.log("onSnapshot triggered");
+                snapshot.docChanges().forEach((change) => {
+                    if (change.type === "added") {
+                        console.log("New room: ", change.doc.data());
+                    }
+                    if (change.type === "modified") {
+                        const docData = change.doc.data();
+                        console.log("Modified room: ", docData.id);
+                        this.#__updateFromSnapshot(docData);
+                    }
+                    if (change.type === "removed") {
+                        console.log("Removed room: ", change.doc.data());
+                    }
+                  });
+            },
+            (err) => {
+                console.log("error while handling snapshot: " + err);
+            }
+            );
+    }
 
     /**
      * Create a room for game play. This method calls _generateRoomCode and ensures 
@@ -92,65 +179,38 @@ export class Room {
      *                              to complete to win the game
      * @returns {Room} A concrete room that has been added to the database.
      */
-    static async createRoom(adminId, tasklist, numImposters, numTasksToDo) {
+    static async createRoom(roomCode, adminId, tasklist, numImposters, numTasksToDo) {
         // only run this method once
-        if (typeof this.createRoom.called == 'undefined') {
-            this.createRoom.called = false;
-        }
+        // if (typeof this.createRoom.called == 'undefined') {
+        //     this.createRoom.called = false;
+        // }
         console.log("create Room");
         
         // create a room code that doesn't conflict with existing documents in the db
-        let i = 0;
-        if (!this.createRoom.called) {
-            this.createRoom.called = true;
-            while(i < 3) {
-                try {
-                    i++; // fail safe to prevent infinite loops
-                    
-                    /** TODO: store all room doc.id in a list, generate a room code
-                     *  until the generated code isn't in the list. Perform one last
-                     * check in the rooms collection (as shown below with the !(...exists())) 
-                     * to ensure a code hasn't been added, then use that code. 
-                     * */
+        // if (!this.createRoom.called) {
+            // this.createRoom.called = true;
+            /** TODO: store all room doc.id in a list, generate a room code
+             *  until the generated code isn't in the list. Perform one last
+             * check in the rooms collection (as shown below with the !(...exists())) 
+             * to ensure a code hasn't been added, then use that code. 
+             * */
 
-                    const roomCode = this.#_generateRoomCode(ROOM_CODE_LENGTH);
-                    console.log("createRoom: " + roomCode);
-    
-                    const docRef = this.#_roomRefForRoomCode(roomCode);
-                    if (!(await getDoc(docRef)).exists()) {
-                        
-                        console.log("creating room doc " + roomCode);
-                        
-                        const room = new Room(roomCode, adminId, roomCode, null, tasklist, numImposters, numTasksToDo);
-                        room.setStatus(RoomStatus.new);
-                        await setDoc(docRef, room);
-                        return room;
-                    }
-                    
-                } catch (error) {
-                    if (error instanceof FirebaseError) {
-                        console.log("caught FirebaseError: " + error + ". Rethrowing!");
-                        throw error;
-                    }
-                }
-            }
+            const docRef = this.#_roomRefForRoomCode(roomCode);
+            
+        if (!(await getDoc(docRef)).exists()) {
+            
+            console.log("creating room doc " + roomCode);
+            
+            const room = new Room(roomCode, adminId, roomCode, null, tasklist, numImposters, numTasksToDo);
+            room.setStatus(RoomStatus.new);
+            await setDoc(docRef, room);
+            return room;
+        } else {
+            throw new DuplicateRoomCodeError(`Attempting to create a room with the same id: ${roomCode}`);
         }
+        // }
     }
 
-    /**
-     * Generate a random string of characters from ROOM_CODE_CHARACTER_SET. the string
-     * will have a length defined be it's only parameter, length.
-     * 
-     * @param {Number} length Length of the string that should be generated
-     * @returns A string of lenght `length` generated from ROOM_CODE_CHARACTER_SET
-     */
-    static #_generateRoomCode(length) {
-        let result = '';
-        for (let i = 0; i < length; i++) {
-            result += ROOM_CODE_CHARACTER_SET.charAt(Math.floor(Math.random() * ROOM_CODE_CHARACTER_SET_LENGTH));
-        }
-        return result;
-    }
 
     static #_roomRefForRoomCode(roomCode) {
         return doc(db, "rooms", roomCode).withConverter(roomConverter);
@@ -176,7 +236,7 @@ export class Room {
         }
         // Currently, support admin having only one room.
         // const docRef = doc(db, "rooms", adminId).withConverter(roomConverter);
-        const docRef = this.#_roomRefForRoomCode(roomCode);
+        const docRef = this.#_roomRefForRoomCode(roomCode.toString());
         const docSnap = await getDoc(docRef);
         if (docSnap.size > 1) {
             throw new MoreThanOneRoomError("More than one roome with code " + roomCode + ". Contact system adminstrator for help.");
@@ -194,7 +254,7 @@ export class Room {
      * That is, it is the callers responsibility to ensure that the returned Room object has the 
      * desired tasklist. 
      * 
-     * If the Room retrieved via the getRoom method has different tasklistObject, numImposters, or 
+     * If the Room retrieved via the getRoom method has different tasklistect, numImposters, or 
      * numTasksToDo than is passed in by the corresponding parameters, it is the responsibility 
      * of the caller to discover and rectify the discrepancies.
      * 
@@ -220,7 +280,9 @@ export class Room {
             room = await Room.getRoom(roomCode);
         } catch (error) {
             if (error instanceof RoomNotExistError) {
-                room = Room.createRoom(roomCode, adminId, tasklist, numImposters, numTasksToDo);
+                console.log("willcreate");
+                room = await Room.createRoom(roomCode, adminId, tasklist, numImposters, numTasksToDo);
+                console.log("have apparently created")
                 console.log("getOrCreateRoom created room with id: " + room.getRoomCode());
             } else if (error instanceof MoreThanOneRoomError) {
                 throw error;
@@ -301,16 +363,13 @@ export class Room {
                 console.log("Player " + playerId + " already in room " + roomCode);
                 return room;
             }
-            
-            // update the room retrieved from the database
-            room.addPlayer(playerId);
 
             // update database
             const roomDocRef = this.#_roomRefForRoomCode(room.getRoomCode());
             await updateDoc(roomDocRef, {
                 players: arrayUnion(playerId)
             });
-            console.log("performed array union");
+
             return room;
 
             
@@ -329,7 +388,15 @@ export class Room {
      * @param {*} playerId 
      */
     static async leaveRoom(code, playerId) {
-        // remove a player from an instance of a room
+        const room = await Room.getRoom(code);
+        const currPlayers = room.getPlayerIds();
+        try {
+            const updatedPlayers = currPlayers.splice(currPlayers.indexOf(playerId), 1);
+            const roomDocRef = this.#_roomRefForRoomCode(code);
+            await updateDoc(roomDocRef, {players: updatedPlayers});
+        } catch (err) {
+            console.log(err);
+        }
     }
 
 }
