@@ -102,7 +102,7 @@ export class Room {
     async addPlayer(playerId) { 
         if (!(this.getPlayerIds().includes(playerId))) {
             this.#playerIds.push(playerId); 
-            this.#__update({playerId: arrayUnion(playerId)});
+            this.#__update({playerIds: arrayUnion(playerId)});
         }
     }
 
