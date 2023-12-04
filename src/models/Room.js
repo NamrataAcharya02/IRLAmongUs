@@ -47,6 +47,7 @@ export class Room {
         this.#numImposters = numImposters;
         this.#numTasksToDo = numTasksToDo;
         this.#playerIds = [];
+        this.#numTasksComplete = 0;
 
         this.#callback = null;
 
@@ -72,6 +73,8 @@ export class Room {
     setNumImposters(numImposters) { this.#numImposters = numImposters; }
     setNumTasksToDo(numTasksToDo) { this.#numTasksToDo = numTasksToDo; }
     setPlayerIds(players) { this.#playerIds = players; }
+    setNumTasksComplete(numTasksToComplete) { this.#numTasksComplete = numTasksToComplete; }
+
     setStatus(status) { 
         if (status instanceof RoomStatus){
             this.status = status; 
