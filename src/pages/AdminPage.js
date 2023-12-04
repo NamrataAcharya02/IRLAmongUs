@@ -90,29 +90,15 @@ const AdminPage = () => {
 
   //function to create a room
   const startRoom = async () => {  
-    console.log("Current user", auth.currentUser.uid);
-    let list = [...tasklist];
     try {
-      //let adminId = auth.currentUser.uid; // Dummy for dev purposes
-      //let controller = new AdminGameController(adminId);
-     // controller.setNumImposters(numImposters);
-      //controller.setNumTasksToComplete(numTasksToDo);
-      //controller.saveTasklist(list);
-
-      let newroom = await controller.startRoom(numImposters, numTasksToDo);
-      //let roomCode = AdminGameController.generateRoomCode(4);
-      //let newroom = await Room.getOrCreateRoom(roomCode, adminId, list, numImposters, numTasksToDo);
-      //await controller.setRoomCode(roomCode);
-
-      setRoom(newroom);
-      console.log(newroom);
+      const newRoom = await Room.getRoom("1966");
+      setRoom(newRoom);
       navigate("/room");
     } catch (error) {
       console.error(error);
       setRoom(null);
     }
-  }
-
+  };
   //----------------------- Room Creation ---------------------------------------
 
   //TODO: Sign out button (refer to skeleton code)
