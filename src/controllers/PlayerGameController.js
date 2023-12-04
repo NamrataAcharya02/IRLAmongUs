@@ -132,7 +132,7 @@ export default class PlayerGameController {
         // update player tasklists task to completed
        this.taskList = this.player.getTaskList();
        this.player.setTaskComplete(description);
-
+       this.room.updateNumTasksComplete(1);
     }
 
 

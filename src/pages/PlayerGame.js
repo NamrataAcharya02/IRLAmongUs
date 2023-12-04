@@ -76,6 +76,7 @@ function PlayerGame(){
             setTasks(controller.current.getVisibleTasks());
             setNumTasksToComplete((controller.current.room.getNumPlayers()-controller.current.room.getNumImposters()), controller.current.room.getNumTasksToDo());
             console.log('threshold tasks: ', (controller.current.room.getNumPlayers()-controller.current.room.getNumImposters()) * controller.current.room.getNumTasksToDo());
+            setComplete(controller.current.room.getNumTasksComplete());
             })();
       }, []);
 
