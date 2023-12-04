@@ -28,8 +28,8 @@ export default class AdminGameController extends GameController {
     crewmates = [];
     impostersWin = false;
 
-    //remove tasklist from constructor (and the other things, keep only adminId)
-    constructor(adminId, callback) {
+
+    constructor() {
         super();
         this.adminId = adminId;
         this.callback = callback;
@@ -321,7 +321,7 @@ export default class AdminGameController extends GameController {
         
     }
 
-    async startGame(numImposters, numTasksToComplete) {
+    startGame() {
         // update Room Status to "inGame"
 
         // NOTE: somewhere in the rendering of the React component,
@@ -382,7 +382,6 @@ export default class AdminGameController extends GameController {
 
     displayGameCode() {
         // get the roomCode from the room Object
-
     }
 
     getTotalNumberTasksCompleted() {
@@ -414,7 +413,6 @@ export default class AdminGameController extends GameController {
         // TODO: this could be a moot function.
         // set room status to ActiveVoting (in front end, if getRoomStatus() is 
         // "ActiveVoting," display voting ui to players)
-        //when voting begins, create a vote doc with an array of all players who have casted a vote
     }
 
     getVotingProgress() {

@@ -1,11 +1,11 @@
 import React, { useState, useEffect, useRef } from 'react';
 
 import { Room } from '../models/Room';
-// import { Player } from '../models/Player';
+import { Player } from '../models/Player';
 
 import { cleanupDbCollectionDocs } from '../models/utils';
 
-// import { faker } from '@faker-js/faker';
+import { faker } from '@faker-js/faker';
 // const { faker } = require('@faker-js/faker');
 
 function DevRoomComponent () {
@@ -28,15 +28,6 @@ function DevRoomComponent () {
             setR(r);
         } catch (e) {
             console.log("DevRoomComponent catch (e): " + e);
-        }
-    }
-
-    const getOrCreateRoom = async () => {
-        try {
-            const r = await Room.getOrCreateRoom('1234', 'adminId', [], 50, 500);
-            console.log(`DevRoomComponent.getOrCreateRoom r.getRoomCode(): ${r.getRoomCode()}`);
-        } catch (err) {
-            console.log(`DevRoomComponent.getOrCreateRoom err: ${err}`);
         }
     }
 
@@ -89,7 +80,6 @@ function DevRoomComponent () {
         <p>{room ? "Room Code: " + room.getRoomCode() : "no room"}</p>
         <p>{room ? "numImposters: " + room.getNumImposters() : "no imposter(s)"}</p>
         <div>
-        <button onClick={getOrCreateRoom}>Get Or Create Room</button>
         <button onClick={printRoom}>Print Room</button>
         <button onClick={removeExtraRooms}>Remove Rooms</button>
         <button onClick={removeExtraPlayers}>Remove Players</button>

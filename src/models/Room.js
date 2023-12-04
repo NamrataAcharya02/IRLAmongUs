@@ -62,6 +62,7 @@ export class Room {
     getNumTasksToDo() { return this.#numTasksToDo; }
     getPlayerIds() { return this.#playerIds; }
     getStatus() {return this.status; }
+    getNumPlayers() {return this.#playerIds.length; }
     getNumTasksComplete() { return this.#numTasksComplete; }
 
     setRoomId(id) { this.#id = id; }
@@ -72,6 +73,7 @@ export class Room {
     setNumImposters(numImposters) { this.#numImposters = numImposters; }
     setNumTasksToDo(numTasksToDo) { this.#numTasksToDo = numTasksToDo; }
     setPlayerIds(players) { this.#playerIds = players; }
+    setNumTasksComplete(numTasksToComplete) { this.#numTasksComplete = numTasksToComplete; }
     setStatus(status) { 
         if (status instanceof RoomStatus){
             this.status = status; 
@@ -85,10 +87,12 @@ export class Room {
      * @param {Number} num the number of tasks to add to NumTasksComplete
      */
     addNumTasksComplete(num) {
-        if (!(num instanceof Number)) {
+        if (!(typeof num !== Number)) {
+            console.log("type of num", typeof num);
             throw TypeError(`num "${num}" in addNumTasksComplete invalid Type`);
+            
         }
-        this.#numTasksComplete = this.getNumTasksComplete() + num;
+        this.setNumTasksComplete(this.getNumTasksComplete() + num);
     }
     
     async updateTaskList(tasklist) { 

@@ -17,6 +17,7 @@ function AdminRoom() {
     {id: 4, name: 'Jacob', imposter:false, dead:true, numCompletedTasks: 5},
     {id: 5, name: 'Hongkun', imposter:false, dead:true, numCompletedTasks: 5}
   ]);
+
   console.log("AdminRoom(): room: " + room);
   const [players, setPlayers] = useState([]);
   const [gameScreen, setGameScreen] = useState(false);
@@ -33,10 +34,10 @@ function AdminRoom() {
   //let toCompleteRef = useRef(20);
   const navigate = useNavigate();
 
-  //const forceUpdate = React.useReducer(() => ({}))[1];
-  const [_, forceUpdate] = React.useReducer((x) => x + 1, 0);
-  let adminId = auth.currentUser.uid; // dummy for testing
-  let controller = useRef(new AdminGameController(adminId, forceUpdate));
+  function callMeeting (){
+    setRoomState("meetingCalled");
+    console.log("AH");
+  }
 
   const [roomState, setRoomState] = useState("inGame");
 
@@ -96,22 +97,34 @@ function AdminRoom() {
     setComplete(controller.current.getTotalNumberTasksCompleted());
   }
 
+  function endMeeting(){
+    setRoomState("inGame");
+  }
+
+  function markDead(id){
+    const updatedPlayers = playerList.map((player) =>{
+      if(player.id === id){
+        const updatedPlayer = {
+          ...player,
+          dead:true,
+        };
+        return updatedPlayer;
+      }
+      return player;
+    })
+    setPlayerList(updatedPlayers);
+  }
+
+  function kickPlayer(id){
+    const updatedPlayers = playerList.filter((player) => player.id !== id);
+    setPlayerList(updatedPlayers);
+  }
+
   useEffect(() => {
     (async function () {
-      
-
-      let roomCode = await controller.current.getRoomCode();
-     // let adminObject = await controller.getAdmin();
       try {
-        const retrievedRoom = await controller.current.getRoomDB(roomCode);
-        console.log(retrievedRoom);
-        console.log("abey saale");
-        console.log("controller" + controller.current.getRoomObject());
-
-        retrievedRoom.addCallback(forceUpdate)
-
+        const retrievedRoom = await Room.getRoom("1966");
         setRoom(retrievedRoom);
-
 
         setPlayers(controller.current.getPlayers());
         setToComplete(controller.current.threshold);
@@ -124,7 +137,6 @@ function AdminRoom() {
         if (controller.current.checkEndGame() && !endGame){
           setEndGame(true);
         }
-
         console.log("AdminRoom(): retrievedRoom: " + retrievedRoom.getRoomCode());
         console.log("AdminRoom(): retrievedRoom: " + retrievedRoom.getRoomCode() + " adminId: " + retrievedRoom.getAdminId() + " tasklist: " + retrievedRoom.getTaskList());
       } catch (error) {
@@ -234,7 +246,6 @@ function AdminRoom() {
         <button onClick={endMeeting}>End Emergency Meeting</button>
       )}
         <button onClick={endGamefunction}>End Game</button>
-      
       
     </div>
   );
