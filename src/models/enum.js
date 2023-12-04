@@ -36,5 +36,10 @@ export class RoomStatus extends Enum {
     static new = new RoomStatus();
     static wait = new RoomStatus();
     static inProgress = new RoomStatus();
+    static finished = new RoomStatus();
+    static impostersWin = new RoomStatus();
+    static crewmatesWin = new RoomStatus();
+    static emergencyMeeting = new RoomStatus();
+    static voting = new RoomStatus();
     static _ = this.closeEnum(); // TypeScript: Color.closeEnum()
 }
