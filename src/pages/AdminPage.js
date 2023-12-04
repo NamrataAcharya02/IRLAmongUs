@@ -90,6 +90,8 @@ const AdminPage = () => {
 
   //function to create a room
   const startRoom = async () => {  
+    console.log("Current user", auth.currentUser.uid);
+    let list = [...tasklist];
     try {
       const newRoom = await Room.getRoom("1966");
       setRoom(newRoom);
