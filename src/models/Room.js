@@ -334,8 +334,9 @@ export class Room {
         // remove all players from room
 
         // then delete this instance of room from the databse
-
-        // optional: return boolean indicating success
+        const doc = getDoc(doc(db, 'rooms', room.getRoomId()));
+        deleteDoc(doc.ref);
+        return true;
     }
 
     /**
