@@ -16,6 +16,7 @@ function PlayerGame(){
     const [playSound] = useSound(meetingSound);
     const [gameState, setGameState] = useState();
     const [tasks, setTasks] = useState([]);
+    const [room, setRoom] = useState();
 
     const navigate = useNavigate();
     let playerId = auth.currentUser.uid; // dummy for testing
@@ -73,10 +74,17 @@ function PlayerGame(){
             console.log(`controller.current.room.getRoomCode(): ${controller.current.room.getRoomCode()}`);
             console.log(`controller.current.room.getTaskList(): ${controller.current.getVisibleTasks()}`);
             
+            const retrievedRoom = controller.current.room;
+
+            retrievedRoom.addCallback(forceUpdate)
+
+            setRoom(retrievedRoom);
+
             setTasks(controller.current.getVisibleTasks());
             setNumTasksToComplete((controller.current.room.getNumPlayers()-controller.current.room.getNumImposters()), controller.current.room.getNumTasksToDo());
             console.log('threshold tasks: ', (controller.current.room.getNumPlayers()-controller.current.room.getNumImposters()) * controller.current.room.getNumTasksToDo());
             setComplete(controller.current.room.getNumTasksComplete());
+            console.log("complete", controller.current.room.getNumTasksComplete())
             })();
       }, []);
 
