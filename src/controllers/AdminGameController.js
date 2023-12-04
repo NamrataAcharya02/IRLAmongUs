@@ -1,3 +1,4 @@
+import { db } from "../firebase";
 import GameController from "./GameController";
 
 export default class AdminGameController extends GameController {
@@ -77,6 +78,14 @@ export default class AdminGameController extends GameController {
         // TODO: this could be a moot function.
         // set room status to ActiveVoting (in front end, if getRoomStatus() is 
         // "ActiveVoting," display voting ui to players)
+
+        // Create a Firestore doc called 'vote'
+        const votingDocRef = db.collection('rooms').doc(this.roomID).collection('vote').doc('vote');
+
+        // Set the 'playerswhovoted' field to an empty array
+        votingDocRef.set({
+            playerswhovoted: []
+        });
     }
 
     getVotingProgress() {
