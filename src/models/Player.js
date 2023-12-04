@@ -82,7 +82,7 @@ export class Player {
         }
         console.log("finished");
     }
-
+//
     #addDocSnapshotListener() {
         const playerRef = doc(db, 'players', this.#id);
 
