@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import { Room } from "../models/Room";
 import {auth, googleAuthProvider} from "../firebase";
 import { useRef } from 'react';
-
+import { useNavigate } from 'react-router-dom';
 import AdminGameController from "../controllers/AdminGameController";
 function AdminRoom() {
   const [room, setRoom] = useState(null);
@@ -23,6 +23,7 @@ function AdminRoom() {
   const [numPlayers, setNumPlayers] = useState(6);
   const [numTasksInFullList, setNumTasksInFullList] = useState(10);
   const [endGame, setEndGame] = useState(false);
+  const navigate = useNavigate();
 
   //const forceUpdate = React.useReducer(() => ({}))[1];
   const [_, forceUpdate] = React.useReducer((x) => x + 1, 0);
@@ -33,6 +34,7 @@ function AdminRoom() {
 
   function callMeeting (){
     setRoomState("meetingCalled");
+    //controller.current.updateRoomStatus("")
     console.log("AH");
   }
 
@@ -44,7 +46,7 @@ function AdminRoom() {
     setRoomState("inGame");
   }
 
-  function markDead(id){
+  async function markDead(id){
     const updatedPlayers = playerList.map((player) =>{
       if(player.id === id){
         const updatedPlayer = {
@@ -56,11 +58,18 @@ function AdminRoom() {
       return player;
     })
     setPlayerList(updatedPlayers);
+    await controller.current.markDead(id);
   }
 
   function kickPlayer(id){
     const updatedPlayers = playerList.filter((player) => player.id !== id);
     setPlayerList(updatedPlayers);
+    controller.current.kickOutPlayer(id);
+  }
+
+  async function endGamefunction(){
+    await controller.current.endGame();
+    //navigate("/");
   }
   
   //Use to toggle to in game screen
@@ -89,6 +98,7 @@ function AdminRoom() {
         retrievedRoom.addCallback(forceUpdate)
 
         setRoom(retrievedRoom);
+
 
         setPlayers(controller.current.getPlayers());
         console.log("updated players", players);
@@ -168,10 +178,10 @@ function AdminRoom() {
                       <div className="player">
                           <h2 className="whiteh2">{player.getName()}</h2>
                           <p>Role: {player.getImposterStatus()? "Imposter" : "Crewmate"}</p>
-                          <p>Status: {player.getStatus == "dead" ? "Dead" : "Alive"}</p>
+                          <p>Status: {player.getStatus() == "dead" ? "Dead" : "Alive"}</p>
                           {!player.getImposterStatus() && (<p>Number of Tasks Completed: {player.getNumTasksCompleted()}</p>)}
-                          {!(player.getStatus == "dead") && (<button className="playerButton" onClick={() => markDead(player.id)}>Mark Dead</button>)}
-                          <button className="kickPlayer" onClick={() => kickPlayer(player.id)}>Kick Player</button>
+                          {!(player.getStatus == "dead") && (<button className="playerButton" onClick={() => markDead(player.getId())}>Mark Dead</button>)}
+                          <button className="kickPlayer" onClick={() => kickPlayer(player.getId())}>Kick Player</button>
                       </div>
           ))}
         </ul>
@@ -184,6 +194,7 @@ function AdminRoom() {
        {controller.current.checkEndGame() && (
         <div>
           <h1>ENDED</h1>
+          <h2>{controller.current.impostersWin? "Imposters won" : "Crewmates won"}</h2>
           
         </div>
       )}
@@ -200,7 +211,7 @@ function AdminRoom() {
       {(roomState == "votingScreen") && (
         <button onClick={endMeeting}>End Emergency Meeting</button>
       )}
-        <button>End Game</button>
+        <button onClick={endGamefunction}>End Game</button>
       
       
     </div>

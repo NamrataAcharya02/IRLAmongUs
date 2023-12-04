@@ -4,6 +4,8 @@ import { Room } from "../models/Room";
 import { DuplicateRoomCodeError } from "../errors/roomError";
 import { RoomStatus } from '../models/enum';
 import {Player} from "../models/Player";
+import { cleanupDbCollectionDocs } from '../models/utils';
+
 const ROOM_CODE_CHARACTER_SET = '0123456789';
 const ROOM_CODE_CHARACTER_SET_LENGTH = ROOM_CODE_CHARACTER_SET.length;
 const ROOM_CODE_LENGTH = 4;
@@ -24,6 +26,7 @@ export default class AdminGameController extends GameController {
     imposterIds = [];
     crewmateIds = [];
     crewmates = [];
+    impostersWin = false;
 
     //remove tasklist from constructor (and the other things, keep only adminId)
     constructor(adminId, callback) {
@@ -230,6 +233,12 @@ export default class AdminGameController extends GameController {
         // return list of playerIds of assigned imposters
     }
 
+    getVictoryStatus() {
+        return this.victoryStatus;
+    }
+
+
+
     async #assignPlayerRoles() {
         // update player object
         let shufflePlayers = this.room.getPlayerIds();
@@ -260,6 +269,10 @@ export default class AdminGameController extends GameController {
 
     }
 
+    async updateRoomStatus(status) {
+        await this.room.updateStatus(status);
+    }
+
     checkEndGame() {
         // check if the game has been won
         // if so, update room status to "Won"
@@ -269,24 +282,28 @@ export default class AdminGameController extends GameController {
         let numImposters = 0;
         let numCrewmates = 0;
         for (const player of this.players) {
-            if (player.getImposterStatus() && player.getStatus() != "kicked") {
+            if (player.getImposterStatus() && player.getStatus() == "alive") {
                 numImposters++;
-            } else if (!player.getImposterStatus() && player.getStatus() != "kicked") {
+            } else if (!player.getImposterStatus() && player.getStatus() == "alive") {
                 numCrewmates++;
             }
         }
         console.log("numImposters: " + numImposters);
         console.log("numCrewmates: " + numCrewmates);
-        if (numImposters != 0 && numCrewmates != 0) {
+        if (numImposters != 0 || numCrewmates != 0) {
 
         if (numImposters >= numCrewmates) {
             console.log("imposters win");
+            //this.victoryStatus = "Imposters Win.";
+            this.impostersWin = true;
             return true;
         }
 
         //numImposters == 0
         if (numImposters == 0) {
             console.log("crewmates win (no imposters)");
+            //this.victoryStatus = "Crewmates Win.";
+            this.impostersWin = false;
             return true;
         }
 
@@ -295,6 +312,8 @@ export default class AdminGameController extends GameController {
         console.log("numTasksCompleted: " + numTasksCompleted);
         if (numTasksCompleted >= this.threshold) {
             console.log("crewmates win (tasks completed)");
+            //this.victoryStatus = "Crewmates Win.";
+            this.impostersWin = false;
             return true;
         }
     }
@@ -328,9 +347,10 @@ export default class AdminGameController extends GameController {
             console.log("player: " + player, player.getId());
             player.addCallback(this.callback);
             console.log("player callback added");
-
+            await player.setAliveStatus("alive");
             await player.setTaskList(this.room.getTaskList()); //assign tasklist to players
             await player.setRoomCode(this.room.getRoomCode());
+            //await player.setNumTasksToComplete(this.room.getNumTasksToDo());
             console.log("player tasklist: " + player.getTaskList());
             this.players.push(player);
         }
@@ -346,6 +366,18 @@ export default class AdminGameController extends GameController {
         await room.updateNumImposters(numImposters);
         await room.updateNumTasksToDo(numTasksToComplete);
 
+    }
+
+    async markDead(playerId) {
+        // update player object
+        // update room object
+        // update room status to "InMeeting"
+        // return true if game has been won, false otherwise
+        let player = await Player.getPlayer(playerId.toString());
+        await player.setAliveStatus("dead");
+        console.log("player marked dead: " + player.getId());
+        //this.checkEndGame();
+        //return this.checkEndGame();
     }
 
     displayGameCode() {
@@ -366,10 +398,16 @@ export default class AdminGameController extends GameController {
 
     }
 
-    endGame() {
+    async endGame() {
         // for every playerId in room.playerIds,
         // delete player object from database
         // delete room object from database
+        for (const player of this.players) {
+            await player.deleteDoc(player.getId());
+        }
+        await Room.deleteRoom(this.room.getRoomCode());
+        
+
     }
 
     startVoting(){
@@ -410,11 +448,18 @@ export default class AdminGameController extends GameController {
         // if (game won) logic -> update room status to "Won"
     }
 
-    kickOutPlayer(playerId) {
+    async kickOutPlayer(playerId) {
         // delete player from database
         // remove player from room.playerIds
-        let player = this.players.find(player => player.getId() == playerId);
-        player.setStatus("kicked");
+        let player = await Player.getPlayer(playerId.toString());
+        await player.setAliveStatus("kicked");
+        this.threshold -= this.room.getNumTasksToDo();
+        this.players = this.players.filter(function(player) {return player.getId() != playerId;});
+        
+        await Room.leaveRoom(this.room.getRoomCode(), playerId);
+        console.log("player kicked out: " + playerId);
+        console.log("new threshold" + this.threshold);
+
 
     }
 
