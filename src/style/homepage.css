@@ -63,6 +63,19 @@ h4{
     color:white;
 }
 
+.helpList{
+    margin-top: 0;
+    color: white;
+}
+
+li{
+    color: white;
+    margin-left: 0;
+    padding-bottom: 10px;
+    list-style-type: decimal;
+    list-style-position: outside;
+}
+
 output{
     color:white;
 }
@@ -131,6 +144,18 @@ input{
     margin: 0px;
 }
 
+.helpButton{
+    position: absolute;
+    top: 1vh;
+    right: 1vh;
+    width: 80px;
+    font-family: 'Amatic SC', sans-serif;
+    font-weight: 700;
+    font-size: large;
+    padding: 5px 5px;
+    margin: 0px;
+}
+
 .inputdiv{
     height: 40px;
     width: 300px;
@@ -173,6 +198,20 @@ main {
     /* border: 2px solid white; */
     padding: 10px;
     margin-top: 50px;
+}
+
+.help-in-box{
+    width: 375px;
+    border: 2px solid white;
+    padding: 10px;
+    margin-top: 0px;
+    margin-bottom: 50px;
+    display: flex;
+    flex-direction: column; /* To center vertically */
+    justify-content: center; /* Center vertically */
+    align-items: center; /* Center horizontally */
+    /* margin: auto; */
+    height: auto;
 }
 
 .player-lobby{
@@ -337,6 +376,19 @@ main {
     color: white;
 }
 
+.overlay-help{
+    background-color:darkslategrey;
+    position:fixed;
+    width:75%;
+    height:75%;
+    top:50%;
+    left:50%;
+    transform:translate(-50%, -50%);
+    z-index:1000;
+    overflow-y: auto;
+    border:2px solid rgb(255, 255, 255);
+}
+
 progress{
     appearance: none;
     width: 300px;
@@ -386,3 +438,46 @@ progress{
     height: 10px;
 }
 
+/* Collapsible CSS */
+.Collapsible__contentInner{
+    padding: 5px;
+    border: 1px solid lightGrey;
+    border-top: 0;
+    padding-top: 10px;
+    padding-bottom: 0px;
+}
+
+.p, .Collapsible__contentInner{
+    font-size: 14px;
+    line-height: 20px;
+}
+
+.Collapsible__trigger {
+    display: block;
+    font-weight: 400;
+    text-decoration: none;
+    position: relative;
+    border: 1px solid white;
+    padding: 10px;
+    background: black;
+    color: white;
+    font-family: 'Amatic SC', sans-serif;
+    font-size: x-large;
+}
+
+.Collapsible__trigger:hover{
+    color: cyan;
+}
+
+.Collapsible__trigger::after{
+    content: '\f107';
+    position: absolute;
+    right: 10px;
+    top: 10px;
+    display: block;
+    transition: transform 300ms;
+}
+
+.is-disabled, .Collapsible__trigger{
+    background-color: black;
+}
