@@ -281,7 +281,7 @@ export class Player {
     async setTaskList(taskList) {
         const playerRef = doc(db, 'players', this.#id);
         try {
-            await updateDoc(playerRef, {taskList: this.#taskList});
+            await updateDoc(playerRef, {taskList: taskList});
             this.#taskList = taskList;
         } catch (error) {
             console.error('Error', error);
@@ -350,16 +350,9 @@ const playerConverter = {
     },
     fromFirestore: (snapshot, options) => {
         const data = snapshot.data(options);
-        let player = new Player(data.name, data.roomCode);
-        
-        player.playerID(data.id);
-        player.playerStatus(data.status);
-        player.playerNumVotesReceived(data.numVotesReceived);
-        player.playerVoteToCast(data.voteToCast);
-        player.playerTaskList(data.taskList);
-        player.playerIsImposter(data.isImposter);
-        player.playerCalledMeeting(data.calledMeeting);
-        player.playerNumTasksCompleted(data.numTasksCompleted);
+        let player = new Player(data.id, data.name, data.status, data.numVotesReceived, 
+            data.voteToCast, data.roomCode, data.taskList, data.isImposter, 
+            data.calledMeeting, data.numTasksCompleted );
 
         return player;
     }
