@@ -75,6 +75,7 @@ export class Player {
         this.#taskList = snapData.taskList;
         this.#isImposter = snapData.isImposter;
         this.#calledMeeting = snapData.calledMeeting;
+        this.#numTasksCompleted = snapData.numTasksCompleted;
         if (this.#callback != null) {
             console.log("running callback for player");
             this.#callback();
