@@ -333,9 +333,11 @@ export class Room {
     static async deleteRoom(room) {
         // remove all players from room
 
+        room.addCallback(null);
         // then delete this instance of room from the databse
-
-        // optional: return boolean indicating success
+        const doc = getDoc(doc(db, 'rooms', room.getRoomId()));
+        deleteDoc(doc.ref);
+        return true;
     }
 
     /**
