@@ -14,6 +14,7 @@ function AdminRoom() {
   const [numTasksToDo, setNumTasksToDo] = useState(4);
   const [numPlayers, setNumPlayers] = useState(6);
   const [numTasksInFullList, setNumTasksInFullList] = useState(10);
+  const [endGame, setEndGame] = useState(false);
 
   //const forceUpdate = React.useReducer(() => ({}))[1];
   const [_, forceUpdate] = React.useReducer((x) => x + 1, 0);
@@ -46,8 +47,16 @@ function AdminRoom() {
         retrievedRoom.addCallback(forceUpdate)
 
         setRoom(retrievedRoom);
+
         setPlayers(controller.current.getPlayers());
+        console.log("updated players", players);
         controller.current.setNumImposters(5);
+        console.log(controller.current.checkEndGame());
+       // console.log(controller.current.getRoomCode());
+        console.log("endgame" + endGame);
+        if (controller.current.checkEndGame() && !endGame){
+          setEndGame(true);
+        }
 
         console.log("AdminRoom(): retrievedRoom: " + retrievedRoom.getRoomCode());
         console.log("AdminRoom(): retrievedRoom: " + retrievedRoom.getRoomCode() + " adminId: " + retrievedRoom.getAdminId() + " tasklist: " + retrievedRoom.getTaskList());
@@ -62,6 +71,12 @@ function AdminRoom() {
     (async function () {
       try {
         //re rendered: check if task threshold has reached. if yes, end game
+        console.log(controller.current.checkEndGame());
+       // console.log(controller.current.getRoomCode());
+        console.log("endgame" + endGame);
+        if (controller.current.checkEndGame() && !endGame){
+          setEndGame(true);
+        }
       
       } catch (error) {
        
@@ -103,7 +118,17 @@ function AdminRoom() {
         <div>
           <h1>In game</h1>
           {room ? (room.getPlayerIds()?.map((playerId) => (<p>{playerId}</p>))): ('no players')}
+          {controller.current.getPlayers().map((player) => (<p>{player.getName()} {player.getNumTasksCompleted()
+          } {player.getStatus()} Imposter? {player.getImposterStatus()}</p>))}
 
+        </div>
+      )}
+
+       {/* In end */}
+       {controller.current.checkEndGame() && (
+        <div>
+          <h1>ENDED</h1>
+          
         </div>
       )}
       

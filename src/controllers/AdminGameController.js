@@ -3,14 +3,14 @@ import { Admin } from "../models/Admin";
 import { Room } from "../models/Room";
 import { DuplicateRoomCodeError } from "../errors/roomError";
 import { RoomStatus } from '../models/enum';
-
+import {Player} from "../models/Player";
 const ROOM_CODE_CHARACTER_SET = '0123456789';
 const ROOM_CODE_CHARACTER_SET_LENGTH = ROOM_CODE_CHARACTER_SET.length;
 const ROOM_CODE_LENGTH = 4;
 
 export default class AdminGameController extends GameController {
     adminId;  // actual Admin object
-    players; // actual list of Player objects that are watched by admin
+    playerIds; // actual list of Player objects that are watched by admin
             // each player must have a listener added
     roomCode = 0;
     tasklist;
@@ -19,7 +19,11 @@ export default class AdminGameController extends GameController {
     adminObject = null;
     callback;
     room;
+    players;
     threshold;
+    imposterIds = [];
+    crewmateIds = [];
+    crewmates = [];
 
     //remove tasklist from constructor (and the other things, keep only adminId)
     constructor(adminId, callback) {
@@ -30,6 +34,7 @@ export default class AdminGameController extends GameController {
         this.players = [];
         this.tasklist = [];
         this.room = null;
+        this.threshold = 0;
     }
 
     async getTaskList() {
@@ -105,7 +110,7 @@ export default class AdminGameController extends GameController {
         this.roomCode = roomCode;*/
         //console.log(admin);
         let admin = await this.getAdmin();
-        admin.updateAdminRoomCode(roomCode);
+        await admin.updateAdminRoomCode(roomCode);
     }
 
     async getRoomCode() {
@@ -166,6 +171,9 @@ export default class AdminGameController extends GameController {
  
                 let roomCode = AdminGameController.generateRoomCode(ROOM_CODE_LENGTH).toString();
 
+                //COMMENT THIS OUTTTTTTT
+               // roomCode = 5780;
+
                 console.log("roomCode: " + roomCode);
 
                 let room = await Room.getOrCreateRoom(roomCode, this.adminId, tasklist, 0, 0);
@@ -224,32 +232,74 @@ export default class AdminGameController extends GameController {
 
     async #assignPlayerRoles() {
         // update player object
-        shufflePlayers = this.players;
+        let shufflePlayers = this.room.getPlayerIds();
         // Shuffle array
-        const shuffled = this.players.sort(() => 0.5 - Math.random());
+        const shuffled = shufflePlayers.sort(() => 0.5 - Math.random());
 
        // Get sub-array of first n elements after shuffled
         let imposters = shuffled.slice(0, this.numImposters);
+        this.imposterIds = imposters;
 
-        this.players.forEach(pid => {
-            if (pid in imposters) {
+        console.log("assigning roles", imposters);
+
+        for (const player of this.players) {
+            console.log("player: " + player.getId());
+            if (imposters.includes(player.getId())) {
                 // update player role to "Imposter"
+                console.log("assigned imposter: " + player.getId());
+                await player.setImposterStatus(true);
 
             } else {
                 // update player role to "Crewmate"
+                console.log("assigned crewmate: " + player.getId());
+                this.crewmateIds.push(player.getId());
+                this.crewmates.push(player);
+                await player.setImposterStatus(false);
             }
-        });
-
+        }
 
     }
 
-    setGameParameters(paramsDict) {
-        // update room with (validated) parameters: 
-        //  - numImposters
-        //  - numTasksToComplete
-        //  - Tasklist
-        // any paramsDict key should map exactly to rooms db schema
+    checkEndGame() {
+        // check if the game has been won
+        // if so, update room status to "Won"
+        // return true if game has been won, false otherwise
 
+        //numImposters >= numCrewmates
+        let numImposters = 0;
+        let numCrewmates = 0;
+        for (const player of this.players) {
+            if (player.getImposterStatus() && player.getStatus() != "kicked") {
+                numImposters++;
+            } else if (!player.getImposterStatus() && player.getStatus() != "kicked") {
+                numCrewmates++;
+            }
+        }
+        console.log("numImposters: " + numImposters);
+        console.log("numCrewmates: " + numCrewmates);
+        if (numImposters != 0 && numCrewmates != 0) {
+
+        if (numImposters >= numCrewmates) {
+            console.log("imposters win");
+            return true;
+        }
+
+        //numImposters == 0
+        if (numImposters == 0) {
+            console.log("crewmates win (no imposters)");
+            return true;
+        }
+
+        //numTasksCompleted >= threshold
+        let numTasksCompleted = this.getTotalNumberTasksCompleted();
+        console.log("numTasksCompleted: " + numTasksCompleted);
+        if (numTasksCompleted >= this.threshold) {
+            console.log("crewmates win (tasks completed)");
+            return true;
+        }
+    }
+        return false;
+        
     }
 
     async startGame(numImposters, numTasksToComplete) {
@@ -267,32 +317,34 @@ export default class AdminGameController extends GameController {
         this.setNumTasksToComplete(numTasksToComplete);
 
         //update room status to inGame and update numImposters and numTasksToComplete
+        
+        this.playerIds = this.room.getPlayerIds();
+        console.log("players: " + this.playerIds);
+
+        for (const pid of this.playerIds) {
+            console.log("pid: " + pid);
+            let player = await Player.getPlayer(pid);
+
+            console.log("player: " + player, player.getId());
+            player.addCallback(this.callback);
+            console.log("player callback added");
+
+            await player.setTaskList(this.room.getTaskList()); //assign tasklist to players
+            await player.setRoomCode(this.room.getRoomCode());
+            console.log("player tasklist: " + player.getTaskList());
+            this.players.push(player);
+        }
+        console.log("players: " + this.players);
+         // assign player roles
+         await this.#assignPlayerRoles();
+         console.log("imposters: " + this.imposters);
+ 
+         this.threshold = this.getNumTasksToComplete() * (this.players.length - this.getNumImposters());
+         console.log("threshold: " + this.threshold);
+ 
         await room.updateStatus(RoomStatus.inProgress);
         await room.updateNumImposters(numImposters);
         await room.updateNumTasksToDo(numTasksToComplete);
-
-        this.players = this.room.getPlayerIds();
-        console.log("players: " + this.players);
-
-
-
-        /*// create player objs
-        _createPlayers();
-        this.room.updateRoomStatus(RoomStatus.inProgress);
-    }
-
-    _createPlayer() {
-        this.players = this.room.getPlayerIds().forEach(pid => {
-            const p = new Player(this.room.getRoomCode(), ...); // I don't know how Player is implemented
-            p.addCallback(this.callback);
-            return p;
-        }); */
-
-        // assign player roles
-       // await this.#assignPlayerRoles();
-        //this.threshold = this.getNumTasksToComplete(); * (len(this.players) - this.getNumImposters());
-
-
 
     }
 
@@ -304,6 +356,14 @@ export default class AdminGameController extends GameController {
     getTotalNumberTasksCompleted() {
         // sum over each player object for the total number of
         // tasks completed
+        let total = 0;
+        for (const player of this.crewmates) {
+            if (player.getStatus() != "kicked") {
+                total += player.getNumTasksCompleted();
+            }
+        }
+        return total;
+
     }
 
     endGame() {
@@ -353,6 +413,9 @@ export default class AdminGameController extends GameController {
     kickOutPlayer(playerId) {
         // delete player from database
         // remove player from room.playerIds
+        let player = this.players.find(player => player.getId() == playerId);
+        player.setStatus("kicked");
+
     }
 
     endMeeting() {
