@@ -7,6 +7,14 @@ import { useRef } from 'react';
 import AdminGameController from "../controllers/AdminGameController";
 function AdminRoom() {
   const [room, setRoom] = useState(null);
+  const [playerList, setPlayerList] = useState([
+    {id: 0, name: 'Namrata', imposter:false, dead:false, numCompletedTasks: 5},
+    {id: 1, name: 'Karen', imposter:false, dead:true, numCompletedTasks: 100}, 
+    {id: 2, name: 'Richard', imposter:false, dead:false, numCompletedTasks: 5},
+    {id: 3, name: 'Victora', imposter:true, dead:false, numCompletedTasks: 0},
+    {id: 4, name: 'Jacob', imposter:false, dead:true, numCompletedTasks: 5},
+    {id: 5, name: 'Hongkun', imposter:false, dead:true, numCompletedTasks: 5}
+  ]);
   console.log("AdminRoom(): room: " + room);
   const [players, setPlayers] = useState([]);
   const [gameScreen, setGameScreen] = useState(false);
@@ -21,6 +29,40 @@ function AdminRoom() {
   let adminId = auth.currentUser.uid; // dummy for testing
   let controller = useRef(new AdminGameController(adminId, forceUpdate));
 
+  const [roomState, setRoomState] = useState("inGame");
+
+  function callMeeting (){
+    setRoomState("meetingCalled");
+    console.log("AH");
+  }
+
+  function openVoting(){
+    setRoomState("votingScreen");
+  }
+
+  function endMeeting(){
+    setRoomState("inGame");
+  }
+
+  function markDead(id){
+    const updatedPlayers = playerList.map((player) =>{
+      if(player.id === id){
+        const updatedPlayer = {
+          ...player,
+          dead:true,
+        };
+        return updatedPlayer;
+      }
+      return player;
+    })
+    setPlayerList(updatedPlayers);
+  }
+
+  function kickPlayer(id){
+    const updatedPlayers = playerList.filter((player) => player.id !== id);
+    setPlayerList(updatedPlayers);
+  }
+  
   //Use to toggle to in game screen
   //Can also simply use 
   //      setGameScreen(true);
@@ -120,8 +162,22 @@ function AdminRoom() {
           {room ? (room.getPlayerIds()?.map((playerId) => (<p>{playerId}</p>))): ('no players')}
           {controller.current.getPlayers().map((player) => (<p>{player.getName()} {player.getNumTasksCompleted()
           } {player.getStatus()} Imposter? {player.getImposterStatus()}</p>))}
-
+          <div className="text-in-box">
+                  <ul className="centered-lists">
+                    {controller.current.getPlayers().map((player) => (
+                      <div className="player">
+                          <h2 className="whiteh2">{player.getName()}</h2>
+                          <p>Role: {player.getImposterStatus()? "Imposter" : "Crewmate"}</p>
+                          <p>Status: {player.getStatus == "dead" ? "Dead" : "Alive"}</p>
+                          {!player.getImposterStatus() && (<p>Number of Tasks Completed: {player.getNumTasksCompleted()}</p>)}
+                          {!(player.getStatus == "dead") && (<button className="playerButton" onClick={() => markDead(player.id)}>Mark Dead</button>)}
+                          <button className="kickPlayer" onClick={() => kickPlayer(player.id)}>Kick Player</button>
+                      </div>
+          ))}
+        </ul>
+      </div>
         </div>
+        
       )}
 
        {/* In end */}
@@ -131,6 +187,21 @@ function AdminRoom() {
           
         </div>
       )}
+
+
+
+
+      {(roomState == "inGame") && (
+        <button onClick={callMeeting}>Call Emergency Meeting</button>
+      )}
+      {(roomState == "meetingCalled") && (
+        <button onClick={openVoting}>Open Voting Screen</button>
+      )}
+      {(roomState == "votingScreen") && (
+        <button onClick={endMeeting}>End Emergency Meeting</button>
+      )}
+        <button>End Game</button>
+      
       
     </div>
   );

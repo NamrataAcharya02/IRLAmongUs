@@ -481,3 +481,45 @@ progress{
 .is-disabled, .Collapsible__trigger{
     background-color: black;
 }
+
+.player{
+    display: flex;
+    background-color: #555e6bbc;
+    position: relative;
+    margin-bottom: 8px;
+    margin-left: 0px;
+    min-height: 100px;
+    width: 300px;
+    align-items: center;
+    border: 1.5px solid rgb(0, 0, 0);
+    box-shadow: inset 0 0 5px #000000;
+    opacity: 1;
+    font-family: 'Amatic SC', sans-serif;
+    font-size: 20px;
+    color: white;
+    flex-direction: column;
+}
+
+.kickPlayer{
+    background:rgb(95, 0, 0);
+    padding: 0px;
+    height: 40px;
+    width: 200px;
+}
+
+.playerButton{
+    padding: 0px;
+    height: 40px;
+    width: 200px;
+    margin-bottom: 0px;
+}
+
+.player h2 {
+    margin-top: 5px;
+    margin-bottom: -5px;
+}
+  
+.player p {
+    margin-top: -5px;
+    margin-bottom: -10px;
+}

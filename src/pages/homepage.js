@@ -52,7 +52,7 @@ function Pages(){
         signInAnonymously(auth)
         .then(function() {
             console.log("REDIRECTED TO LOBBY")
-            navigate('/lobby');
+            navigate('/lobby', {state:{name:nickname, code:roomCode}});
         })
         .catch((error) => {
             console.error('Error signing in anonymously:', error);
