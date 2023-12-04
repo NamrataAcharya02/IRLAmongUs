@@ -1,5 +1,5 @@
 import React, {useState} from "react";
-//retired legacy player task list
+
 
 function PlayerTaskList() { 
     //order the following list is how it is shuffled

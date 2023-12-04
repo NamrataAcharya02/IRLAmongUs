@@ -110,7 +110,7 @@ input{
     justify-content: center; /* Center vertically */
     align-items: center; /* Center horizontally */
     /* margin: auto; */
-    height: 100%;
+    height: auto;
 }
 
 .enter{

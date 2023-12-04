@@ -1,7 +1,5 @@
 // Adapted from https://github.com/rauschma/enumify/blob/master/ts/src/index.ts
 
-import { Room } from "./Room";
-
 export class Enum {
     static closeEnum() {
         const enumKeys = [];
@@ -37,7 +35,6 @@ export class Enum {
 export class RoomStatus extends Enum {
     static new = new RoomStatus();
     static wait = new RoomStatus();
-    static emergency = new RoomStatus();
     static inProgress = new RoomStatus();
     static finished = new RoomStatus();
     static impostersWin = new RoomStatus();

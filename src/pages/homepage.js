@@ -3,7 +3,9 @@
 import React, {useState, useId} from "react";
 import Popup from 'reactjs-popup';
 import PlayerWaiting from "./PlayerWaiting.js";
-// import { useSelector, useDispatch } from 'react-redux'
+import { Admin } from "../models/Admin.js";
+import AdminController from "../controllers/AdminGameController.js";
+import { useSelector, useDispatch } from 'react-redux'
 import { setValue } from '../components/counter/counterSlice.js'
 import background from "../images/stars-background.jpg";
 
@@ -41,6 +43,7 @@ function Pages(){
         signInWithPopup(auth, googleAuthProvider)
         .then(function(){
             console.log("REDIRECTED")
+           
             navigate('/adminpage');
         });
     }
