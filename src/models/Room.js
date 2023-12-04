@@ -252,8 +252,8 @@ export class Room {
      */
     // static async getRoom(adminId) {
     static async getRoom(roomCode) {
-        if (roomCode == null) {
-            throw new RoomNotExistError("null roomCode");
+        if (roomCode == null || roomCode == "") {
+            throw new RoomNotExistError("null or empty roomCode");
         }
         // Currently, support admin having only one room.
         // const docRef = doc(db, "rooms", adminId).withConverter(roomConverter);
