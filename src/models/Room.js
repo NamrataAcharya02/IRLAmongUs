@@ -397,15 +397,6 @@ export class Room {
         } catch (err) {
             console.log(err);
         }
-        const room = await Room.getRoom(code);
-        const currPlayers = room.getPlayerIds();
-        try {
-            const updatedPlayers = currPlayers.splice(currPlayers.indexOf(playerId), 1);
-            const roomDocRef = this.#_roomRefForRoomCode(code);
-            await updateDoc(roomDocRef, {players: updatedPlayers});
-        } catch (err) {
-            console.log(err);
-        }
     }
 
 }
