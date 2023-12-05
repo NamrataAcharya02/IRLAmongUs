@@ -36,8 +36,9 @@ export default class PlayerGameController {
         this.player = player;
 
         try {
-            console.log(`this.player.getRoomCode(): ${this.player.getRoomCode()}`);
+            console.log(`this.player.getRoomCode(): ${this.player.getRoomCode()}`);   
             this.room = await Room.getRoom(this.player.getRoomCode()); // will either have 4-char string or ""
+            console.log("retrieved player room", this.room);
         } catch (err) {
             if (err instanceof RoomNotExistError) {
                 console.log(`PlayerGameController.init() room ${this.player.getRoomCode()} not exist`);
@@ -158,5 +159,14 @@ export default class PlayerGameController {
     getTasklistStatus() {
         // return (number of tasks complete, number of tasks requred)
         return this.player.getNumTasksCompleted();
+    }
+
+    getRoomNumTasksCompleted(){
+        return this.room.getNumTasksComplete();
+    }
+
+    getRoomStatus(){
+        console.log("status", this.room.getStatus().enumKey)
+        return this.room.getStatusAsString();
     }
 }

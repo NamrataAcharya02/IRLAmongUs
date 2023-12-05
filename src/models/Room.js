@@ -25,6 +25,7 @@ import { FirebaseError } from "firebase/app";
 
 export class Room {
     status;
+    // #statusAsString;
     #id;
     #adminId;
     #code;
@@ -64,7 +65,12 @@ export class Room {
     getNumPlayers() {return this.#playerIds.length; }
     getPlayerIds() { return this.#playerIds; }
     getStatus() {return this.status; }
+    getStatusAsString() { 
+        console.log("return status", this.status.enumKey);
+        return this.status.enumKey; 
+    }
     getNumTasksComplete() { return this.#numTasksComplete; }
+    
 
     setRoomId(id) { this.#id = id; }
     setAdminId(adminId) { this.#adminId = adminId; }
@@ -148,6 +154,7 @@ export class Room {
         this.#numImposters = snapData.numImposters;
         this.#numTasksToDo = snapData.numTasksToDo;
         this.#playerIds = snapData.playerIds;
+        this.status = RoomStatus.enumValueOf(snapData.status);
         if (this.#callback != null) {
             console.log("running callback in room");
             this.#callback();

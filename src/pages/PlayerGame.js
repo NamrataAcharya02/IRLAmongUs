@@ -9,6 +9,8 @@ import meetingBackground from "../images/stars-background.jpg";
 import { useNavigate } from "react-router-dom";
 import PlayerGameController from "../controllers/PlayerGameController";
 import { auth } from "../firebase.js";
+import { current } from "@reduxjs/toolkit";
+import { RoomStatus } from "../models/enum.js";
 
 function PlayerGame(){
     const [currentComplete, setComplete] = useState(0);
@@ -73,80 +75,79 @@ function PlayerGame(){
     
             console.log(`controller.current.room.getRoomCode(): ${controller.current.room.getRoomCode()}`);
             console.log(`controller.current.room.getTaskList(): ${controller.current.getVisibleTasks()}`);
-            
-            const retrievedRoom = controller.current.room;
 
-            retrievedRoom.addCallback(forceUpdate)
-
-            setRoom(retrievedRoom);
-
+            setRoom(controller.current.room);
             setTasks(controller.current.getVisibleTasks());
-            setNumTasksToComplete((controller.current.room.getNumPlayers()-controller.current.room.getNumImposters()), controller.current.room.getNumTasksToDo());
-            console.log('threshold tasks: ', (controller.current.room.getNumPlayers()-controller.current.room.getNumImposters()) * controller.current.room.getNumTasksToDo());
-            setComplete(controller.current.room.getNumTasksComplete());
-            console.log("complete", controller.current.room.getNumTasksComplete())
+            // setNumTasksToComplete((controller.current.room.getNumPlayers()-controller.current.room.getNumImposters()), controller.current.room.getNumTasksToDo());
+            // console.log('threshold tasks: ', (controller.current.room.getNumPlayers()-controller.current.room.getNumImposters()) * controller.current.room.getNumTasksToDo());
+            // setComplete(controller.current.getRoomNumTasksCompleted());
+            // console.log("complete", controller.current.getRoomNumTasksCompleted());
             })();
       }, []);
+
+    
 
     return (
         <div className="center" style={{paddingTop: "20px", paddingBottom:"20px", backgroundImage: `url(${meetingBackground})`}}>
             {/* Progress bar shows how many tasks completed (currentComplete) out of total tasks (toComplete) */}
-            <h4>Total Tasks Completed</h4>
-            <progress value={currentComplete} max={toComplete}></progress>
-            <br></br>
-            {/* <button onClick={completeATask}>Complete a Task</button> */}
-            {/* <button onClick={playSound}>Beep</button> */}
-            {/* Player's task list */}
-            <ul className="centered-lists">
-		        {tasks.map((task) => (
-                    <div className="task">
-                        <h3>
-                            <input 
-                                type="checkbox"
-                                className="checkbox"
-                                onClick={() => markComplete(task)}
-                                checked={false}
-                            /> 
-                            {task}
-                        </h3>
-                    </div>
-                ))}
-            </ul>
-            <button onClick={markSelfDead}>Mark Self Dead</button>
-
-            {/* emergency meeting called screen */}
-            {gameState==="emergency" && (
-                <div className="overlay">
-                    <h1>EMERGENCY MEETING CALLED</h1>
-                    <button onClick={setInGame}>Return to Normal</button>
+            {room && (
+                <div className="center">
+                    <h4>Total Tasks Completed {controller.current.getRoomNumTasksCompleted()}</h4>
+                    <progress value={controller.current.getRoomNumTasksCompleted()} max={toComplete}></progress>
+                    <br></br>
+                    <ul className="centered-lists">
+                        {tasks.map((task) => (
+                            <div className="task">
+                                <h3>
+                                    <input 
+                                        type="checkbox"
+                                        className="checkbox"
+                                        onClick={() => markComplete(task)}
+                                        checked={false}
+                                    /> 
+                                    {task}
+                                </h3>
+                            </div>
+                        ))}
+                    </ul>
+                    <button onClick={markSelfDead}>Mark Self Dead</button>
+                    <h1>Room status: {controller.current.getRoomStatus()}</h1>
+        
+                    {/* emergency meeting called screen */}
+                    {controller.current.getRoomStatus()=="emergencyMeeting" && (
+                        <div className="overlay">
+                            <h1>EMERGENCY MEETING CALLED</h1>
+                            <button onClick={setInGame}>Return to Normal</button>
+                        </div>
+                    )}
+                    {controller.current.getRoomStatus()=="voting" && (
+                        <div className="overlay-meeting" style={{ backgroundImage: `url(${meetingBackground})` }}  >
+                            <h1>Voting in Session</h1>
+                            <button onClick={setInGame}>Return to Normal</button>
+                        </div>
+                    )}
+                    {controller.current.getRoomStatus()== "impostersWin" && (
+                        <div className="imposter-win">
+                            <h1>IMPOSTER VICTORY</h1>
+                            <div className="center">
+                                <button onClick={returnHome}>Return Home</button>
+                            </div>                   
+                        </div>
+                    )}
+                    {controller.current.getRoomStatus()=="crewmatesWin" && (
+                        <div className="crewmate-win">
+                            <h1>CREWMATE VICTORY</h1>
+                            <div className="center">
+                                <button onClick={returnHome}>Return Home</button>
+                            </div>
+                        </div>
+                    )}
+                    <button onClick={setEmergencyScreen}>Call Emergency Meeting</button>
+                    {/* <button onClick={setVotingScreen}>Set Voting Screen</button>
+                    <button onClick={setImposterWin}>Set Imposter Victory</button>
+                    <button onClick={setCrewmateWin}>Set Crewmate Victory</button> */}
                 </div>
-            )}
-            {gameState==="voting" && (
-                <div className="overlay-meeting" style={{ backgroundImage: `url(${meetingBackground})` }}  >
-                    <h1>Voting in Session</h1>
-                    <button onClick={setInGame}>Return to Normal</button>
-                </div>
-            )}
-            {gameState==="imposterWin" && (
-                <div className="imposter-win">
-                    <h1>IMPOSTER VICTORY</h1>
-                    <div className="center">
-                        <button onClick={returnHome}>Return Home</button>
-                    </div>                   
-                </div>
-            )}
-            {gameState==="crewmateWin" && (
-                <div className="crewmate-win">
-                    <h1>CREWMATE VICTORY</h1>
-                    <div className="center">
-                        <button onClick={returnHome}>Return Home</button>
-                    </div>
-                </div>
-            )}
-            <button onClick={setEmergencyScreen}>Call Emergency Meeting</button>
-            <button onClick={setVotingScreen}>Set Voting Screen</button>
-            <button onClick={setImposterWin}>Set Imposter Victory</button>
-            <button onClick={setCrewmateWin}>Set Crewmate Victory</button>
+            )}            
         </div>
     );
 }
