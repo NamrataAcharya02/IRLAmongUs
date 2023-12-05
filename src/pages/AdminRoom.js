@@ -188,12 +188,12 @@ function AdminRoom() {
           <h1>In game</h1>
           <progress value={controller.current.getTotalNumberTasksCompleted()} max={controller.current.threshold}></progress>
 
-          {controller.current.threshold}
-          {controller.current.getTotalNumberTasksCompleted()}
+         // {controller.current.threshold}
+        //  {controller.current.getTotalNumberTasksCompleted()}
 
-          {room ? (room.getPlayerIds()?.map((playerId) => (<p>{playerId}</p>))): ('no players')}
-          {controller.current.getPlayers().map((player) => (<p>{player.getName()} {player.getNumTasksCompleted()
-          } {player.getStatus()} Imposter? {player.getImposterStatus()}</p>))}
+        //  {room ? (room.getPlayerIds()?.map((playerId) => (<p>{playerId}</p>))): ('no players')}
+        //  {controller.current.getPlayers().map((player) => (<p>{player.getName()} {player.getNumTasksCompleted()
+       //   } {player.getStatus()} Imposter? {player.getImposterStatus()}</p>))}
           <div className="text-in-box">
                   <ul className="centered-lists">
                     {controller.current.getPlayers().map((player) => (
