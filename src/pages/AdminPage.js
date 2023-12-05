@@ -218,7 +218,7 @@ const AdminPage = () => {
       <Link to="/">
         <button className="back">Back</button>
       </Link>
-      <DevRoomComponent></DevRoomComponent>
+      //<DevRoomComponent></DevRoomComponent>
 
       {/* "How to Play" pop-up overlay for Players */}
       <AdminHowTo></AdminHowTo>
