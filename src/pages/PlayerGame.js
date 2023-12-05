@@ -83,6 +83,10 @@ function PlayerGame(){
             // setComplete(controller.current.getRoomNumTasksCompleted());
             // console.log("complete", controller.current.getRoomNumTasksCompleted());
             })();
+            const interval = setInterval(() => {
+                forceUpdate();
+                // console.log("ding");
+            }, 100000);
       }, []);
 
     
@@ -111,22 +115,19 @@ function PlayerGame(){
                         ))}
                     </ul>
                     <button onClick={markSelfDead}>Mark Self Dead</button>
-                    <h1>Room status: {controller.current.getRoomStatus()}</h1>
         
                     {/* emergency meeting called screen */}
-                    {controller.current.getRoomStatus()=="emergencyMeeting" && (
+                    {controller.current.getRoomStatus()==="emergencyMeeting" && (
                         <div className="overlay">
                             <h1>EMERGENCY MEETING CALLED</h1>
-                            <button onClick={setInGame}>Return to Normal</button>
                         </div>
                     )}
-                    {controller.current.getRoomStatus()=="voting" && (
+                    {controller.current.getRoomStatus()==="voting" && (
                         <div className="overlay-meeting" style={{ backgroundImage: `url(${meetingBackground})` }}  >
                             <h1>Voting in Session</h1>
-                            <button onClick={setInGame}>Return to Normal</button>
                         </div>
                     )}
-                    {controller.current.getRoomStatus()== "impostersWin" && (
+                    {controller.current.getRoomStatus()=== "impostersWin" && (
                         <div className="imposter-win">
                             <h1>IMPOSTER VICTORY</h1>
                             <div className="center">
@@ -134,7 +135,7 @@ function PlayerGame(){
                             </div>                   
                         </div>
                     )}
-                    {controller.current.getRoomStatus()=="crewmatesWin" && (
+                    {controller.current.getRoomStatus()==="crewmatesWin" && (
                         <div className="crewmate-win">
                             <h1>CREWMATE VICTORY</h1>
                             <div className="center">

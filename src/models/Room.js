@@ -66,7 +66,7 @@ export class Room {
     getPlayerIds() { return this.#playerIds; }
     getStatus() {return this.status; }
     getStatusAsString() { 
-        console.log("return status", this.status.enumKey);
+        // console.log("return status", this.status.enumKey);
         return this.status.enumKey; 
     }
     getNumTasksComplete() { return this.#numTasksComplete; }

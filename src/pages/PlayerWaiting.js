@@ -2,6 +2,7 @@ import React, {useEffect, useState, useRef} from "react";
 import {Link, useLocation} from "react-router-dom";
 import background from "../images/stars-background.jpg";
 import PlayerHowTo from "../components/PlayerHowTo.js";
+import { useNavigate } from "react-router-dom";
 
 import { auth } from "../firebase.js";
 import PlayerGameController from "../controllers/PlayerGameController";
@@ -10,6 +11,7 @@ function PlayerWaiting(){
     const location = useLocation();
     const [nickname, setNickname] = useState(location.state.name);
     const [roomCode, setRoomCode] = useState(location.state.code);
+    const navigate = useNavigate();
 
     const forceUpdate = React.useReducer(() => ({}))[1];
     let playerId = auth.currentUser.uid; // dummy for testing
@@ -24,6 +26,12 @@ function PlayerWaiting(){
         console.log(`controller.current.room.getRoomCode(): ${controller.current.room.getRoomCode()}`);
         console.log(`controller.current.room.getTaskList(): ${controller.current.getVisibleTasks()}`);
         
+        const interval = setInterval(() => {
+            if(controller.current.getRoomStatus() === "inProgress"){
+                navigate("/game");
+            }
+            // console.log("dong");
+        }, 5000);
         })();
   }, []); // 
     // useEffect(() =>{
@@ -43,9 +51,9 @@ function PlayerWaiting(){
             <div className="player-lobby">
                 <h3>player lobby waiting screen here</h3>
             </div>
-            <Link to="/game">
+            {/* <Link to="/game">
                 <button>To Temporary Player Screen</button>
-            </Link>
+            </Link> */}
         </div>
     );
 }

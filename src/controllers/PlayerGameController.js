@@ -166,7 +166,7 @@ export default class PlayerGameController {
     }
 
     getRoomStatus(){
-        console.log("status", this.room.getStatus().enumKey)
+        // console.log("status", this.room.getStatus().enumKey)
         return this.room.getStatusAsString();
     }
 }
