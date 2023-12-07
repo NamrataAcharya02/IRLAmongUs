@@ -86,7 +86,7 @@ function PlayerGame(){
             const interval = setInterval(() => {
                 forceUpdate();
                 // console.log("ding");
-            }, 100000);
+            }, 5000);
       }, []);
 
     
