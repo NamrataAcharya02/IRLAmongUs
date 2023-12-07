@@ -83,6 +83,7 @@ export class Room {
     setNumTasksComplete(numTasksToComplete) { this.#numTasksComplete = numTasksToComplete; }
 
     setStatus(status) { 
+        console.log("status changed");
         if (status instanceof RoomStatus){
             this.status = status; 
         } else {
@@ -90,7 +91,7 @@ export class Room {
         }
     }
 
-    /**
+    /**updateRoomStatus
      * 
      * @param {Number} num the number of tasks to add to NumTasksComplete
      */

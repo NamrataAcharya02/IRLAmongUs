@@ -3,6 +3,7 @@ import {Player} from "../models/Player";
 import {Room} from "../models/Room";
 import {shuffler} from "../models/utils";
 import { RoomNotExistError } from "../errors/roomError";
+import { RoomStatus } from "../models/enum";
 
 // export default class PlayerGameController extends GameController {
 export default class PlayerGameController {
@@ -112,8 +113,9 @@ export default class PlayerGameController {
         // TODO: SOrt this out
         // Jacob, just use this.player.setCallMeetingStatus();
         // Also, what does setCallMeetingStatus actually do?
-        this.player.setCallMeetingStatus(true);
-
+        // this.player.setCallMeetingStatus(true);
+        this.room.updateStatus(RoomStatus.emergencyMeeting);
+        
 
         // Jacob, I should add a function to room: createEmergencySubcollection
 
@@ -130,10 +132,13 @@ export default class PlayerGameController {
     }
 
     async markTaskComplete(description) {
+        this.taskList = this.player.getTaskList();
+        this.player.setTaskComplete(description);
+        if(!this.player.getImposterStatus())
+        {
+            this.room.updateNumTasksComplete(1);
+        }
         // update player tasklists task to completed
-       this.taskList = this.player.getTaskList();
-       this.player.setTaskComplete(description);
-       this.room.updateNumTasksComplete(1);
     }
 
 

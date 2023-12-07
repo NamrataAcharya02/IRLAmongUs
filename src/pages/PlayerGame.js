@@ -19,6 +19,7 @@ function PlayerGame(){
     const [gameState, setGameState] = useState();
     const [tasks, setTasks] = useState([]);
     const [room, setRoom] = useState();
+    const [showingRole, setShowingRole] = useState(false);
 
     const navigate = useNavigate();
     let playerId = auth.currentUser.uid; // dummy for testing
@@ -35,6 +36,7 @@ function PlayerGame(){
 
     const setEmergencyScreen = () => {
         playSound();
+        controller.current.callMeeting();
         setGameState("emergency");
     }
 
@@ -96,6 +98,16 @@ function PlayerGame(){
             {/* Progress bar shows how many tasks completed (currentComplete) out of total tasks (toComplete) */}
             {room && (
                 <div className="center">
+                    {!showingRole && (
+                        <button onClick={() => setShowingRole(true)}>Show Role</button>
+                    )}
+                    {showingRole && (
+                        <div className="center">
+                            <h1>Role: {controller.current.player.getImposterStatus() ? "Imposter" : "Crewmate"}</h1>
+                            <button onClick={() => setShowingRole(false)}>Hide Role</button>
+                        </div>                    
+                    )}
+                    
                     <h4>Total Tasks Completed {controller.current.getRoomNumTasksCompleted()}</h4>
                     <progress value={controller.current.getRoomNumTasksCompleted()} max={toComplete}></progress>
                     <br></br>
@@ -143,7 +155,7 @@ function PlayerGame(){
                             </div>
                         </div>
                     )}
-                    <button onClick={setEmergencyScreen}>Call Emergency Meeting</button>
+                    <button onClick={setEmergencyScreen}>Report Dead Body</button>
                     {/* <button onClick={setVotingScreen}>Set Voting Screen</button>
                     <button onClick={setImposterWin}>Set Imposter Victory</button>
                     <button onClick={setCrewmateWin}>Set Crewmate Victory</button> */}
