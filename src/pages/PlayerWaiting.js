@@ -12,6 +12,7 @@ function PlayerWaiting(){
     const [nickname, setNickname] = useState(location.state.name);
     const [roomCode, setRoomCode] = useState(location.state.code);
     const navigate = useNavigate();
+    const [room, setRoom] = useState();
 
     const forceUpdate = React.useReducer(() => ({}))[1];
     let playerId = auth.currentUser.uid; // dummy for testing
@@ -25,7 +26,7 @@ function PlayerWaiting(){
 
         console.log(`controller.current.room.getRoomCode(): ${controller.current.room.getRoomCode()}`);
         console.log(`controller.current.room.getTaskList(): ${controller.current.getVisibleTasks()}`);
-        
+        setRoom(controller.current.room);
         const interval = setInterval(() => {
             if(controller.current.getRoomStatus() === "inProgress"){
                 navigate("/game");
@@ -47,10 +48,10 @@ function PlayerWaiting(){
             <PlayerHowTo></PlayerHowTo>
             
             <h1>Hello {nickname}!</h1>
-            <h2 className="whiteh2">Room Code: {roomCode}</h2>
-            <div className="player-lobby">
-                <h3>player lobby waiting screen here</h3>
-            </div>
+            {room &&(
+                <h2 className="whiteh2">Room Code: {controller.current.room.getRoomCode()}</h2>
+            )}           
+            <div></div>
             {/* <Link to="/game">
                 <button>To Temporary Player Screen</button>
             </Link> */}

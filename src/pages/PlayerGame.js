@@ -36,7 +36,7 @@ function PlayerGame(){
 
     const setEmergencyScreen = () => {
         playSound();
-        controller.current.callMeeting();
+        controller.current.room.updateStatus(RoomStatus.emergencyMeeting);
         setGameState("emergency");
     }
 
