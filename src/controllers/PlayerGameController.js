@@ -95,7 +95,8 @@ export default class PlayerGameController {
 
         // update player object with the generated list
         const stringArray = this.room.getTaskList();
-        this.taskList = shuffler(stringArray);
+        this.taskList = stringArray.sort(() => 0.5 - Math.random());
+        console.log("Shuffled tasks", this.taskList);
 
         this.player.setTaskList(this.taskList);
 
@@ -134,7 +135,7 @@ export default class PlayerGameController {
     async markTaskComplete(description) {
         this.taskList = this.player.getTaskList();
         this.player.setTaskComplete(description);
-        if(!this.player.getImposterStatus())
+        if(!this.player.getImposterStatus() && this.player.getStatus() == "alive")
         {
             this.room.updateNumTasksComplete(1);
         }

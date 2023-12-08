@@ -5,10 +5,13 @@ import { DuplicateRoomCodeError } from "../errors/roomError";
 import { RoomStatus } from '../models/enum';
 import {Player} from "../models/Player";
 import { cleanupDbCollectionDocs } from '../models/utils';
+import { redirect } from "react-router-dom";
+import { shuffler } from "../models/utils";
 
 const ROOM_CODE_CHARACTER_SET = '0123456789';
 const ROOM_CODE_CHARACTER_SET_LENGTH = ROOM_CODE_CHARACTER_SET.length;
 const ROOM_CODE_LENGTH = 4;
+
 
 export default class AdminGameController extends GameController {
     adminId;  // actual Admin object
@@ -348,7 +351,8 @@ export default class AdminGameController extends GameController {
             player.addCallback(this.callback);
             console.log("player callback added");
             await player.setAliveStatus("alive");
-            await player.setTaskList(this.room.getTaskList()); //assign tasklist to players
+            let shuffledTaskList = shuffler(this.room.getTaskList());
+            await player.setTaskList(shuffledTaskList); //assign tasklist to players
             await player.setRoomCode(this.room.getRoomCode());
             //await player.setNumTasksToComplete(this.room.getNumTasksToDo());
             console.log("player tasklist: " + player.getTaskList());
@@ -359,7 +363,7 @@ export default class AdminGameController extends GameController {
          await this.#assignPlayerRoles();
          console.log("imposters: " + this.imposters);
  
-         this.threshold = this.getNumTasksToComplete() * (this.players.length - this.getNumImposters());
+         this.threshold = numTasksToComplete;
          console.log("threshold: " + this.threshold);
  
         await room.updateStatus(RoomStatus.inProgress);
@@ -378,6 +382,14 @@ export default class AdminGameController extends GameController {
         console.log("player marked dead: " + player.getId());
         //this.checkEndGame();
         //return this.checkEndGame();
+    }
+
+    async getPlayerName(pid)
+    {
+        
+        let player = await Player.getPlayer(pid);
+        console.log("player name: ", player.getName());
+        return player.getName();
     }
 
     displayGameCode() {
@@ -403,9 +415,9 @@ export default class AdminGameController extends GameController {
         // delete player object from database
         // delete room object from database
         for (const player of this.players) {
-            await player.deleteDoc(player.getId());
+            await player.deletePlayer()
         }
-        await Room.deleteRoom(this.room.getRoomCode());
+        await Room.deleteRoom(this.roomCode);
         
 
     }
@@ -438,6 +450,10 @@ export default class AdminGameController extends GameController {
         // of the unique player voted out
 
         // TODO: if max votes is not unique to one player...
+    }
+
+    getRoomStatus(){
+        return this.room.getStatusAsString();
     }
 
     finalizeVotingResults() {

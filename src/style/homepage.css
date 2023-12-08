@@ -1,6 +1,5 @@
 @import url('https://fonts.googleapis.com/css2?family=Amatic+SC:wght@700&display=swap');
 
-
 button {
     position: relative;
     background-color: #000000; /* Green */
@@ -544,4 +543,17 @@ progress{
 .player p {
     margin-top: -5px;
     margin-bottom: -10px;
+}
+
+.addTask{
+    width: 100px;
+}
+
+.background-div{
+    min-height: 100vh;
+    background-image: url("../images/stars-background.jpg");
+}
+
+html {
+    height: 100%;
 }

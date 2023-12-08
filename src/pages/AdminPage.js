@@ -5,12 +5,12 @@ import React, { useState, useEffect, useReducer } from "react";
 import { Link } from "react-router-dom";
 import { Room } from "../models/Room";
 import { Task, TaskList } from "../models/TaskList.js";
-import {Admin} from "../models/Admin.js";
+import { Admin } from "../models/Admin.js";
 import background from "../images/stars-background.jpg";
 import { useNavigate } from 'react-router-dom';
 import DevRoomComponent from "../development-components/DevAdminComponent.js";
 import AdminGameController from "../controllers/AdminGameController.js";
-import {auth, googleAuthProvider} from "../firebase";
+import { auth, googleAuthProvider } from "../firebase";
 import AdminHowTo from "../components/AdminHowTo.js";
 import { useRef } from 'react';
 
@@ -19,7 +19,7 @@ let room = null;
 //let controller = null;
 
 const AdminPage = () => {
-  
+
   const [, forceUpdate] = useReducer(x => x + 1, 0);
   //const [controller, setController] = useState(null);
   let controller = useRef(new AdminGameController(auth.currentUser.uid, forceUpdate));
@@ -29,11 +29,11 @@ const AdminPage = () => {
   var tasklistObject = null;
   const navigate = useNavigate();
   //console.log(tasklist)
-  
+
 
   //don't exceed number of tasks
-  const hasEmptyTask = tasklist.some((singleTask, index) => {
-    if (singleTask.description == "") {
+  const hasEmptyTask = tasklist.some((singleTask) => {
+    if (singleTask == "") {
       return true;
     }
     return false;
@@ -49,7 +49,7 @@ const AdminPage = () => {
         navigate("/");
       } else {
         if (controller == null) {
-         // setController(new AdminGameController(auth.currentUser.uid, forceUpdate));
+          // setController(new AdminGameController(auth.currentUser.uid, forceUpdate));
 
 
         }
@@ -65,29 +65,29 @@ const AdminPage = () => {
       try {
         if (tasklist == null || tasklist.length == 0) {
           console.log("getting admin", auth.currentUser.uid)
-        let admin  = await Admin.getOrCreateAdmin(auth.currentUser.uid, ['task']);
-        console.log("got admin", admin)
-        list = admin.getTaskList();
-        setTasklist(list);
-        forceUpdate();
+          let admin = await Admin.getOrCreateAdmin(auth.currentUser.uid, ['task']);
+          console.log("got admin", admin)
+          list = admin.getTaskList();
+          setTasklist(list);
+          forceUpdate();
         }
-      //setTasklist(list);
+        //setTasklist(list);
 
       } catch (error) {
         console.error(error);
       }
-      
+
     })();
   });
 
 
   //handle adding a task, adds an extra input field and new task object to tasklist
   const handleAddTask = () => {
-    if(!hasEmptyTask){
-      setTasklist((prevTasklist) => [...prevTasklist, new Task("")]);
+    if (!hasEmptyTask) {
+      setTasklist((prevTasklist) => [...prevTasklist, ""]);
     }
   }
-  
+
   const deleteItem = (index) => {
     const updatedTasklist = [...tasklist];
     updatedTasklist.splice(index, 1);
@@ -117,7 +117,7 @@ const AdminPage = () => {
 
     //let controller = new AdminGameController(auth.currentUser.uid, null, null);
     controller.current.saveTasklist(list);
-    
+
     //await admin.updateAdminTasklists(tasklistObj);
 
     console.log(tasklistObj);
@@ -137,7 +137,7 @@ const AdminPage = () => {
   }
   //---------------------- Room Creation ----------------------------------------
   const [room, setRoom] = useState(null);
-  
+
   // Temporary Task Lists
   const taskListObjs = [{
     name: "frontend set task list",
@@ -165,45 +165,49 @@ const AdminPage = () => {
 
 
   //function to create a room
-  const startRoom = async () => {  
-    console.log("Current user", auth.currentUser.uid);
-    let list = [...tasklist];
-    try {
-      //let adminId = auth.currentUser.uid; // Dummy for dev purposes
-      //let controller = new AdminGameController(adminId);
-     // controller.setNumImposters(numImposters);
-      //controller.setNumTasksToComplete(numTasksToDo);
-      //controller.saveTasklist(list);
+  const startRoom = async () => {
+    if (tasklist.length >= 10 && !hasEmptyTask)
+    {
+      console.log("Current user", auth.currentUser.uid);
+      let list = [...tasklist];
+      try {
+        //let adminId = auth.currentUser.uid; // Dummy for dev purposes
+        //let controller = new AdminGameController(adminId);
+        // controller.setNumImposters(numImposters);
+        //controller.setNumTasksToComplete(numTasksToDo);
+        //controller.saveTasklist(list);
 
-      let newroom = await controller.current.startRoom(numImposters, numTasksToDo);
-      //let roomCode = AdminGameController.generateRoomCode(4);
-      //let newroom = await Room.getOrCreateRoom(roomCode, adminId, list, numImposters, numTasksToDo);
-      //await controller.setRoomCode(roomCode);
+        let newroom = await controller.current.startRoom(numImposters, numTasksToDo);
+        //let roomCode = AdminGameController.generateRoomCode(4);
+        //let newroom = await Room.getOrCreateRoom(roomCode, adminId, list, numImposters, numTasksToDo);
+        //await controller.setRoomCode(roomCode);
 
-      setRoom(newroom);
-      console.log(newroom);
-      navigate("/room");
-    } catch (error) {
-      console.error(error);
-      setRoom(null);
+        setRoom(newroom);
+        console.log(newroom);
+        navigate("/room");
+      } catch (error) {
+        console.error(error);
+        setRoom(null);
+      }
     }
+    
 
 
-      /*let roomCode = '1234';
-      const newRoom = await Room.getOrCreateRoom(
-        adminId,
-        roomCode,
-        adminId,
-        tasklistObj,
-        numImposters,
-        numTasksToDo
-      );
-      await newRoom.updateRoom(tasklistObject, numImposters, numTasksToDo);
-      setRoom(newRoom);
-    } catch (error) {
-      console.error(error);
-      setRoom(null);
-    } */
+    /*let roomCode = '1234';
+    const newRoom = await Room.getOrCreateRoom(
+      adminId,
+      roomCode,
+      adminId,
+      tasklistObj,
+      numImposters,
+      numTasksToDo
+    );
+    await newRoom.updateRoom(tasklistObject, numImposters, numTasksToDo);
+    setRoom(newRoom);
+  } catch (error) {
+    console.error(error);
+    setRoom(null);
+  } */
   };
   //----------------------- Room Creation ---------------------------------------
 
@@ -214,42 +218,46 @@ const AdminPage = () => {
   //   )
   // }
   return (
-    <div className="center" style={{ backgroundImage: `url(${background})` }}>
-      <Link to="/">
-        <button className="back">Back</button>
-      </Link>
-      {/* <DevRoomComponent></DevRoomComponent> */}
+    <div className="background-div">
+      <div className="center">
+        <Link to="/">
+          <button className="back">Back</button>
+        </Link>
+        {/* <DevRoomComponent></DevRoomComponent> */}
 
-      {/* "How to Play" pop-up overlay for Players */}
-      <AdminHowTo></AdminHowTo>
+        {/* "How to Play" pop-up overlay for Players */}
+        <AdminHowTo></AdminHowTo>
 
-      {/* TaskList:: */}
+        {/* TaskList:: */}
 
-      <div className="text-in-box">
-        <input className="tasklist-title" placeholder="Name of Task List" value={listName} onChange={(e) => setListName(e.target.value)} />
-        <div className="space-divider"></div>
-        {tasklist.map((singleTask, index) => (
-          <div className='task-container' key={index}>
-            <input className="task" required type="text" placeholder="Task Description" value={singleTask} name="task" onChange={(e) => (handleTaskChange(e, index))} />
-            <button className="delete-x" onClick={() => deleteItem(index)}>&#10006;</button>
-            {/* {index == tasklist.length - 1}             */}
+        <div className="text-in-box">
+          <div className="space-divider"></div>
+          {tasklist.map((singleTask, index) => (
+            <div className='task-container' key={index}>
+              <input className="task" required type="text" placeholder="Task Description" value={singleTask} name="task" onChange={(e) => (handleTaskChange(e, index))} />
+              <button className="delete-x" onClick={() => deleteItem(index)}>&#10006;</button>
+              {/* {index == tasklist.length - 1}             */}
+            </div>
+
+          ))
+
+
+          }
+          <div className="center">
+            <button onClick={handleAddTask} > Add Task </button>
+            <button onClick={handleSaveTasklist}> Save List</button>
           </div>
-
-        ))
-
-
-        }
-        <div>
-          <button onClick={handleAddTask} > Add Task </button>
-          <button onClick={handleSaveTasklist}> Save List</button>
         </div>
-      </div>
-      {/* Game customizations other than task list: */}
+        {/* Game customizations other than task list: */}
 
-      {/* Room Generation: */}
-      <button onClick={startRoom}>Start a Room</button>
-      
-      {/* <h1>Room Code: {room ? room.getRoomCode() : 'N/A'}</h1> */}
+        {/* Room Generation: */}
+        {tasklist.length < 10 && (
+          <h2 className="whiteh2">Please make sure there are at least 10 tasks before starting a room.</h2>
+        )}
+        <button onClick={startRoom}>Start a Room</button>
+
+        {/* <h1>Room Code: {room ? room.getRoomCode() : 'N/A'}</h1> */}
+      </div>
     </div>
   );
 }

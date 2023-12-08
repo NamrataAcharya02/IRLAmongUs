@@ -22,6 +22,7 @@ import { RoomStatus } from './enum';
 import { db } from "../firebase";
 import { RoomNotExistError, MoreThanOneRoomError, DuplicateRoomCodeError } from "../errors/roomError";
 import { FirebaseError } from "firebase/app";
+import { redirect } from "react-router-dom";
 
 export class Room {
     status;
@@ -154,6 +155,7 @@ export class Room {
         this.#tasklist = snapData.tasklist;
         this.#numImposters = snapData.numImposters;
         this.#numTasksToDo = snapData.numTasksToDo;
+        this.#numTasksComplete = snapData.numTasksComplete;
         this.#playerIds = snapData.playerIds;
         this.status = RoomStatus.enumValueOf(snapData.status);
         if (this.#callback != null) {
@@ -360,13 +362,11 @@ export class Room {
      * TODO:
      * @param {*} code 
      */
-    static async deleteRoom(room) {
-        // remove all players from room
+    static async deleteRoom(roomCode) {
+        
 
-        room.addCallback(null);
-        // then delete this instance of room from the databse
-        const doc = getDoc(doc(db, 'rooms', room.getRoomId()));
-        deleteDoc(doc.ref);
+        const roomDocRef = this.#_roomRefForRoomCode(roomCode);
+        await deleteDoc(roomDocRef);
         return true;
     }
 

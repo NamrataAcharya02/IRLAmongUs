@@ -1,5 +1,5 @@
-import React, {useState, useEffect, useRef} from "react";
-import {Link} from "react-router-dom";
+import React, { useState, useEffect, useRef } from "react";
+import { Link } from "react-router-dom";
 import { useSelector } from 'react-redux'
 import background from "../images/stars-background.jpg";
 import VoteScreen from "../components/VoteScreen";
@@ -12,7 +12,7 @@ import { auth } from "../firebase.js";
 import { current } from "@reduxjs/toolkit";
 import { RoomStatus } from "../models/enum.js";
 
-function PlayerGame(){
+function PlayerGame() {
     const [currentComplete, setComplete] = useState(0);
     const [toComplete, setToComplete] = useState(20);
     const [playSound] = useSound(meetingSound);
@@ -57,7 +57,7 @@ function PlayerGame(){
     //     setComplete(currentComplete + 1);
     // }
     //function to calculate total number of tasks (toComplete) based on number of crewmates and number of tasks per crewmate
-    function setNumTasksToComplete(numCrewmates, numTasksPerCrewmate){
+    function setNumTasksToComplete(numCrewmates, numTasksPerCrewmate) {
         setToComplete(numCrewmates * numTasksPerCrewmate);
     }
 
@@ -67,14 +67,14 @@ function PlayerGame(){
         setTasks(updatedTasks);
     }
 
-    function markSelfDead(){
+    function markSelfDead() {
         controller.current.markSelfDead();
     }
 
     useEffect(() => {
         (async function () {
             await controller.current.init();
-    
+
             console.log(`controller.current.room.getRoomCode(): ${controller.current.room.getRoomCode()}`);
             console.log(`controller.current.room.getTaskList(): ${controller.current.getVisibleTasks()}`);
 
@@ -84,83 +84,87 @@ function PlayerGame(){
             // console.log('threshold tasks: ', (controller.current.room.getNumPlayers()-controller.current.room.getNumImposters()) * controller.current.room.getNumTasksToDo());
             // setComplete(controller.current.getRoomNumTasksCompleted());
             // console.log("complete", controller.current.getRoomNumTasksCompleted());
-            })();
-            const interval = setInterval(() => {
-                forceUpdate();
-                // console.log("ding");
-            }, 5000);
-      }, []);
 
-    
+        })();
+        const interval = setInterval(() => {
+            forceUpdate();
+            console.log("ding");
+        }, 5000);
+    }, []);
+
+
+
 
     return (
-        <div className="center" style={{paddingTop: "20px", paddingBottom:"20px", backgroundImage: `url(${meetingBackground})`}}>
-            {/* Progress bar shows how many tasks completed (currentComplete) out of total tasks (toComplete) */}
-            {room && (
-                <div className="center">
-                    {!showingRole && (
-                        <button onClick={() => setShowingRole(true)}>Show Role</button>
-                    )}
-                    {showingRole && (
-                        <div className="center">
-                            <h1>Role: {controller.current.player.getImposterStatus() ? "Imposter" : "Crewmate"}</h1>
-                            <button onClick={() => setShowingRole(false)}>Hide Role</button>
-                        </div>                    
-                    )}
-                    
-                    <h4>Total Tasks Completed {controller.current.getRoomNumTasksCompleted()}</h4>
-                    <progress value={controller.current.getRoomNumTasksCompleted()} max={toComplete}></progress>
-                    <br></br>
-                    <ul className="centered-lists">
-                        {tasks.map((task) => (
-                            <div className="task">
-                                <h3>
-                                    <input 
-                                        type="checkbox"
-                                        className="checkbox"
-                                        onClick={() => markComplete(task)}
-                                        checked={false}
-                                    /> 
-                                    {task}
-                                </h3>
-                            </div>
-                        ))}
-                    </ul>
-                    <button onClick={markSelfDead}>Mark Self Dead</button>
-        
-                    {/* emergency meeting called screen */}
-                    {controller.current.getRoomStatus()==="emergencyMeeting" && (
-                        <div className="overlay">
-                            <h1>EMERGENCY MEETING CALLED</h1>
-                        </div>
-                    )}
-                    {controller.current.getRoomStatus()==="voting" && (
-                        <div className="overlay-meeting" style={{ backgroundImage: `url(${meetingBackground})` }}  >
-                            <h1>Voting in Session</h1>
-                        </div>
-                    )}
-                    {controller.current.getRoomStatus()=== "impostersWin" && (
-                        <div className="imposter-win">
-                            <h1>IMPOSTER VICTORY</h1>
+        <div className="background-div">
+            <div className="center" style={{ paddingTop: "20px", paddingBottom: "20px" }}>
+                {/* Progress bar shows how many tasks completed (currentComplete) out of total tasks (toComplete) */}
+                {room && (
+                    <div className="center">
+                        {!showingRole && (
+                            <button onClick={() => setShowingRole(true)}>Show Role</button>
+                        )}
+                        {showingRole && (
                             <div className="center">
-                                <button onClick={returnHome}>Return Home</button>
-                            </div>                   
-                        </div>
-                    )}
-                    {controller.current.getRoomStatus()==="crewmatesWin" && (
-                        <div className="crewmate-win">
-                            <h1>CREWMATE VICTORY</h1>
-                            <div className="center">
-                                <button onClick={returnHome}>Return Home</button>
+                                <h1>Role: {controller.current.player.getImposterStatus() ? "Imposter" : "Crewmate"}</h1>
+                                <button onClick={() => setShowingRole(false)}>Hide Role</button>
                             </div>
-                        </div>
-                    )}
-                    <button onClick={setEmergencyScreen}>Report Dead Body</button>
-                    {/* <button onClick={setVotingScreen}>Set Voting Screen</button>
-                    <button onClick={setImposterWin}>Set Imposter Victory</button>
-                    <button onClick={setCrewmateWin}>Set Crewmate Victory</button> */}
-                </div>
-            )}            
+                        )}
+
+                        <h4>Total Tasks Completed {controller.current.room.getNumTasksComplete()}</h4>
+                        <progress value={controller.current.room.getNumTasksComplete()} max={toComplete}></progress>
+                        <br></br>
+                        <ul className="centered-lists">
+                            {tasks.map((task) => (
+                                <div className="task">
+                                    <h3>
+                                        <input
+                                            type="checkbox"
+                                            className="checkbox"
+                                            onClick={() => markComplete(task)}
+                                            checked={false}
+                                        />
+                                        {task}
+                                    </h3>
+                                </div>
+                            ))}
+                        </ul>
+                        <button onClick={markSelfDead}>Mark Self Dead</button>
+
+                        {/* emergency meeting called screen */}
+                        {controller.current.getRoomStatus() === "emergencyMeeting" && (
+                            <div className="overlay">
+                                <h1>EMERGENCY MEETING CALLED</h1>
+                            </div>
+                        )}
+                        {controller.current.getRoomStatus() === "voting" && (
+                            <div className="overlay-meeting" style={{ backgroundImage: `url(${meetingBackground})` }}  >
+                                <h1>Voting in Session</h1>
+                            </div>
+                        )}
+                        {controller.current.getRoomStatus() === "impostersWin" && (
+                            <div className="imposter-win">
+                                <h1>IMPOSTER VICTORY</h1>
+                                <div className="center">
+                                    <button onClick={returnHome}>Return Home</button>
+                                </div>
+                            </div>
+                        )}
+                        {controller.current.getRoomStatus() === "crewmatesWin" && (
+                            <div className="crewmate-win">
+                                <h1>CREWMATE VICTORY</h1>
+                                <div className="center">
+                                    <button onClick={returnHome}>Return Home</button>
+                                </div>
+                            </div>
+                        )}
+                        <button onClick={setEmergencyScreen}>Report Dead Body</button>
+                        {/* <button onClick={setVotingScreen}>Set Voting Screen</button>
+                        <button onClick={setImposterWin}>Set Imposter Victory</button>
+                        <button onClick={setCrewmateWin}>Set Crewmate Victory</button> */}
+                    </div>
+                )}
+            </div>
         </div>
     );
 }
