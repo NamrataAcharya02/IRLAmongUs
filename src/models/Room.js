@@ -58,6 +58,10 @@ export class Room {
 
     getRoomId() { return this.#id; }
     getAdminId() { return this.#adminId; }
+    /**
+     * 
+     * @returns room code associated with the room
+     */
     getRoomCode() { return this.#code; }
     getCreatedAt() { return this.#createdAt; }
     getTaskList() { return this.#tasklist; }
@@ -92,10 +96,6 @@ export class Room {
         }
     }
 
-    /**updateRoomStatus
-     * 
-     * @param {Number} num the number of tasks to add to NumTasksComplete
-     */
     addNumTasksComplete(num) {
         if (!(typeof num !== Number)) {
             throw TypeError(`num "${num}" in addNumTasksComplete invalid Type`);
@@ -103,18 +103,37 @@ export class Room {
         this.#numTasksComplete = this.getNumTasksComplete() + num;
     }
     
+    /**
+     * updates the task list associated with the room
+     * @param {string[]} tasklist the task list that is associated with the room
+     */
     async updateTaskList(tasklist) { 
         this.setTaskList(tasklist);
         this.#__update({tasklist: tasklist});
     }
+
+    /**
+     * updates the number of imposters in the room
+     * @param {Number} numImposters the number of imposters to set for the room
+     */
     async updateNumImposters(numImposters) { 
         this.setNumImposters(numImposters); 
         this.#__update({numImposters: numImposters});
     }
+
+    /**
+     * updates how many tasks the crewmates should aim to achieve
+     * @param {Number} numTasksToDo the number of tasks the room should collectively do
+     */
     async updateNumTasksToDo(numTasksToDo) { 
         this.setNumTasksToDo(numTasksToDo);
         this.#__update({numTasksToDo: numTasksToDo});
     }
+
+    /**
+     * sets the room status to what is passed in
+     * @param {RoomStatus} status enum that signifies what state the room is in
+     */
     async updateStatus(status) { 
         if (status instanceof RoomStatus){
             this.setStatus(status); 
@@ -124,11 +143,20 @@ export class Room {
         }
     }
 
+    /**
+     * adds num to the number of tasks the room has completed
+     * updates the database
+     * @param {Number} num how many tasks that has been completed since last update
+     */
     async updateNumTasksComplete(num) {
         this.addNumTasksComplete(num);
         this.#__update({numTasksComplete: this.getNumTasksComplete()});
     }
 
+    /**
+     * adds player to room
+     * @param {String} playerId id of player that wants to join the room
+     */
     async addPlayer(playerId) { 
         if (!(this.getPlayerIds().includes(playerId))) {
             this.#playerIds.push(playerId); 
@@ -136,16 +164,28 @@ export class Room {
         }
     }
 
+    /**
+     * 
+     * @param {Callback} callback listener for updating the data of the room live
+     */
     addCallback(callback) {
         console.log("room adding callback");
         this.#callback = callback;
     }
 
+    /**
+     * 
+     * @param {Field} field what field of the doc is updated
+     */
     async #__update(field) {
         await updateDoc(Room.#_roomRefForRoomCode(this.getRoomCode()), field);
     }
 
 
+    /**
+     * repopulates and updates the class variables with the latest snapshot of the database
+     * @param {Data} snapData the data that is pulled from the database
+     */
     #__updateFromSnapshot(snapData) {
         console.log("updating");
         this.#id = snapData.id;
@@ -165,6 +205,9 @@ export class Room {
         console.log("finished");
     }
 
+    /**
+     * adds a listener to the database to send updates from the snapshot
+     */
     #addDocSnapshotListener() {
         console.log("registering DocSnapshotListener for Room " + this.getRoomCode());
         const docQuery = query(collection(db, "rooms"), where(documentId(), "==", this.getRoomCode()));
