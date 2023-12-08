@@ -94,8 +94,8 @@ function AdminRoom() {
     setNumPlayers(room.getPlayerIds().length);
     let latestPlayerNum = room.getPlayerIds().length;
     console.log("Current number of players", room.getPlayerIds().length)
-    if(true){
-    // if (numImposters <= (latestPlayerNum / 4)) {
+    // if(true){
+    if (numImposters <= (latestPlayerNum / 4)) {
       setGameScreen(!gameScreen);
       console.log("controller.current" + controller.current.getRoomObject(), controller.current.getNumImposters());
       await controller.current.startGame(numImposters, ((latestPlayerNum - numImposters) * numTasksToDo));
