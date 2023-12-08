@@ -2,6 +2,12 @@ import React, {useState} from "react";
 import GameController from "../controllers/GameController";
 import PlayerGameController from "../controllers/PlayerGameController";
 
+/**
+ * This React component renders the voting screen for the IRL Among Us app.
+ * 
+ * @function VoteScreen
+ * @returns The VoteScreen component.
+ */
 function VoteScreen() { 
     //alive player list, to be set by getActivePlayers() in GameController
 	const players = [
@@ -17,16 +23,35 @@ function VoteScreen() {
 
     const [voted, toggleVoted] = useState(false);
 
+    /**
+     * Handles player submitting a vote for a specific player.
+     * 
+     * @function submitVote
+     * @param {string} playerId The ID of the player to vote for.
+     * @returns {void}
+     */
     const submitVote = (playerId) => {
         toggleVoted(true);
         //PlayerController.castVote(playerId)
     }
 
+    /**
+     * Handles player choosing to skip voting.
+     * 
+     * @function submitSkip
+     * @returns {void}
+     */
     const submitSkip = () => {
         setSkipVote(true);
         toggleVoted(true);
     }
 
+    /**
+     * Clears the player selection for voting.
+     * 
+     * @function chooseSkip
+     * @returns {void}
+     */
     const chooseSkip = () => {
         setSelectedPlayer(null);
     }
