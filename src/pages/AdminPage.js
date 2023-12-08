@@ -118,7 +118,7 @@ const AdminPage = () => {
   /**
    * handles task name change in textbox. Updates task object as changes are being made
    * @param {any} e
-   * @param {any} index
+   * @param {int} index
   */
   const handleTaskChange = (e, index) => {
     const { name, value } = e.target
