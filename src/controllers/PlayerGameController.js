@@ -107,7 +107,9 @@ export default class PlayerGameController {
         // remove player id from room.playerids
         // delete player db instance
 
-        this.room.leaveRoom(this.playerId);
+        //code, playerId
+        // this.room.leaveRoom(this.roomCode, this.playerId);
+        this.player.deletePlayer();
     }
 
     async callMeeting() {

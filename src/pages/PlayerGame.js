@@ -51,8 +51,19 @@ function PlayerGame() {
     }
 
     const returnHome = () => {
-        navigate("/");
+        // controller.current.player.deletePlayer();
+        try{
+            controller.current.leaveRoom();
+            navigate("/");
+        }
+        catch{
+            navigate("/");
+        }
+        
+        
+        
     }
+
 
     //function to add 1 to currentComplete (tracks number of completed tasks)
     // function completeATask(){
@@ -87,7 +98,7 @@ function PlayerGame() {
             // console.log(`controller.current.room.getTaskList(): ${controller.current.getVisibleTasks()}`);
 
             setRoom(controller.current.room);
-            setRoomCode(controller.current.room.getRoomCode());
+            // setRoomCode(controller.current.room.getRoomCode());
 
             console.log("Room is currently:", room);
             setTasks(controller.current.getVisibleTasks());
@@ -98,12 +109,6 @@ function PlayerGame() {
 
         })();
         const interval = setInterval(() => {
-            try{
-                controller.current.room.getRoom(roomCode);
-            }catch
-            {
-                navigate("/");
-            }
             // console.log("ding");
         }, 5000);
     }, []);
@@ -114,6 +119,7 @@ function PlayerGame() {
     return (
         <div className="background-div">
             <div className="center" style={{ paddingTop: "20px", paddingBottom: "20px" }}>
+              <button className="back" onClick={() => returnHome()} style={{width: "100px"}}>Leave Game</button>
                 {/* Progress bar shows how many tasks completed (currentComplete) out of total tasks (toComplete) */}
                 {room && (
                     <div className="center">

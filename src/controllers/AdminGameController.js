@@ -30,6 +30,7 @@ export default class AdminGameController extends GameController {
     crewmateIds = [];
     crewmates = [];
     impostersWin = false;
+    numTasksPerPlayer;
 
     //remove tasklist from constructor (and the other things, keep only adminId)
     constructor(adminId, callback) {
@@ -299,6 +300,7 @@ export default class AdminGameController extends GameController {
             console.log("imposters win");
             //this.victoryStatus = "Imposters Win.";
             this.impostersWin = true;
+            this.updateRoomStatus(RoomStatus.impostersWin);
             return true;
         }
 
@@ -307,6 +309,7 @@ export default class AdminGameController extends GameController {
             console.log("crewmates win (no imposters)");
             //this.victoryStatus = "Crewmates Win.";
             this.impostersWin = false;
+            this.updateRoomStatus(RoomStatus.crewmatesWin);
             return true;
         }
 
@@ -317,6 +320,7 @@ export default class AdminGameController extends GameController {
             console.log("crewmates win (tasks completed)");
             //this.victoryStatus = "Crewmates Win.";
             this.impostersWin = false;
+            this.updateRoomStatus(RoomStatus.crewmatesWin);
             return true;
         }
     }
@@ -337,6 +341,7 @@ export default class AdminGameController extends GameController {
         let room = this.getRoomObject();
         this.setNumImposters(numImposters);
         this.setNumTasksToComplete(numTasksToComplete);
+        this.numTasksPerPlayer = numTasksToComplete / (this.room.getPlayerIds().length - numImposters);
 
         //update room status to inGame and update numImposters and numTasksToComplete
         
@@ -410,6 +415,7 @@ export default class AdminGameController extends GameController {
 
     }
 
+
     async endGame() {
         // for every playerId in room.playerIds,
         // delete player object from database
@@ -469,7 +475,7 @@ export default class AdminGameController extends GameController {
         // remove player from room.playerIds
         let player = await Player.getPlayer(playerId.toString());
         await player.setAliveStatus("kicked");
-        this.threshold -= this.room.getNumTasksToDo();
+        this.threshold -= this.numTasksPerPlayer;
         this.players = this.players.filter(function(player) {return player.getId() != playerId;});
         
         await Room.leaveRoom(this.room.getRoomCode(), playerId);

@@ -96,6 +96,7 @@ function AdminRoom() {
     console.log("Current number of players", room.getPlayerIds().length)
     // if(true){
     if (numImposters <= (latestPlayerNum / 4)) {
+      // console.log("latest player num", latestPlayerNum);
       setGameScreen(!gameScreen);
       console.log("controller.current" + controller.current.getRoomObject(), controller.current.getNumImposters());
       await controller.current.startGame(numImposters, ((latestPlayerNum - numImposters) * numTasksToDo));
@@ -253,7 +254,7 @@ function AdminRoom() {
         {gameScreen && (
           <div className="center">
             <h1>In game</h1>
-            <progress value={controller.current.getTotalNumberTasksCompleted()} max={controller.current.threshold}></progress>
+            <progress value={controller.current.getTotalNumberTasksCompleted()} max={controller.current.getNumTasksToComplete()}></progress>
             <div className="text-in-box">
               <ul className="centered-lists">
                 {controller.current.getPlayers().map((player) => (
