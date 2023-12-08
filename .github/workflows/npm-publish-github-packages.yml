@@ -9,6 +9,9 @@ jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
 
+    env:
+      CI: false
+
     steps:
     - uses: actions/checkout@v3
     - name: Use Node.js 16
@@ -17,4 +20,4 @@ jobs:
         node-version: 16
         cache: 'yarn'
     - run: yarn install
-    - run: yarn build
+    - run: CI="" yarn build
