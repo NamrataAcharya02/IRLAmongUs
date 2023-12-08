@@ -11,6 +11,7 @@ import PlayerGameController from "../controllers/PlayerGameController";
 import { auth } from "../firebase.js";
 import { current } from "@reduxjs/toolkit";
 import { RoomStatus } from "../models/enum.js";
+import { redirect } from "react-router-dom";
 
 function PlayerGame() {
     const [currentComplete, setComplete] = useState(0);
@@ -20,6 +21,7 @@ function PlayerGame() {
     const [tasks, setTasks] = useState([]);
     const [room, setRoom] = useState();
     const [showingRole, setShowingRole] = useState(false);
+    const [roomCode, setRoomCode] = useState("");
 
     const navigate = useNavigate();
     let playerId = auth.currentUser.uid; // dummy for testing
@@ -75,10 +77,19 @@ function PlayerGame() {
         (async function () {
             await controller.current.init();
 
-            console.log(`controller.current.room.getRoomCode(): ${controller.current.room.getRoomCode()}`);
-            console.log(`controller.current.room.getTaskList(): ${controller.current.getVisibleTasks()}`);
+            // try{
+            //     controller.current.room.getRoomStatus();
+            //     console.log("Tried to get room code");
+            // }catch{
+            //     navigate("/");
+            // }
+            // console.log(`controller.current.room.getRoomCode(): ${controller.current.room.getRoomCode()}`);
+            // console.log(`controller.current.room.getTaskList(): ${controller.current.getVisibleTasks()}`);
 
             setRoom(controller.current.room);
+            setRoomCode(controller.current.room.getRoomCode());
+
+            console.log("Room is currently:", room);
             setTasks(controller.current.getVisibleTasks());
             // setNumTasksToComplete((controller.current.room.getNumPlayers()-controller.current.room.getNumImposters()), controller.current.room.getNumTasksToDo());
             // console.log('threshold tasks: ', (controller.current.room.getNumPlayers()-controller.current.room.getNumImposters()) * controller.current.room.getNumTasksToDo());
@@ -87,8 +98,13 @@ function PlayerGame() {
 
         })();
         const interval = setInterval(() => {
-            forceUpdate();
-            console.log("ding");
+            try{
+                controller.current.room.getRoom(roomCode);
+            }catch
+            {
+                navigate("/");
+            }
+            // console.log("ding");
         }, 5000);
     }, []);
 

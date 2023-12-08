@@ -325,6 +325,7 @@ export class Room {
         return room;
     }
 
+
     /**
      * Update a room instance and database with parameters, only if a change in any one of the 
      * parameters has occured. This method checks for changes to prevent unnecessary database
@@ -357,6 +358,8 @@ export class Room {
         }
         return this;
     }
+
+
 
     /**
      * TODO:
