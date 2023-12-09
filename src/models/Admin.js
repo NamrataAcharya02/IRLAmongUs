@@ -16,35 +16,70 @@ export class Admin {
     roomCode = 0;
 
 
-    /** */
+    /** 
+     * @constructor
+     * @param {string} adminId - The id of the admin
+     * @param {string} name - The name of the admin
+     * @param {TaskList} tasklist - The tasklist of the admin
+     * @param {string} roomCode - The room code of the admin
+     * 
+    */
     constructor(adminId, name, tasklist, roomCode) {
         this.adminId = adminId;
         this.name = name;
         this.tasklist = tasklist;
         this.roomCode = roomCode;
-
     }
 
+    /**This function gets the admin id
+     * @function getAdminId
+     * @returns {string} - The admin id
+     * */
     getAdminId() {
         return this.adminId;
     }
 
+    /**This function gets the tasklist
+     * @function getTaskList
+     * @returns {Array <String>} - The tasklist
+     * */
     getTaskList() {
         return this.tasklist;
     }
 
+    /**This function gets the name
+     * @function getName
+     * @returns {string} - The name
+     * */
     getName() { 
         return this.name;
     }
 
+    /**This function sets the room code
+     * @function setRoomCode
+     * @param {string} roomCode - The room code
+     * */
     setRoomCode(roomCode) {
         this.roomCode = roomCode;
     }
 
+    /**This function gets the room code
+     * @function getRoomCode
+     * @returns {string} - The room code
+     * */
     getRoomCode() { 
         return this.roomCode;
     }
 
+    /**This function gets the admin document from the database and returns an admin object
+     * initialised with the data from the document
+     * @function getAdmin
+     * @async
+     * @param {string} adminId - The id of the admin
+     * @returns {Admin} - The admin object
+     * 
+     * 
+        */
     static async getAdmin(adminId) {
         const docRef = doc(db, "admins", adminId).withConverter(adminConverter);
         const docSnap = await getDoc(docRef);
@@ -56,6 +91,16 @@ export class Admin {
         return false;
     }
 
+    /**This function creates an admin document in the database and returns an admin object
+     * initialised with the data from the document
+     * @function createAdmin
+     * @async
+     * @param {string} adminId - The id of the admin
+     * @param {Array <String>} taskLists - The tasklist of the admin
+     * @returns {Admin} - The admin object
+     * 
+     * 
+     * */
     static async createAdmin(adminId, taskLists) {
         const docRef = doc(db, "admins", adminId).withConverter(adminConverter);
         //const docRef = doc(db, "admins", adminId);
@@ -73,6 +118,18 @@ export class Admin {
 
     }
 
+    /**This function gets the admin document from the database and returns an admin object
+     * initialised with the data from the document. If the admin document does not exist,
+     * it creates an admin document in the database and returns an admin object
+     * initialised with the data from the document
+     * @function getOrCreateAdmin
+     * @async
+     * @param {string} adminId - The id of the admin
+     * @param {Array <String>} taskLists - The tasklist of the admin
+     * @returns {Admin} - The admin object
+     * 
+     *  
+     * */
     static async getOrCreateAdmin(adminId, taskLists) {
         let admin = null;
         admin = await this.getAdmin(adminId);
@@ -98,6 +155,14 @@ export class Admin {
         return admin;
     }
 
+    /**This function updates the admin document in the database.  
+     * It sets the object's tasklist and returns the admin object
+     * @function updateAdmin
+     * @async
+     * @param {string} adminId - The id of the admin
+     * @param {Array <String>} taskLists - The tasklist to be updated with
+     * @returns {Admin} - The admin object
+     * */
     async updateAdminTasklist(tasklist) { 
         //double check
         
@@ -115,6 +180,15 @@ export class Admin {
         console.log("Admin updated");
         return this;
     }
+
+    /**This function updates the admin document in the database.
+     * It sets the object's room code and returns the admin object
+     * @function updateAdmin
+     * @async
+     * @param {string} roomCode - The room code to be updated with
+     * @returns {Admin} - The admin object
+     * 
+     * */
 
     async updateAdminRoomCode(roomCode) {
         if (JSON.stringify(this.getRoomCode()) !== JSON.stringify(roomCode))  
