@@ -205,5 +205,7 @@ describe('Room addPlayer', () => {
 })
 
 describe('Room addCallback', () => { 
-    
+    test('adding callback to a room object', () => {})
+
+    test('a function that calls callback and succeeds', () => {})
  })
