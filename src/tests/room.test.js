@@ -119,3 +119,39 @@ describe('Room.getRoom()', () => {
         expect(room.getPlayerIds()).toStrictEqual([]);
     })
 })
+
+describe('Room.getOrCreateRoom()', () => {
+
+})
+
+describe('Room.joinRoom()', () => {
+
+})
+
+describe('Room.leaveRoom()', () => {
+    
+})
+
+describe('Room core getters and setters', () => { 
+    test('addCallback success', () => {})
+ })
+
+describe('Room.createRoom(...)', () => {
+
+})
+
+describe('Room Status sets and updates', () => {
+
+})
+
+describe('Room addNumTasksComplete', () => { 
+    
+})
+
+describe('Room addPlayer', () => {
+
+})
+
+describe('Room addCallback', () => { 
+    
+ })
