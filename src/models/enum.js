@@ -1,5 +1,7 @@
 // Adapted from https://github.com/rauschma/enumify/blob/master/ts/src/index.ts
-
+/**
+ * @class
+ */
 export class Enum {
     static closeEnum() {
         const enumKeys = [];
@@ -32,6 +34,17 @@ export class Enum {
     }
 }
 
+/**
+ * @class
+ * @enum RoomStatus enum
+ * new for new room
+ * wait for room in waiting
+ * inProgress for room that has started it's game
+ * impostersWin for room where imposters have won
+ * crewmatesWin for room where crewmates have won
+ * emergencyMeeting for room where emergencyMeeting has been called
+ * voting for room when voting is in session
+ */
 export class RoomStatus extends Enum {
     static new = new RoomStatus();
     static wait = new RoomStatus();

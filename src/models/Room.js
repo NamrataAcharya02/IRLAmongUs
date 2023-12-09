@@ -39,6 +39,16 @@ export class Room {
     #playerIds;
 
     #callback;
+    /**
+     * @constructor
+     * @param {String} id 
+     * @param {String} adminId 
+     * @param {String} code 
+     * @param {DateTime} createdAt 
+     * @param {String[]} tasklist 
+     * @param {Number} numImposters 
+     * @param {Number} numTasksToDo 
+     */
     constructor(id, adminId, code, createdAt, tasklist, numImposters, numTasksToDo) {
         this.status = RoomStatus.new;
         this.#id = id;
@@ -59,7 +69,7 @@ export class Room {
     getRoomId() { return this.#id; }
     getAdminId() { return this.#adminId; }
     /**
-     * 
+     * @function getRoomCode
      * @returns room code associated with the room
      */
     getRoomCode() { return this.#code; }
@@ -96,6 +106,11 @@ export class Room {
         }
     }
 
+    /**
+     * @function addNumTasksComplete
+     * increments the number of tasks that have been completed by num
+     * @param {Number} num of tasks that is to be updated in database
+     */
     addNumTasksComplete(num) {
         if (!(typeof num !== Number)) {
             throw TypeError(`num "${num}" in addNumTasksComplete invalid Type`);
@@ -104,6 +119,7 @@ export class Room {
     }
     
     /**
+     * @function updateTaskList
      * updates the task list associated with the room
      * @param {string[]} tasklist the task list that is associated with the room
      */
@@ -113,6 +129,7 @@ export class Room {
     }
 
     /**
+     * @function updateNumImposters
      * updates the number of imposters in the room
      * @param {Number} numImposters the number of imposters to set for the room
      */
@@ -122,6 +139,7 @@ export class Room {
     }
 
     /**
+     * @function updateNumTasksToDo
      * updates how many tasks the crewmates should aim to achieve
      * @param {Number} numTasksToDo the number of tasks the room should collectively do
      */
@@ -131,6 +149,7 @@ export class Room {
     }
 
     /**
+     * @function updateStatus
      * sets the room status to what is passed in
      * @param {RoomStatus} status enum that signifies what state the room is in
      */
@@ -144,6 +163,7 @@ export class Room {
     }
 
     /**
+     * @function updateNumTasksComplete
      * adds num to the number of tasks the room has completed
      * updates the database
      * @param {Number} num how many tasks that has been completed since last update
@@ -154,6 +174,7 @@ export class Room {
     }
 
     /**
+     * @function addPlayer
      * adds player to room
      * @param {String} playerId id of player that wants to join the room
      */
@@ -165,7 +186,8 @@ export class Room {
     }
 
     /**
-     * 
+     * @function addCallback
+     * adds callback to player
      * @param {Callback} callback listener for updating the data of the room live
      */
     addCallback(callback) {
@@ -174,8 +196,9 @@ export class Room {
     }
 
     /**
-     * 
-     * @param {Field} field what field of the doc is updated
+     * @function #update
+     * updates the database's data in the field
+     * @param {any} field what field of the doc is updated
      */
     async #__update(field) {
         await updateDoc(Room.#_roomRefForRoomCode(this.getRoomCode()), field);
@@ -183,6 +206,7 @@ export class Room {
 
 
     /**
+     * @function #__updateFromSnapshot
      * repopulates and updates the class variables with the latest snapshot of the database
      * @param {Data} snapData the data that is pulled from the database
      */
@@ -206,6 +230,7 @@ export class Room {
     }
 
     /**
+     * @function #addDocSnapshotListener
      * adds a listener to the database to send updates from the snapshot
      */
     #addDocSnapshotListener() {
@@ -236,6 +261,7 @@ export class Room {
     }
 
     /**
+     * @function createRoom
      * Create a room for game play. This method calls _generateRoomCode and ensures 
      * code uniqueness. It verifies that the number of tasks asked to be completed
      * are within bounds of the number of tasks in a task list. For the time being,
@@ -292,6 +318,7 @@ export class Room {
     }
 
     /**
+     * @function getRoom
      * Query the database for the unique room belonging to the admin as defined by
      * the parameter `adminId`.
      * 
@@ -405,8 +432,9 @@ export class Room {
 
 
     /**
-     * TODO:
-     * @param {*} code 
+     * @function deleteRoom
+     * deletes room associated with roomCode
+     * @param {String} roomCode
      */
     static async deleteRoom(roomCode) {
         
@@ -417,6 +445,7 @@ export class Room {
     }
 
     /**
+     * @function joinRoom
      * Add a player to a rooms `players` list and update firestore to reflect a
      * newly added added player.
      * 
@@ -461,9 +490,10 @@ export class Room {
     }
 
     /**
-     * TODO:
-     * @param {*} code 
-     * @param {*} playerId 
+     * @function leaveRoom
+     * removes player associated with playerId from room associated with code
+     * @param {String} code 
+     * @param {String} playerId 
      */
     static async leaveRoom(code, playerId) {
         const room = await Room.getRoom(code);
@@ -481,6 +511,7 @@ export class Room {
 
 
 /**
+ * @function roomConverter
  * Firestore converter used to convert:
  *      * a Room object to a firestore document in the room collection
  *      * a room collection document to a Room object

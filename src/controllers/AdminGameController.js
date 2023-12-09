@@ -32,7 +32,13 @@ export default class AdminGameController extends GameController {
     impostersWin = false;
     numTasksPerPlayer;
 
-    //remove tasklist from constructor (and the other things, keep only adminId)
+        /**
+     * Creates a new AdminGameController instance.
+     *
+     * @constructor
+     * @param {string} adminId - The ID of the admin.
+     * @param {Function} callback - The callback function to be executed after upon updates in the db.
+     */
     constructor(adminId, callback) {
         super();
         this.adminId = adminId;
@@ -44,6 +50,11 @@ export default class AdminGameController extends GameController {
         this.threshold = 0;
     }
 
+    /**
+     * This function gets the admin's tasklist
+     * @async
+     * @returns {Promise} A promise that resolves with the admin's tasklist
+     * */
     async getTaskList() {
         let admin = await this.getAdmin();
         this.tasklist = await admin.getTaskList();
@@ -66,6 +77,15 @@ export default class AdminGameController extends GameController {
         return this.numTasksToComplete;
     }
 
+    /**
+     * Retrieves the admin object. If it doesn't exist, creates a new one with a default tasklist.
+     *  
+     * @async
+     * @function createAdmin
+     * @param {string} adminId - The ID of the admin.
+     * @param {Array<Object>} tasklist - An array of task objects to be saved.
+     * @returns {Promise<Object>} A promise that resolves with the admin object.
+     * 
     static async createAdmin(adminId, tasklist) {
         // create an admin object
         // add the admin object to the database
@@ -76,6 +96,13 @@ export default class AdminGameController extends GameController {
 
     }
 
+    /**
+     * Retrieves the admin object. If it doesn't exist, creates a new one with a default tasklist.
+     *
+     * @async
+     * @function getAdmin
+     * @returns {Promise<Object>} A promise that resolves with the admin object.
+     */
     async getAdmin() {
         if (this.adminObject == null) {
             this.adminObject = await Admin.getOrCreateAdmin(this.adminId, ['task']);
@@ -83,6 +110,15 @@ export default class AdminGameController extends GameController {
         return this.adminObject;
     }
 
+    /**
+     * Retrieves the admin object from the database.
+     * 
+     * @async
+     * @function getAdminDB
+     * @param {string} adminId - The ID of the admin.
+     * @returns {Promise<Object>} A promise that resolves with the admin object.
+     * 
+     * */
     static async getAdminDB(adminId) {
         // get the admin object from the database
         // return the admin object
@@ -103,15 +139,28 @@ export default class AdminGameController extends GameController {
         return this.players;    
     }
 
+    /** 
+     * This function gets the room object from the database and sets the room object
+     * in the controller to the room object from the database.
+     * @async
+     * @param {string} roomCode - The room code of the room to be retrieved.
+     * @returns {Promise} room object associated with the room code that resolves
+     * 
+     * */
     async getRoomDB(roomCode) {
         // get the room object from the database
         let room = await Room.getRoom(roomCode.toString());
-        console.log("CHALU KYA HAI", room)
         this.setRoomObject(room);
-        console.log("CHALU KYA HAIiiiiiiiiiiiiii", this.room)
         return room;
     }
 
+    /**
+     * This function updates the admin in the database with the room code.
+     * @async
+     * @param {string} roomCode - The room code to be updated in the database.
+     * @returns {Promise} A promise that resolves when the room code has been updated in the database.
+     * 
+     * */
     async setRoomCode(roomCode) {
         /*let admin = await this.getAdmin();
         this.roomCode = roomCode;*/
@@ -120,11 +169,26 @@ export default class AdminGameController extends GameController {
         await admin.updateAdminRoomCode(roomCode);
     }
 
+    /**
+     * This function gets the room code from the admin object.
+     * @async
+     * @returns {Promise} A promise that resolves with the room code.
+     *  
+     * */
     async getRoomCode() {
         let admin = await this.getAdmin();
         this.roomCode = await admin.getRoomCode();
         return this.roomCode;
     }
+
+    /**
+     * Saves the tasklist for the game.
+     *
+     * @async
+     * @function saveTasklist
+     * @param {Array<Object>} tasklist - An array of task objects to be saved.
+     * @returns {Promise} A promise that resolves when the tasklist has been saved to the database.
+     */
     async saveTasklist(tasklist) {
         // update admin.tasklist
         let adminUser = await Admin.getAdmin(this.adminId);
@@ -135,6 +199,13 @@ export default class AdminGameController extends GameController {
 
     }
 
+    /**
+     * Generates a random room code.
+     * 
+     * @param {number} length - The length of the room code to be generated.
+     * @returns {string} A randomly generated room code.
+     * 
+     * */
     static generateRoomCode(length) {
         let result = '';
         for (let i = 0; i < length; i++) {
@@ -143,11 +214,23 @@ export default class AdminGameController extends GameController {
         return result;
     }
 
+    /**
+     * This function adds a callback to the admin controller.
+     * @param {Function} callback - The callback function to be executed upon updates in the db.
+     * 
+     * */
     addCallback(callback) {
         console.log("admincontroller noting callback");
         this.callback = callback;
     }
 
+    /**
+     * This function generated a random room code and generated a new room object and
+     * calls the getOrCreateRoom function to create a room in the database.
+     * @async
+     * 
+     * @returns {Promise} room object associated with the generated room code that resolves
+     */
     async startRoom() {
         //create a room object
         console.log("startRoom");
@@ -211,38 +294,18 @@ export default class AdminGameController extends GameController {
         }
     }
 
-    validateNumImposters(n) {
-        // ensure: 0 < n < imposterThreshold*numberOfPlayers
-        // upon fail, throw an error the front end can interpret
-    }
-
-    validateNumTasksToComplete(n) {
-        // ensure: 0 < n < maximum Task in Tasklist
-        // upon fail, throw an error the front end can interpret
-    }
-
-    #calculateMinMaxImposters() {
-        // return (min, imposter Threshold * number Of Players)
-    }
-    
-    #calculateMinMaxTasksToComplete() {
-        // return (min, maxNumberTasksAvailable)
-    }
-
-    #determinePlayerRoles() {
-        // Initially, all player roles *should* be "Crewmate"
-        // using (validated) numImposters and number of players 
-        // in room,
-        // randomly assign imposter roles to numImposters players
-        // return list of playerIds of assigned imposters
-    }
-
     getVictoryStatus() {
         return this.victoryStatus;
     }
 
-
-
+    /**
+     * This function randomly assigns player roles depending on the number of imposters (numImposters)
+     * and the number of players in the room (numPlayers). It doesn't return anything, but it updates
+     * the player objects in the database with their status.
+     * @async
+     * 
+     * 
+     */
     async #assignPlayerRoles() {
         // update player object
         let shufflePlayers = this.room.getPlayerIds();
@@ -273,10 +336,20 @@ export default class AdminGameController extends GameController {
 
     }
 
+    /**
+     * This function updates the room status in the database.
+     * @async
+     * @param {string} status - The status to be updated in the database.
+     * */
     async updateRoomStatus(status) {
         await this.room.updateStatus(status);
     }
 
+    /**
+     * This function checks for the different game end conditions.It bases this on 
+     * the number of imposters, the number of crewmates, and the number of tasks completed.
+     * @returns {boolean} true if the game has been won, false otherwise
+     */
     checkEndGame() {
         // check if the game has been won
         // if so, update room status to "Won"
@@ -328,6 +401,15 @@ export default class AdminGameController extends GameController {
         
     }
 
+     /**
+     * Starts the game, sets up the room and players.
+     *
+     * @async
+     * @function startGame
+     * @param {number} numImposters - The number of imposters in the game.
+     * @param {number} numTasksToComplete - The number of tasks to be completed in the game.
+     * @returns {Promise} A promise of a room object that resolves when the game has started, room status is updated, players are set up, and tasks are assigned.
+     */
     async startGame(numImposters, numTasksToComplete) {
         // update Room Status to "inGame"
 
@@ -376,7 +458,14 @@ export default class AdminGameController extends GameController {
         await room.updateNumTasksToDo(numTasksToComplete);
 
     }
-
+    /**
+     * Marks a player as dead in the game.
+     *
+     * @async
+     * @function markDead
+     * @param {string} playerId - The ID of the player to be marked as dead.
+     * @returns {Promise} A promise that resolves when the player's status has been updated to "dead"
+     */
     async markDead(playerId) {
         // update player object
         // update room object
@@ -401,7 +490,13 @@ export default class AdminGameController extends GameController {
         // get the roomCode from the room Object
 
     }
-
+    /**
+     * Gets the total number of tasks completed in the game.
+     *
+     * @async
+     * @function getTotalNumberTasksCompleted
+     * @returns {total} The total number of tasks that have been completed in the game.
+     */
     getTotalNumberTasksCompleted() {
         // sum over each player object for the total number of
         // tasks completed
@@ -414,8 +509,13 @@ export default class AdminGameController extends GameController {
         return total;
 
     }
-
-
+    /**
+     * Ends the game, deletes player and room objects from the database.
+     *
+     * @async
+     * @function endGame
+     * @returns {Promise} A promise that resolves when all player objects and the room object have been deleted from the database.
+     */
     async endGame() {
         // for every playerId in room.playerIds,
         // delete player object from database
@@ -428,6 +528,14 @@ export default class AdminGameController extends GameController {
 
     }
 
+    /**
+     * Kicks a player out of the game.
+     * 
+     * @async
+     * @function kickOutPlayer
+     * @param {string} playerId - The ID of the player to be kicked out.
+     * @returns {Promise} A promise that resolves when the player has been kicked out of the game.
+     */
     startVoting(){
         // TODO: this could be a moot function.
         // set room status to ActiveVoting (in front end, if getRoomStatus() is 

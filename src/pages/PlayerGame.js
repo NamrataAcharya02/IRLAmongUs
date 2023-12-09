@@ -29,20 +29,36 @@ function PlayerGame() {
     const forceUpdate = React.useReducer(() => ({}))[1];
     let controller = useRef(new PlayerGameController(playerId, forceUpdate));
 
+    /**
+     * @function setImposterWin
+     * sets the screen to imposter win
+     */
     const setImposterWin = () => {
-        setGameState("imposterWin");
+        setGameState("impostersWin");
     }
 
+    /**
+     * @function setCrewmateWin
+     * sets the screen to crewmate win
+     */
     const setCrewmateWin = () => {
-        setGameState("crewmateWin");
+        setGameState("crewmatesWin");
     }
 
+    /**
+     * @function setEmergencyScreen
+     * sets the emergency screen and updates the database to reflect the call, plays a sound
+     */
     const setEmergencyScreen = () => {
         playSound();
         controller.current.room.updateStatus(RoomStatus.emergencyMeeting);
         setGameState("emergency");
     }
 
+    /**
+     * @function setVotingScreen
+     * sets the voting screen
+     */
     const setVotingScreen = () => {
         setGameState("voting")
     }
@@ -51,6 +67,10 @@ function PlayerGame() {
         setGameState("");
     }
 
+    /**
+     * @function returnHome
+     * makes player leave room, navigates to home screen
+     */
     const returnHome = () => {
         // controller.current.player.deletePlayer();
         try{
@@ -71,20 +91,39 @@ function PlayerGame() {
     //     setComplete(currentComplete + 1);
     // }
     //function to calculate total number of tasks (toComplete) based on number of crewmates and number of tasks per crewmate
+    /**
+     * @function setNumTasksToComplete
+     * calculates and sets the number of tasksfor all crewmates to complete to complete
+     * @param {Number} numCrewmates 
+     * @param {Number} numTasksPerCrewmate 
+     */
     function setNumTasksToComplete(numCrewmates, numTasksPerCrewmate) {
         setToComplete(numCrewmates * numTasksPerCrewmate);
     }
 
+    /**
+     * @function markComplete
+     * marks task as complete, updates database to reflect change
+     * @param {String} name 
+     */
     const markComplete = (name) => {
         controller.current.markTaskComplete(name);
         const updatedTasks = controller.current.getVisibleTasks();
         setTasks(updatedTasks);
     }
 
+    /**
+     * @function markSelfDead
+     * marks self as dead, updates database to reflect
+     */
     function markSelfDead() {
         controller.current.markSelfDead();
     }
 
+    /**
+     * @function useEffect
+     * called on start to fill in information that is needed
+     */
     useEffect(() => {
         (async function () {
             await controller.current.init();
@@ -137,7 +176,7 @@ function PlayerGame() {
                         )}
 
                         <h4>Total Tasks Completed {controller.current.room.getNumTasksComplete()}</h4>
-                        <progress value={controller.current.room.getNumTasksComplete()} max={toComplete}></progress>
+                        <progress value={controller.current.room.getNumTasksComplete()} max={controller.current.room.getNumTasksToDo()}></progress>
                         <br></br>
                         <ul className="centered-lists">
                             {tasks.map((task) => (

@@ -15,6 +15,13 @@ export default class PlayerGameController {
     playerId;
     roomCode;
 
+    /**
+     * Creates a new instance of PlayerGameController.
+     * @class
+     * @constructor
+     * @param {string} playerId - The ID of the player.
+     * @param {Function} listener - The listener function for the player.
+     */
     constructor(playerId, listener) {
         this.room = null;
         this.player = null;
@@ -26,6 +33,11 @@ export default class PlayerGameController {
         this.visibleTasks = [];
     }
 
+    /**
+     * Initializes the PlayerGameController.
+     * @function init
+     * @returns {Promise<PlayerGameController>} A promise that resolves to an instance of PlayerGameController.
+     */
     async init() {
         let player = await Player.getPlayer(this.playerId);
         if (!player) {
@@ -55,6 +67,12 @@ export default class PlayerGameController {
         return this;
     }
 
+    /**
+     * Joins the room with the provided room code and player name.
+     * @function joinRoom
+     * @param {string} roomCode - The code of the room to join.
+     * @param {string} name - The name of the player.
+     */
     async joinRoom(roomCode, name) {
         if (!this.room) {
             try {
@@ -89,6 +107,10 @@ export default class PlayerGameController {
 
     }
 
+    /**
+     * Sets the tasks for the player.
+     * @function setTasks
+     */
     async setTasks() {
         // generate from room.tasklist.tasks a randomized list of 
         // N = room.numTasksToComplete tasks.
@@ -102,7 +124,10 @@ export default class PlayerGameController {
 
     }
 
-
+    /**
+     * Makes the player leave the current room.
+     * @function leaveRoom
+     */
     async leaveRoom() {
         // remove player id from room.playerids
         // delete player db instance
@@ -112,6 +137,10 @@ export default class PlayerGameController {
         this.player.deletePlayer();
     }
 
+    /**
+     * Calls a meeting in the game.
+     * @function callMeeting
+     */
     async callMeeting() {
         // TODO: SOrt this out
         // Jacob, just use this.player.setCallMeetingStatus();
@@ -125,6 +154,10 @@ export default class PlayerGameController {
         // update room status
     }
 
+    /**
+     * Marks the player as dead in the game.
+     * @function markSelfDead
+     */
     async markSelfDead() {
         // if player is crewmate,
         // then update player status
@@ -134,6 +167,11 @@ export default class PlayerGameController {
 
     }
 
+    /**
+     * Marks a task as complete for the player.
+     * @function markTaskComplete
+     * @param {string} description - The description of the task to be marked as complete.
+     */
     async markTaskComplete(description) {
         this.taskList = this.player.getTaskList();
         this.player.setTaskComplete(description);
@@ -145,6 +183,11 @@ export default class PlayerGameController {
     }
 
 
+    /**
+     * Gets up to four tasks that have not been completed.
+     * @function getVisibleTasks
+     * @returns {Array} An array of up to four tasks that have not been completed.
+     */
     getVisibleTasks() {
         // Display up to four tasks that have not been completed.
         this.taskList = this.player.getTaskList();
@@ -164,15 +207,28 @@ export default class PlayerGameController {
         return this.visibleTasks;
     }
 
+    /**
+     * Gets the total tasks completed
+     * @function getTasklistStatus
+     * @returns {number} A number represnting the total tasks completed.
+     */
     getTasklistStatus() {
         // return (number of tasks complete, number of tasks requred)
         return this.player.getNumTasksCompleted();
     }
 
+    /**
+     * @function getRoomNumTasksCompleted
+     * @returns {number} A number representing the total tasks completed by the player
+     */
     getRoomNumTasksCompleted(){
         return this.room.getNumTasksComplete();
     }
 
+    /**
+     * @function getRoomStatus
+     * @returns {string} A string representing the room status
+     */
     getRoomStatus(){
         // console.log("status", this.room.getStatus().enumKey)
         return this.room.getStatusAsString();

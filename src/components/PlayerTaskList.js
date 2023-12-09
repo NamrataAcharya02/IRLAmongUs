@@ -1,9 +1,15 @@
 import React, {useState} from "react";
 
-
+/**
+ * This React component renders the list of tasks for a player in the IRL Among Us app.
+ * 
+ * @function PlayerTaskList
+ * @returns The PlayerTaskList component.
+ */
 function PlayerTaskList() { 
-    //order the following list is how it is shuffled
-    //i.e. as long as the task 'go to the roof of Boelter' is after 'enter Boelter 3400'
+    // State variable for storing the list of tasks
+    // Order the following list is how it is shuffled
+    // i.e. as long as the task 'go to the roof of Boelter' is after 'enter Boelter 3400'
     //      the id does not matter and 'enter Boelter 3400' will always be displayed first (it can be bigger or smaller)
 	const [tasks, setTasks] = useState([
         {name: 'say hi to Prof Eggert', completed:false, visible:true},
@@ -14,7 +20,13 @@ function PlayerTaskList() {
         {name: 'go to class 2 hours early', completed:false, visible:false}
     ]);
 
-    //marks task as complete and updates the task
+    /**
+     * Marks a task as completed and updates the task list.
+     * 
+     * @function markComplete
+     * @param {string} name The name of the task to mark as completed.
+     * @returns {void}
+     */
     const markComplete = (name) => {
         var setNewToVisible = false;
         const updatedTasks = tasks.map((task) => {
@@ -66,5 +78,6 @@ function PlayerTaskList() {
     );
 } 
 
+// Export the component as the default export.
 export default PlayerTaskList; 
 

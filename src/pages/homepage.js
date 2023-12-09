@@ -21,13 +21,25 @@ import { useCollectionData } from 'react-firebase-hooks/firestore';
 import { auth, googleAuthProvider } from "../firebase";
 import { signInWithPopup, signInAnonymously, onAuthStateChanged, signOut } from "firebase/auth";
 
+/**
+ * @function SignOut
+ * @returns If user is signed in and clicked on the Sign Out button, sign out the user
+ */
 function SignOut() {
     return auth.currentUser && (
         <button onClick={() => signOut(auth)} className='sign-out'>Sign Out</button>
     )
 }
 
-function Pages() {
+/**
+ * @function Pages
+ * @returns render of the homepage. Homepage displays the game's name and two buttons.
+ * "Create a Game" button authenticates the user through Google and navigates them
+ * to the admin page.
+ * "Join a Room" button prompts the user to input a Room Code, then set a nickname. After
+ * confirming, the user is navigated to the PlayerWaiting screen associated with the room code.
+ */
+function Pages(){
     const [isTextFieldVisible, setTextFieldVisible] = useState(false);
 
     const toggleTextField = () => {
@@ -39,6 +51,11 @@ function Pages() {
     const [nickname, setNickname] = useState('');
     const navigate = useNavigate();
 
+    /**
+     * Authenticates Admin user with Google sign in
+     * 
+     * @function signInWithGoogle
+     */
     const signInWithGoogle = () => {
         signInWithPopup(auth, googleAuthProvider)
             .then(function () {
@@ -48,6 +65,11 @@ function Pages() {
             });
     }
 
+    /**
+     * Authenticates Player user with anonymous sign in
+     * 
+     * @function anonymousSignIn
+     */
     const anonymousSignIn = () => {
         signInAnonymously(auth)
             .then(function () {
@@ -58,7 +80,9 @@ function Pages() {
                 console.error('Error signing in anonymously:', error);
             });
     }
-
+    /**
+     * Checks if user changed
+     */
     onAuthStateChanged(auth, function (user) {
         if (user) {
             // User is signed in and get the id of the user.
