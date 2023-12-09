@@ -199,7 +199,9 @@ describe('Room num tasks accessessors', () => {
 })
 
 describe('Room addPlayer', () => {
+    test('adding a player that already exists', async () => {})
 
+    test('adding a new player to the players list', async () => {})
 })
 
 describe('Room addCallback', () => { 
