@@ -139,7 +139,21 @@ describe('Room.getRoom()', () => {
 })
 
 describe('Room.getOrCreateRoom()', () => {
+    test('create room because room does not exist', async () => {
 
+    })
+
+    test('more than one room found error re-thrown', async () => {
+
+    })
+
+    test('room object was created from scratch', async () => {
+
+    })
+
+    test('room object was converted from firestore doc', async () => {
+        
+    })
 })
 
 describe('Room.joinRoom()', () => {
