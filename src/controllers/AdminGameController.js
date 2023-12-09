@@ -46,6 +46,11 @@ export default class AdminGameController extends GameController {
         this.threshold = 0;
     }
 
+    /**
+     * This function gets the admin's tasklist
+     * @async
+     * @returns {Promise} A promise that resolves with the admin's tasklist
+     * */
     async getTaskList() {
         let admin = await this.getAdmin();
         this.tasklist = await admin.getTaskList();
@@ -68,6 +73,15 @@ export default class AdminGameController extends GameController {
         return this.numTasksToComplete;
     }
 
+    /**
+     * Retrieves the admin object. If it doesn't exist, creates a new one with a default tasklist.
+     *  
+     * @async
+     * @function createAdmin
+     * @param {string} adminId - The ID of the admin.
+     * @param {Array<Object>} tasklist - An array of task objects to be saved.
+     * @returns {Promise<Object>} A promise that resolves with the admin object.
+     * 
     static async createAdmin(adminId, tasklist) {
         // create an admin object
         // add the admin object to the database
@@ -92,6 +106,15 @@ export default class AdminGameController extends GameController {
         return this.adminObject;
     }
 
+    /**
+     * Retrieves the admin object from the database.
+     * 
+     * @async
+     * @function getAdminDB
+     * @param {string} adminId - The ID of the admin.
+     * @returns {Promise<Object>} A promise that resolves with the admin object.
+     * 
+     * */
     static async getAdminDB(adminId) {
         // get the admin object from the database
         // return the admin object
@@ -142,6 +165,12 @@ export default class AdminGameController extends GameController {
         await admin.updateAdminRoomCode(roomCode);
     }
 
+    /**
+     * This function gets the room code from the admin object.
+     * @async
+     * @returns {Promise} A promise that resolves with the room code.
+     *  
+     * */
     async getRoomCode() {
         let admin = await this.getAdmin();
         this.roomCode = await admin.getRoomCode();
@@ -181,6 +210,11 @@ export default class AdminGameController extends GameController {
         return result;
     }
 
+    /**
+     * This function adds a callback to the admin controller.
+     * @param {Function} callback - The callback function to be executed upon updates in the db.
+     * 
+     * */
     addCallback(callback) {
         console.log("admincontroller noting callback");
         this.callback = callback;
@@ -298,6 +332,11 @@ export default class AdminGameController extends GameController {
 
     }
 
+    /**
+     * This function updates the room status in the database.
+     * @async
+     * @param {string} status - The status to be updated in the database.
+     * */
     async updateRoomStatus(status) {
         await this.room.updateStatus(status);
     }
