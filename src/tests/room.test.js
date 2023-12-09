@@ -118,6 +118,24 @@ describe('Room.getRoom()', () => {
         expect(room.getNumTasksComplete()).toBe(0);
         expect(room.getPlayerIds()).toStrictEqual([]);
     })
+
+    test('null roomCode provided', async () => {
+        
+    })
+
+    test('empty roomCode provided', async () => {
+
+    })
+
+    test('more than one room', async () => {
+
+    })
+
+    test('dockSnap room does not exist', async () => {
+
+    })
+
+
 })
 
 describe('Room.getOrCreateRoom()', () => {
