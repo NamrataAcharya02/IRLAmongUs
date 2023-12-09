@@ -33,7 +33,11 @@ function SignOut() {
 
 /**
  * @function Pages
- * @returns 
+ * @returns render of the homepage. Homepage displays the game's name and two buttons.
+ * "Create a Game" button authenticates the user through Google and navigates them
+ * to the admin page.
+ * "Join a Room" button prompts the user to input a Room Code, then set a nickname. After
+ * confirming, the user is navigated to the PlayerWaiting screen associated with the room code.
  */
 function Pages(){
     const [isTextFieldVisible, setTextFieldVisible] = useState(false);
@@ -78,7 +82,10 @@ function Pages(){
     }
 
     /**
+     * if user is signed in, get the user's uid
      * 
+     * @function onAuthStateChanged
+     * @param {User} user
      */
     onAuthStateChanged(auth, function(user) {
         if (user) {
