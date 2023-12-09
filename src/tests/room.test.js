@@ -190,8 +190,12 @@ describe('Room Status sets and updates', () => {
     test('setStatus with correct type of status attempted', async () => {})
 })
 
-describe('Room addNumTasksComplete', () => { 
+describe('Room num tasks accessessors', () => { 
+    test('addNumTasksComplete prevents non Number from being added', async () => {})
     
+    test('addNumTasksComplete incrememnts the classes number of tasks complete by num', async () => {})
+    
+    test('setNumTasksComplete updates the caller model', async () => {})
 })
 
 describe('Room addPlayer', () => {
