@@ -524,7 +524,7 @@ export class Player {
  * @property {function(Player): Object} toFirestore - Converts a Player object into a plain JavaScript object for storage in Firestore.
  * @property {function(firebase.firestore.DocumentSnapshot, firebase.firestore.SnapshotOptions): Player} fromFirestore - Converts a Firestore document snapshot into a Player object.
  */
-const playerConverter = {
+export const playerConverter = {
     toFirestore: (player) => {
         return {
             id: player.getId(),

@@ -3,6 +3,7 @@ import {Player} from "../models/Player";
 import {Room} from "../models/Room";
 import {shuffler} from "../models/utils";
 import { RoomNotExistError } from "../errors/roomError";
+import { RoomStatus } from "../models/enum";
 
 // export default class PlayerGameController extends GameController {
 export default class PlayerGameController {
@@ -41,8 +42,9 @@ export default class PlayerGameController {
         this.player = player;
 
         try {
-            console.log(`this.player.getRoomCode(): ${this.player.getRoomCode()}`);
+            console.log(`this.player.getRoomCode(): ${this.player.getRoomCode()}`);   
             this.room = await Room.getRoom(this.player.getRoomCode()); // will either have 4-char string or ""
+            console.log("retrieved player room", this.room);
         } catch (err) {
             if (err instanceof RoomNotExistError) {
                 console.log(`PlayerGameController.init() room ${this.player.getRoomCode()} not exist`);
@@ -107,7 +109,8 @@ export default class PlayerGameController {
 
         // update player object with the generated list
         const stringArray = this.room.getTaskList();
-        this.taskList = shuffler(stringArray);
+        this.taskList = stringArray.sort(() => 0.5 - Math.random());
+        console.log("Shuffled tasks", this.taskList);
 
         this.player.setTaskList(this.taskList);
 
@@ -120,7 +123,9 @@ export default class PlayerGameController {
         // remove player id from room.playerids
         // delete player db instance
 
-        this.room.leaveRoom(this.playerId);
+        //code, playerId
+        // this.room.leaveRoom(this.roomCode, this.playerId);
+        this.player.deletePlayer();
     }
 
     /**
@@ -130,8 +135,9 @@ export default class PlayerGameController {
         // TODO: SOrt this out
         // Jacob, just use this.player.setCallMeetingStatus();
         // Also, what does setCallMeetingStatus actually do?
-        this.player.setCallMeetingStatus(true);
-
+        // this.player.setCallMeetingStatus(true);
+        this.room.updateStatus(RoomStatus.emergencyMeeting);
+        
 
         // Jacob, I should add a function to room: createEmergencySubcollection
 
@@ -156,10 +162,13 @@ export default class PlayerGameController {
      * @param {string} description - The description of the task to be marked as complete.
      */
     async markTaskComplete(description) {
+        this.taskList = this.player.getTaskList();
+        this.player.setTaskComplete(description);
+        if(!this.player.getImposterStatus() && this.player.getStatus() == "alive")
+        {
+            this.room.updateNumTasksComplete(1);
+        }
         // update player tasklists task to completed
-       this.taskList = this.player.getTaskList();
-       this.player.setTaskComplete(description);
-       this.room.updateNumTasksComplete(1);
     }
 
 
@@ -196,6 +205,13 @@ export default class PlayerGameController {
         // return (number of tasks complete, number of tasks requred)
         return this.player.getNumTasksCompleted();
     }
+
+    getRoomNumTasksCompleted(){
+        return this.room.getNumTasksComplete();
+    }
+
+    getRoomStatus(){
+        // console.log("status", this.room.getStatus().enumKey)
+        return this.room.getStatusAsString();
+    }
 }
-
-

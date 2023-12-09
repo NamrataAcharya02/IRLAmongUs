@@ -160,7 +160,7 @@ export class Admin {
    
 }
 
-const adminConverter = {
+export const adminConverter = {
     toFirestore: (admin) => {
         return {
             adminId: admin.getAdminId(),

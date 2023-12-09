@@ -5,10 +5,13 @@ import { DuplicateRoomCodeError } from "../errors/roomError";
 import { RoomStatus } from '../models/enum';
 import {Player} from "../models/Player";
 import { cleanupDbCollectionDocs } from '../models/utils';
+import { redirect } from "react-router-dom";
+import { shuffler } from "../models/utils";
 
 const ROOM_CODE_CHARACTER_SET = '0123456789';
 const ROOM_CODE_CHARACTER_SET_LENGTH = ROOM_CODE_CHARACTER_SET.length;
 const ROOM_CODE_LENGTH = 4;
+
 
 export default class AdminGameController extends GameController {
     adminId;  // actual Admin object
@@ -27,6 +30,7 @@ export default class AdminGameController extends GameController {
     crewmateIds = [];
     crewmates = [];
     impostersWin = false;
+    numTasksPerPlayer;
 
         /**
      * Creates a new AdminGameController instance.
@@ -330,6 +334,7 @@ export default class AdminGameController extends GameController {
             console.log("imposters win");
             //this.victoryStatus = "Imposters Win.";
             this.impostersWin = true;
+            this.updateRoomStatus(RoomStatus.impostersWin);
             return true;
         }
 
@@ -338,6 +343,7 @@ export default class AdminGameController extends GameController {
             console.log("crewmates win (no imposters)");
             //this.victoryStatus = "Crewmates Win.";
             this.impostersWin = false;
+            this.updateRoomStatus(RoomStatus.crewmatesWin);
             return true;
         }
 
@@ -348,6 +354,7 @@ export default class AdminGameController extends GameController {
             console.log("crewmates win (tasks completed)");
             //this.victoryStatus = "Crewmates Win.";
             this.impostersWin = false;
+            this.updateRoomStatus(RoomStatus.crewmatesWin);
             return true;
         }
     }
@@ -377,6 +384,7 @@ export default class AdminGameController extends GameController {
         let room = this.getRoomObject();
         this.setNumImposters(numImposters);
         this.setNumTasksToComplete(numTasksToComplete);
+        this.numTasksPerPlayer = numTasksToComplete / (this.room.getPlayerIds().length - numImposters);
 
         //update room status to inGame and update numImposters and numTasksToComplete
         
@@ -391,7 +399,8 @@ export default class AdminGameController extends GameController {
             player.addCallback(this.callback);
             console.log("player callback added");
             await player.setAliveStatus("alive");
-            await player.setTaskList(this.room.getTaskList()); //assign tasklist to players
+            let shuffledTaskList = shuffler(this.room.getTaskList());
+            await player.setTaskList(shuffledTaskList); //assign tasklist to players
             await player.setRoomCode(this.room.getRoomCode());
             //await player.setNumTasksToComplete(this.room.getNumTasksToDo());
             console.log("player tasklist: " + player.getTaskList());
@@ -402,7 +411,7 @@ export default class AdminGameController extends GameController {
          await this.#assignPlayerRoles();
          console.log("imposters: " + this.imposters);
  
-         this.threshold = this.getNumTasksToComplete() * (this.players.length - this.getNumImposters());
+         this.threshold = numTasksToComplete;
          console.log("threshold: " + this.threshold);
  
         await room.updateStatus(RoomStatus.inProgress);
@@ -428,6 +437,14 @@ export default class AdminGameController extends GameController {
         console.log("player marked dead: " + player.getId());
         //this.checkEndGame();
         //return this.checkEndGame();
+    }
+
+    async getPlayerName(pid)
+    {
+        
+        let player = await Player.getPlayer(pid);
+        console.log("player name: ", player.getName());
+        return player.getName();
     }
 
     displayGameCode() {
@@ -465,9 +482,9 @@ export default class AdminGameController extends GameController {
         // delete player object from database
         // delete room object from database
         for (const player of this.players) {
-            await player.deleteDoc(player.getId());
+            await player.deletePlayer()
         }
-        await Room.deleteRoom(this.room.getRoomCode());
+        await Room.deleteRoom(this.roomCode);
         
 
     }
@@ -480,12 +497,54 @@ export default class AdminGameController extends GameController {
      * @param {string} playerId - The ID of the player to be kicked out.
      * @returns {Promise} A promise that resolves when the player has been kicked out of the game.
      */
+    startVoting(){
+        // TODO: this could be a moot function.
+        // set room status to ActiveVoting (in front end, if getRoomStatus() is 
+        // "ActiveVoting," display voting ui to players)
+        //when voting begins, create a vote doc with an array of all players who have casted a vote
+    }
+
+    getVotingProgress() {
+        // return (number votes recieve, number active players in room)
+    }
+
+    endVoting() {
+        // TODO: this could be a moot function.
+        // set room status to "InactiveVoting" (in front end, if getRoomStatus() 
+        // is "InactiveVoting," display ...?)
+    }
+
+    getVotingResults() {
+        // get voting progress. 
+
+        // count votes for each player
+
+        // rank vites in decreasing order
+
+        // if max votes is unique to one player, display that the name
+        // of the unique player voted out
+
+        // TODO: if max votes is not unique to one player...
+    }
+
+    getRoomStatus(){
+        return this.room.getStatusAsString();
+    }
+
+    finalizeVotingResults() {
+        // getVotingResults
+        // kickout the player(s) voted out
+        // endMeeting()
+
+        // if (game won) logic -> update room status to "Won"
+    }
+
     async kickOutPlayer(playerId) {
         // delete player from database
         // remove player from room.playerIds
         let player = await Player.getPlayer(playerId.toString());
-        await player.setAliveStatus("kicked");
-        this.threshold -= this.room.getNumTasksToDo();
+        await player.deletePlayer();        
+        this.threshold -= this.numTasksPerPlayer;
         this.players = this.players.filter(function(player) {return player.getId() != playerId;});
         
         await Room.leaveRoom(this.room.getRoomCode(), playerId);
