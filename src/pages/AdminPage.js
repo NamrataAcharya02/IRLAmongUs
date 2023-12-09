@@ -37,8 +37,11 @@ const AdminPage = () => {
   const navigate = useNavigate();
   //console.log(tasklist)
 
-
-  //don't exceed number of tasks
+  /**
+   * don't exceed number of tasks
+   * 
+   * @function hasEmptyTask
+   */
   const hasEmptyTask = tasklist.some((singleTask) => {
     if (singleTask == "") {
       return true;
@@ -105,15 +108,17 @@ const AdminPage = () => {
 
   /** 
    * handles adding a task, adds an extra input field and new task object to tasklist 
-   * 
+   * @function handleAddTask
   */
   const handleAddTask = () => {
     if (!hasEmptyTask) {
       setTasklist((prevTasklist) => [...prevTasklist, ""]);
     }
   }
+
   /**
    * handles deleting a task
+   * @function deleteItem
    * @param {int} index 
    */
   const deleteItem = (index) => {
@@ -124,6 +129,8 @@ const AdminPage = () => {
 
   /**
    * handles task name change in textbox. Updates task object as changes are being made
+   * 
+   * @function handleTaskChange
    * @param {any} e
    * @param {int} index
   */
