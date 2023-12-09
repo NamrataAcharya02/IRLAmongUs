@@ -18,6 +18,10 @@ function PlayerWaiting() {
     let playerId = auth.currentUser.uid; // dummy for testing
     let controller = useRef(new PlayerGameController(playerId, forceUpdate));
 
+    /**
+     * called at start to populate waiting screen
+     * also refreshes page to redirect when game has started
+     */
     useEffect(() => {
         (async function () {
             await controller.current.init();
