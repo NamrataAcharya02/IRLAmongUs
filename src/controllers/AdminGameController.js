@@ -474,7 +474,7 @@ export default class AdminGameController extends GameController {
         // delete player from database
         // remove player from room.playerIds
         let player = await Player.getPlayer(playerId.toString());
-        await player.setAliveStatus("kicked");
+        await player.deletePlayer();        
         this.threshold -= this.numTasksPerPlayer;
         this.players = this.players.filter(function(player) {return player.getId() != playerId;});
         
