@@ -344,7 +344,7 @@ export class Player {
 
 }
 
-const playerConverter = {
+export const playerConverter = {
     toFirestore: (player) => {
         return {
             id: player.getId(),

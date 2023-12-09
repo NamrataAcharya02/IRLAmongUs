@@ -431,7 +431,7 @@ export class Room {
  *      * a Room object to a firestore document in the room collection
  *      * a room collection document to a Room object
  */
-const roomConverter = {
+export const roomConverter = {
     toFirestore: (room) => {
         return {
             status: room.getStatus().enumKey,
