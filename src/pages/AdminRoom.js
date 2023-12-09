@@ -8,7 +8,7 @@ import AdminGameController from "../controllers/AdminGameController";
 import {RoomStatus} from "../models/enum";
 
 /**
- * 
+ * @function AdminRoom
  * @returns rendered page displaying RoomCode, Players, 
  * Number of Imposters, and Number of Tasks per Player before the game starts.
  * Render changes as RoomState changes. 

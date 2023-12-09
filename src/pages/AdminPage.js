@@ -18,6 +18,13 @@ let room = null;
 
 //let controller = null;
 
+/**
+ * @function AdminPage
+ * @returns rendered page after Admin is authenticated and navigates
+ * to a page displaying TaskList that the Admin can edit.
+ * The Admin can view "How to Play".
+ * The Admin can create a Room, then navigates to it.
+ */
 const AdminPage = () => {
   
   const [, forceUpdate] = useReducer(x => x + 1, 0);

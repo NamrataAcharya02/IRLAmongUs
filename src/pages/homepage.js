@@ -21,12 +21,20 @@ import { useCollectionData } from 'react-firebase-hooks/firestore';
 import {auth, googleAuthProvider} from "../firebase";
 import { signInWithPopup, signInAnonymously, onAuthStateChanged, signOut } from "firebase/auth";
 
+/**
+ * @function SignOut
+ * @returns If user is signed in and clicked on the Sign Out button, sign out the user
+ */
 function SignOut() {
   return auth.currentUser && (
     <button onClick={() => signOut(auth)} className='sign-out'>Sign Out</button>
   )
 }
 
+/**
+ * @function Pages
+ * @returns 
+ */
 function Pages(){
     const [isTextFieldVisible, setTextFieldVisible] = useState(false);
 
@@ -39,6 +47,11 @@ function Pages(){
     const [nickname, setNickname] = useState('');
     const navigate = useNavigate();
 
+    /**
+     * Authenticates Admin user with Google sign in
+     * 
+     * @function signInWithGoogle
+     */
     const signInWithGoogle = () => {
         signInWithPopup(auth, googleAuthProvider)
         .then(function(){
@@ -48,6 +61,11 @@ function Pages(){
         });
     }
 
+    /**
+     * Authenticates Player user with anonymous sign in
+     * 
+     * @function anonymousSignIn
+     */
     const anonymousSignIn = () => {
         signInAnonymously(auth)
         .then(function() {
@@ -59,6 +77,9 @@ function Pages(){
         });
     }
 
+    /**
+     * 
+     */
     onAuthStateChanged(auth, function(user) {
         if (user) {
           // User is signed in and get the id of the user.
