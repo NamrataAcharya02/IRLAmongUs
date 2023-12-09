@@ -176,7 +176,7 @@ function PlayerGame() {
                         )}
 
                         <h4>Total Tasks Completed {controller.current.room.getNumTasksComplete()}</h4>
-                        <progress value={controller.current.room.getNumTasksComplete()} max={toComplete}></progress>
+                        <progress value={controller.current.room.getNumTasksComplete()} max={controller.current.room.getNumTasksToDo()}></progress>
                         <br></br>
                         <ul className="centered-lists">
                             {tasks.map((task) => (
