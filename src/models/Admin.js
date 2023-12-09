@@ -16,6 +16,7 @@ export class Admin {
     roomCode = 0;
 
 
+    /** */
     constructor(adminId, name, tasklist, roomCode) {
         this.adminId = adminId;
         this.name = name;
