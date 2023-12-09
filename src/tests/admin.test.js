@@ -11,8 +11,12 @@ import {
 import { DocRefMock, DocSnapMock } from "./mocks";
 
 import { Admin, adminConverter } from "../models/Admin";
-
+import AdminController from "../controllers/AdminGameController";
 const adminData = {
+    adminId: "abc123",
+    name: "Test Admin",
+    tasklist: [],
+    roomCode: 0
     // TODO: Set a default
 }
 
@@ -43,6 +47,10 @@ beforeEach(() => {
 
 test('addCallback to player object', () => {
     // TODO
+    let func = jest.fn();
+    let controller = new AdminController("1234", func);
+    
+
 });
 
 describe('Admin.getOrCreateAdmin functionality', () => {
@@ -50,9 +58,14 @@ describe('Admin.getOrCreateAdmin functionality', () => {
         getDoc.mockResolvedValue(goodDocSnap);
 
         // TODO: add the body
-        await Admin.getOrCreateAdmin("1234");
+        let admin = await Admin.getOrCreateAdmin("1234");
 
         expect(getDoc).toHaveBeenCalled();
+        expect(admin.getAdminId()).toBe("abc123");
+        expect(admin.getName()).toBe("Test Admin");
+        expect(admin.getTaskList()).toEqual([]);
+        expect(admin.getRoomCode()).toBe(0);
+
     })
 
     test('Admin.getOrCreateAdmin("1234") fails with [specify condition 1]', async () => {
@@ -64,6 +77,7 @@ describe('Admin.getOrCreateAdmin functionality', () => {
     test('Admin.getOrCreateAdmin("1234") fails with [specify condition 2]', async () => {
         getDoc.mockResolvedValue(badDocSnap);
 
+
         // code how you expect this function to act
     })
 })
@@ -71,8 +85,15 @@ describe('Admin.getOrCreateAdmin functionality', () => {
 describe('Admin.createAdmin() functionality', () => {
     test('createAdmin succeeds', async () => {
         // initialize 
+        getDoc.mockResolvedValue(goodDocSnap);
+        let admin = await Admin.createAdmin("abc123", []);
 
         // expect
+        expect(setDoc).toHaveBeenCalled();
+        expect(admin.getAdminId()).toBe("abc123");
+        expect(admin.getName()).toBe("Test Admin");
+        expect(admin.getTaskList()).toEqual([]);
+        expect(admin.getRoomCode()).toBe(0);
     })
 
     test('createAdmin fails [specify condition 1]', async () => {
@@ -92,14 +113,33 @@ describe('Admin.createAdmin() functionality', () => {
 describe('Admin.getAdmin()', () => {
     test('getAdmin succeeds', async () => {
         // initialize 
+        getDoc.mockResolvedValue(goodDocSnap);
 
         // expect
+        let spyOnExists = jest.spyOn(goodDocSnap, 'exists');
+
+        let admin = await Admin.getAdmin("abc123");
+
+        expect(getDoc).toHaveBeenCalled();
+        expect(spyOnExists).toHaveBeenCalled();
+        console.log(`result.getId(): ${admin.getAdminId()}`);
+
+
     })
 
     test('getAdmin fails', async () => {
         // initialize
+        getDoc.mockResolvedValue(badDocSnap);
 
         // expect
+        let spyOnExists = jest.spyOn(badDocSnap, 'exists');
+
+        let admin = await Admin.getAdmin("invalid");
+
+        expect(getDoc).toHaveBeenCalled();
+        expect(spyOnExists).toHaveBeenCalled();
+        expect(admin).toBe(false);
+
     })
 
     // TODO: other core functionality
@@ -108,8 +148,12 @@ describe('Admin.getAdmin()', () => {
 describe('Admin.updateAdminRoomCode()', () => {
     test('updateAdminRoomCode succeeds', async () => {
         // initialize 
-
+        getDoc.mockResolvedValue(goodDocSnap);
+        let admin = new Admin("abc123", "Test Admin", [], 0);
+        await admin.updateAdminRoomCode('20');
         // expect
+        expect(updateDoc).toHaveBeenCalled();
+        expect(admin.getRoomCode()).toBe('20');
     })
 
     test('updateAdminRoomCode fails', async () => {
@@ -123,9 +167,13 @@ describe('Admin.updateAdminRoomCode()', () => {
 
 describe('Admin.updateTasklist()', () => {
     test('updateTasklist succeeds', async () => {
-        // initialize 
-
-        // expect
+       // initialize 
+       getDoc.mockResolvedValue(goodDocSnap);
+       let admin = new Admin("abc123", "Test Admin", [], 0);
+       await admin.updateAdminTasklist(['task1', 'task2', 'task3']);
+       // expect
+       expect(updateDoc).toHaveBeenCalled();
+       expect(admin.getTaskList()).toEqual(['task1', 'task2', 'task3']);
     })
 
     test('updateTasklist fails', async () => {

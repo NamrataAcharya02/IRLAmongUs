@@ -106,6 +106,7 @@ export class Admin {
 
         //taskLists.push(tasklist);
         //console.log(taskLists)
+        this.tasklist = tasklist;
 
         await updateDoc(docRef, {
             tasklist: tasklist,
