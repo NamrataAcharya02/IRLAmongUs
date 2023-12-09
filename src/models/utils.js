@@ -21,6 +21,11 @@ export const cleanupDbCollectionDocs = async (collectionName, IDsToOmit) => {
     }
 }
 
+/**
+ * @function shuffles the array that is passed in
+ * @param {Array} array 
+ * @returns the shuffled array
+ */
 export function shuffler(array){
     for (var i = array.length - 1; i > 0; i--) {
         var j = Math.floor(Math.random() * (i + 1));

@@ -59,7 +59,6 @@ export class Room {
     getRoomId() { return this.#id; }
     getAdminId() { return this.#adminId; }
     /**
-     * 
      * @returns room code associated with the room
      */
     getRoomCode() { return this.#code; }
@@ -97,7 +96,7 @@ export class Room {
     }
 
     /**
-     * 
+     * @function increments the number of tasks that have been completed by num
      * @param {Number} num of tasks that is to be updated in database
      */
     addNumTasksComplete(num) {
@@ -108,7 +107,7 @@ export class Room {
     }
     
     /**
-     * updates the task list associated with the room
+     * @function updates the task list associated with the room
      * @param {string[]} tasklist the task list that is associated with the room
      */
     async updateTaskList(tasklist) { 
@@ -117,7 +116,7 @@ export class Room {
     }
 
     /**
-     * updates the number of imposters in the room
+     * @function updates the number of imposters in the room
      * @param {Number} numImposters the number of imposters to set for the room
      */
     async updateNumImposters(numImposters) { 
@@ -126,7 +125,7 @@ export class Room {
     }
 
     /**
-     * updates how many tasks the crewmates should aim to achieve
+     * @function updates how many tasks the crewmates should aim to achieve
      * @param {Number} numTasksToDo the number of tasks the room should collectively do
      */
     async updateNumTasksToDo(numTasksToDo) { 
@@ -135,7 +134,7 @@ export class Room {
     }
 
     /**
-     * sets the room status to what is passed in
+     * @function sets the room status to what is passed in
      * @param {RoomStatus} status enum that signifies what state the room is in
      */
     async updateStatus(status) { 
@@ -148,7 +147,7 @@ export class Room {
     }
 
     /**
-     * adds num to the number of tasks the room has completed
+     * @function adds num to the number of tasks the room has completed
      * updates the database
      * @param {Number} num how many tasks that has been completed since last update
      */
@@ -158,7 +157,7 @@ export class Room {
     }
 
     /**
-     * adds player to room
+     * @function adds player to room
      * @param {String} playerId id of player that wants to join the room
      */
     async addPlayer(playerId) { 
@@ -169,7 +168,7 @@ export class Room {
     }
 
     /**
-     * 
+     * @function adds callback to player
      * @param {Callback} callback listener for updating the data of the room live
      */
     addCallback(callback) {
@@ -178,8 +177,8 @@ export class Room {
     }
 
     /**
-     * 
-     * @param {Field} field what field of the doc is updated
+     * @function updates the database's data in the field
+     * @param {any} field what field of the doc is updated
      */
     async #__update(field) {
         await updateDoc(Room.#_roomRefForRoomCode(this.getRoomCode()), field);
@@ -187,7 +186,7 @@ export class Room {
 
 
     /**
-     * repopulates and updates the class variables with the latest snapshot of the database
+     * @function repopulates and updates the class variables with the latest snapshot of the database
      * @param {Data} snapData the data that is pulled from the database
      */
     #__updateFromSnapshot(snapData) {
