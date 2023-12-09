@@ -24,6 +24,8 @@ After installing Node.js, do the following:
 1) Run ```yarn install```
 2) Run ```yarn build``` to build the project
 3) Run ```yarn start``` to run the application on your local machine.
+4) Run ```yarn test``` to run tests.
+   
 ## Available `yarn` Scripts
 
 In the project directory, you can run:
@@ -50,4 +52,4 @@ The build is minified and the filenames include the hashes.\
 Your app is ready to be deployed!
 
 ### Deployment
- Our deployed site is available at:
+ Our deployed site is available at: https://irl-among-us-d5453.web.app
