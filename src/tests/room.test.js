@@ -120,92 +120,130 @@ describe('Room.getRoom()', () => {
     })
 
     test('null roomCode provided', async () => {
-        
+        fail('un-implemented');
     })
 
     test('empty roomCode provided', async () => {
-
+        fail('un-implemented');
     })
 
     test('more than one room', async () => {
-
+        fail('un-implemented');
     })
 
     test('dockSnap room does not exist', async () => {
-
+        fail('un-implemented');
     })
 
 
 })
 
 describe('Room.createRoom(...)', () => {
-    test('doc that exists throws a DuplicateRoomCodeError', async () => {})
+    test('doc that exists throws a DuplicateRoomCodeError', async () => {
+        fail('un-implemented');
+    })
 
-    test('a room is created with new status when a doc does not exist', async () => {})
+    test('a room is created with new status when a doc does not exist', async () => {
+        fail('un-implemented');
+    })
 })
 
 describe('Room.getOrCreateRoom()', () => {
     test('create room because room does not exist', async () => {
-
+        fail('un-implemented');
     })
 
     test('more than one room found error re-thrown', async () => {
-
+        fail('un-implemented');
     })
 
     test('room object was created from scratch', async () => {
-
+        fail('un-implemented');
     })
 
     test('room object was converted from firestore doc', async () => {
-
+        fail('un-implemented');
     })
 })
 
 describe('Room.joinRoom()', () => {
-    test('adding player that already exists in room', async () => {})
+    test('adding player that already exists in room', async () => {
+        fail('un-implemented');
+    })
 
-    test('update doc with a new player id', async () => {})
+    test('update doc with a new player id', async () => {
+        fail('un-implemented');
+    })
     
-    test('join room returns a room object', async () => {})
+    test('join room returns a room object', async () => {
+        fail('un-implemented');
+    })
 })
 
 describe('Room.leaveRoom()', () => {
-    test('error thrown when invalid roomcode provided', () => {})
+    test('error thrown when invalid roomcode provided', () => {
+        fail('un-implemented');
+    })
 
-    test('player removed from a room', () => {})
+    test('player removed from a room', () => {
+        fail('un-implemented');
+    })
 })
 
 describe('Room core getters and setters', () => { 
-    test('addCallback success', () => {})
+    test('addCallback success', () => {
+        fail('un-implemented');
+    })
  })
 
 describe('Room Status sets and updates', () => {
-    test('update with wrong type of status attempted', async () => {})
+    test('update with wrong type of status attempted', async () => {
+        fail('un-implemented');
+    })
 
-    test('update with correct status type', async () => {})
+    test('update with correct status type', async () => {
+        fail('un-implemented');
+    })
 
-    test('setStatus with wrong type of status attempted', async () => {})
+    test('setStatus with wrong type of status attempted', async () => {
+        fail('un-implemented');
+    })
 
-    test('setStatus with correct type of status attempted', async () => {})
+    test('setStatus with correct type of status attempted', async () => {
+        fail('un-implemented');
+    })
 })
 
 describe('Room num tasks accessessors', () => { 
-    test('addNumTasksComplete prevents non Number from being added', async () => {})
+    test('addNumTasksComplete prevents non Number from being added', async () => {
+        fail('un-implemented');
+    })
     
-    test('addNumTasksComplete incrememnts the classes number of tasks complete by num', async () => {})
+    test('addNumTasksComplete incrememnts the classes number of tasks complete by num', async () => {
+        fail('un-implemented');
+    })
     
-    test('setNumTasksComplete updates the caller model', async () => {})
+    test('setNumTasksComplete updates the caller model', async () => {
+        fail('un-implemented');
+    })
 })
 
 describe('Room addPlayer', () => {
-    test('adding a player that already exists', async () => {})
+    test('adding a player that already exists', async () => {
+        fail('un-implemented');
+    })
 
-    test('adding a new player to the players list', async () => {})
+    test('adding a new player to the players list', async () => {
+        fail('un-implemented');
+    })
 })
 
 describe('Room addCallback', () => { 
-    test('adding callback to a room object', () => {})
+    test('adding callback to a room object', () => {
+        fail('un-implemented');
+    })
 
-    test('a function that calls callback and succeeds', () => {})
+    test('a function that calls callback and succeeds', () => {
+        fail('un-implemented');
+    })
  })
