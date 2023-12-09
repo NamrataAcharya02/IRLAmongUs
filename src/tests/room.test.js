@@ -139,7 +139,9 @@ describe('Room.getRoom()', () => {
 })
 
 describe('Room.createRoom(...)', () => {
-    
+    test('doc that exists throws a DuplicateRoomCodeError', async () => {})
+
+    test('a room is created with new status when a doc does not exist', async () => {})
 })
 
 describe('Room.getOrCreateRoom()', () => {
