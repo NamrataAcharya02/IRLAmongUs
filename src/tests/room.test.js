@@ -138,6 +138,10 @@ describe('Room.getRoom()', () => {
 
 })
 
+describe('Room.createRoom(...)', () => {
+    
+})
+
 describe('Room.getOrCreateRoom()', () => {
     test('create room because room does not exist', async () => {
 
@@ -173,10 +177,6 @@ describe('Room.leaveRoom()', () => {
 describe('Room core getters and setters', () => { 
     test('addCallback success', () => {})
  })
-
-describe('Room.createRoom(...)', () => {
-    
-})
 
 describe('Room Status sets and updates', () => {
 
