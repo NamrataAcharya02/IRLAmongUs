@@ -256,6 +256,11 @@ function AdminRoom() {
     })();
   }, []); // 
 
+  /**
+   * Sets interval for when to re-render the page
+   * 
+   * @function setInterval
+   */
   useEffect(() => {
     const interval = setInterval(() => {
       forceUpdate();
