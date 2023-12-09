@@ -7,6 +7,7 @@ import { useNavigate } from 'react-router-dom';
 import AdminGameController from "../controllers/AdminGameController";
 import { RoomStatus } from "../models/enum";
 import { redirect } from "react-router-dom";
+import AdminHowTo from "../components/AdminHowTo";
 
 function AdminRoom() {
   const [room, setRoom] = useState(null);
@@ -202,6 +203,7 @@ function AdminRoom() {
 
   return (
     <div className="background-div">
+      <AdminHowTo></AdminHowTo>
       <div className="center">
         {/* Waiting room screen */}
         {!gameScreen && (

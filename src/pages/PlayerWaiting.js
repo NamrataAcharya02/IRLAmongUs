@@ -41,12 +41,13 @@ function PlayerWaiting() {
 
     return (
         <div className="background-div">
+            <PlayerHowTo></PlayerHowTo>
             <div className="center" >
                 <Link to="/">
                     <button className="back">Back</button>
                 </Link>
                 {/* "How to Play" pop-up overlay for Players */}
-                <PlayerHowTo></PlayerHowTo>
+                
 
                 <h1>Hello {nickname}!</h1>
                 {room && (

@@ -12,6 +12,7 @@ import { auth } from "../firebase.js";
 import { current } from "@reduxjs/toolkit";
 import { RoomStatus } from "../models/enum.js";
 import { redirect } from "react-router-dom";
+import PlayerHowTo from "../components/PlayerHowTo.js";
 
 function PlayerGame() {
     const [currentComplete, setComplete] = useState(0);
@@ -119,6 +120,7 @@ function PlayerGame() {
 
     return (
         <div className="background-div">
+            <PlayerHowTo></PlayerHowTo>
             <div className="center" style={{ paddingTop: "20px", paddingBottom: "20px" }}>
               <button className="back" onClick={() => returnHome()} style={{width: "100px"}}>Leave Game</button>
                 {/* Progress bar shows how many tasks completed (currentComplete) out of total tasks (toComplete) */}
