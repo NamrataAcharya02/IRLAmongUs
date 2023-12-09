@@ -14,7 +14,18 @@ import { Player, playerConverter } from "../models/Player";
 
 const playerData = {
     // TODO: Set a default
+    id: "abc123",
+    name: "Test Player",
+    status: "alive",
+    numVotesReceived: 0,
+    voteToCast: "",
+    roomCode: 0,
+    taskList: ['task1', 'task2', 'task3'],
+    isImposter: false,
+    calledMeeting: false,
+    numTasksCompleted: 0
 }
+
 
 const goodDocRef_noConverter = new DocRefMock(playerData);
 const goodDocRef = new DocRefMock(playerData).withConverter(playerConverter);
@@ -43,6 +54,9 @@ beforeEach(() => {
 
 test('addCallback to player object', () => {
     // TODO
+  //  let func = jest.fn();
+   // let player = Player.getPlayer(playerData.id);
+   // player.addCallback(func);
 });
 
 describe('Player.getPlayer functionality', () => {
@@ -50,9 +64,10 @@ describe('Player.getPlayer functionality', () => {
         getDoc.mockResolvedValue(goodDocSnap);
 
         // TODO: add the body
-        await Player.getPlayer("1234");
+        let player = await Player.getPlayer("1234");
 
         expect(getDoc).toHaveBeenCalled();
+        expect(player.getId()).toBe('abc123');
     })
 
     test('Player.getPlayer("1234") fails with [specify condition]', async () => {
@@ -65,8 +80,13 @@ describe('Player.getPlayer functionality', () => {
 describe('Player.createPlayer()', () => {
     test('createPlayer succeeds', async () => {
         // initialize 
+        getDoc.mockResolvedValue(goodDocSnap);
 
         // expect
+        let player = await Player.createPlayer(playerData.name, playerData.id, '5678');
+        expect(setDoc).toHaveBeenCalled();
+        expect(player.getId()).toBe('abc123');
+
     })
 
     test('createPlayer fails [specify condition 1]', async () => {
@@ -86,8 +106,15 @@ describe('Player.createPlayer()', () => {
 describe('Player primitive operations', () => {
     test('setTasksComplete succeeds', async () => {
         // initialize 
+        getDoc.mockResolvedValue(goodDocSnap);
+        let player = await Player.createPlayer(playerData.id, playerData.name, '5678');
+        await player.setTaskList(playerData.taskList);
+        await player.setTaskComplete('task1');
 
         // expect
+        expect(updateDoc).toHaveBeenCalled();
+        expect(player.getNumTasksCompleted()).toBe(1);
+
     })
 
     test('setTasksComplete fails', async () => {
@@ -99,8 +126,13 @@ describe('Player primitive operations', () => {
     test('setImposterStatus succeeds', async () => {
         // If there is another way to fail, put it here
         // initialize
+        getDoc.mockResolvedValue(goodDocSnap);
+        let player = await Player.getPlayer(playerData.id);
+        await player.setImposterStatus(true);
 
         // expect
+        expect(updateDoc).toHaveBeenCalled();
+        expect(player.getImposterStatus()).toBe(true);
     })
     
     test('setImposterStatus fails', async () => {
