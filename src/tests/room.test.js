@@ -88,31 +88,6 @@ describe('Room.getRoom()', () => {
         expect(r.getNumTasksComplete()).toBe(2);
     })
 
-    test('what happens when Room.createRoom(...) is called', async () => {
-        getDoc.mockResolvedValue(badDocSnap);
-        const room = await Room.createRoom(
-            roomData.id,
-            roomData.adminId,
-            roomData.tasklist,
-            roomData.numImposters,
-            roomData.numTasksToDo
-        );
-
-        expect(getDoc).toHaveBeenCalled(); // sanity check
-        expect(setDoc).toHaveBeenCalled();
-
-        expect(room.getStatus().enumKey).toBe("new");
-        expect(room.getRoomId()).toBe(roomData.id);
-        expect(room.getAdminId()).toBe(roomData.adminId);
-        expect(room.getRoomCode()).toBe(roomData.id);
-        expect(room.getCreatedAt()).toBe(null);
-        expect(room.getTaskList()).toBe(roomData.tasklist);
-        expect(room.getNumImposters()).toBe(roomData.numImposters);
-        expect(room.getNumTasksToDo()).toBe(roomData.numTasksToDo);
-        expect(room.getNumTasksComplete()).toBe(0);
-        expect(room.getPlayerIds()).toStrictEqual([]);
-    })
-
     test('null roomCode provided', async () => {
         expect(async () => await Room.getRoom(null)).rejects.toThrow(RoomNotExistError);
     })
@@ -153,6 +128,31 @@ describe('Room.createRoom(...)', () => {
 
     test('a room is created with new status when a doc does not exist', async () => {
         fail('un-implemented');
+    })
+
+    test('successfully use Room.createRoom(...)', async () => {
+        getDoc.mockResolvedValue(badDocSnap);
+        const room = await Room.createRoom(
+            roomData.id,
+            roomData.adminId,
+            roomData.tasklist,
+            roomData.numImposters,
+            roomData.numTasksToDo
+        );
+
+        expect(getDoc).toHaveBeenCalled(); // sanity check
+        expect(setDoc).toHaveBeenCalled();
+
+        expect(room.getStatus().enumKey).toBe("new");
+        expect(room.getRoomId()).toBe(roomData.id);
+        expect(room.getAdminId()).toBe(roomData.adminId);
+        expect(room.getRoomCode()).toBe(roomData.id);
+        expect(room.getCreatedAt()).toBe(null);
+        expect(room.getTaskList()).toBe(roomData.tasklist);
+        expect(room.getNumImposters()).toBe(roomData.numImposters);
+        expect(room.getNumTasksToDo()).toBe(roomData.numTasksToDo);
+        expect(room.getNumTasksComplete()).toBe(0);
+        expect(room.getPlayerIds()).toStrictEqual([]);
     })
 })
 
