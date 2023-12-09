@@ -14,7 +14,7 @@ import { Room, roomConverter } from "../models/Room";
 
 import { RoomStatus } from "../models/enum";
 
-import { RoomNotExistError } from "../errors/roomError";
+import { RoomNotExistError, MoreThanOneRoomError } from "../errors/roomError";
 
 const roomData = {
     id: '1234',
@@ -74,12 +74,6 @@ describe('Room.getRoom()', () => {
 
     })
 
-    test('Room.getRoom("1234") throws RoomNotExistError', async () => {
-        getDoc.mockResolvedValue(badDocSnap);
-
-        expect(async () => await Room.getRoom('1234')).rejects.toThrow(RoomNotExistError);
-    })
-
     test('update room.updateNumTasksComplete', async () => {
         let r = new Room(roomData.id, roomData.adminId, roomData.code, roomData.createdAt, roomData.tasklist, roomData.numImposters, roomData.numTasksToDo);
         r.setPlayerIds(roomData.playerIds);
@@ -120,19 +114,33 @@ describe('Room.getRoom()', () => {
     })
 
     test('null roomCode provided', async () => {
-        fail('un-implemented');
+        expect(async () => await Room.getRoom(null)).rejects.toThrow(RoomNotExistError);
     })
 
     test('empty roomCode provided', async () => {
-        fail('un-implemented');
+        expect(async () => await Room.getRoom('')).rejects.toThrow(RoomNotExistError);
     })
 
-    test('more than one room', async () => {
-        fail('un-implemented');
+    test('more than one room exists', async () => {
+        const notgoodDocSnap = new DocSnapMock(goodDocRef, {size: 2});
+        getDoc.mockResolvedValue(notgoodDocSnap);
+
+        expect(async () => await Room.getRoom('1234')).rejects.toThrow(MoreThanOneRoomError);
+        expect(async () => await Room.getRoom('1234')).rejects.toEqual(new MoreThanOneRoomError("More than one roome with code 1234. Contact system adminstrator for help."));
     })
 
-    test('dockSnap room does not exist', async () => {
-        fail('un-implemented');
+    test('docSnap room does not exist', async () => {
+        getDoc.mockResolvedValue(badDocSnap);
+        const spy = jest.spyOn(badDocSnap, 'exists');
+
+        expect(async () => await Room.getRoom('1234')).rejects.toThrow(RoomNotExistError);
+        expect(async () => await Room.getRoom('1234')).rejects.toEqual(new RoomNotExistError("No room with code: 1234"));
+
+        expect(getDoc).toHaveBeenCalled();
+
+        // TODO: figure out why this isn't being called.
+        expect(spy).toHaveBeenCalled();
+        fail("need to fix the test case checking to make sure exists is called");
     })
 
 
