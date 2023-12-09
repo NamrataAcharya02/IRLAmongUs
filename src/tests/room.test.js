@@ -181,7 +181,13 @@ describe('Room core getters and setters', () => {
  })
 
 describe('Room Status sets and updates', () => {
+    test('update with wrong type of status attempted', async () => {})
 
+    test('update with correct status type', async () => {})
+
+    test('setStatus with wrong type of status attempted', async () => {})
+
+    test('setStatus with correct type of status attempted', async () => {})
 })
 
 describe('Room addNumTasksComplete', () => { 
