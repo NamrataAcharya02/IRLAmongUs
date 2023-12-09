@@ -7,6 +7,15 @@ import { useNavigate } from 'react-router-dom';
 import AdminGameController from "../controllers/AdminGameController";
 import {RoomStatus} from "../models/enum";
 
+/**
+ * @function AdminRoom
+ * @returns rendered page displaying RoomCode, Players, 
+ * Number of Imposters, and Number of Tasks per Player before the game starts.
+ * Render changes as RoomState changes. 
+ * When in game, list of Players and their Statuses are displayed.
+ * When emergency meeting is called, displays voting screen.
+ * When the game ends, screen shows which team won.
+ */
 function AdminRoom() {
   const [room, setRoom] = useState(null);
   const [playerList, setPlayerList] = useState([
@@ -40,23 +49,49 @@ function AdminRoom() {
 
   const [roomState, setRoomState] = useState("inGame");
 
+  /**
+   * Sets the RoomState to 'meetingCalled'.
+   * 
+   * @async
+   * @function callMeeting
+   */
   async function callMeeting (){
     setRoomState("meetingCalled");
     await controller.current.updateRoomStatus(RoomStatus.emergencyMeeting);
     console.log("AH");
   }
 
+   /**
+    * Sets RoomState to 'votingScreen
+    * 
+    * @async
+    * @function openVoting
+    */
   async function openVoting(){
     await controller.current.updateRoomStatus(RoomStatus.voting);
     setRoomState("votingScreen");
   }
 
+  /**
+   * Sets RoomState to 'inGame'
+   * 
+   * @async
+   * @function endMeeting
+   */
   async function endMeeting(){
     await controller.current.updateRoomStatus(RoomStatus.inProgress);
 
     setRoomState("inGame");
   }
 
+  /**
+   * If a Player is 'dead', update the Player's status to 'dead'
+   * and set the PlayerList with the updated list of Players.
+   * 
+   * @async
+   * @function markDead
+   * @param {int} id 
+   */
   async function markDead(id){
     const updatedPlayers = playerList.map((player) =>{
       if(player.id === id){
@@ -72,21 +107,35 @@ function AdminRoom() {
     await controller.current.markDead(id);
   }
 
+  /**
+   * Kicks a Player from the PlayerList.
+   * 
+   * @function kickPlayer
+   * @param {int} id 
+   */
   function kickPlayer(id){
     const updatedPlayers = playerList.filter((player) => player.id !== id);
     setPlayerList(updatedPlayers);
     controller.current.kickOutPlayer(id);
   }
 
+  /**
+   * Calls controller from AdminGameController to end the game.
+   * 
+   * @async
+   * @function endGamefunction
+   */
   async function endGamefunction(){
     await controller.current.endGame();
     //navigate("/");
   }
   
-  //Use to toggle to in game screen
-  //Can also simply use 
-  //      setGameScreen(true);
-  //To go into in game screen
+  /**
+   * Use to toggle to in game screen
+   * 
+   * @async
+   * @function toggleGameScreen
+   */
   async function toggleGameScreen(){
     setGameScreen(!gameScreen);
     console.log("controller.current" + controller.current.getRoomObject(), controller.current.getNumImposters());
@@ -96,6 +145,15 @@ function AdminRoom() {
     setComplete(controller.current.getTotalNumberTasksCompleted());
   }
 
+  /**
+   * Initializes the Room with Admin, RoomCode, database, Players, 
+   * the game settings (number of imposters, tasks).
+   * 
+   * Checks if the game has ended.
+   * 
+   * @async
+   * @function
+   */
   useEffect(() => {
     (async function () {
       
@@ -134,6 +192,12 @@ function AdminRoom() {
     })();
   }, []); // 
   
+  /**
+   * Checks if the task threshold has been reached. If yes, end game
+   * 
+   * @async
+   * @function
+   */
   useEffect(() => {
     (async function () {
       try {

@@ -18,6 +18,13 @@ let room = null;
 
 //let controller = null;
 
+/**
+ * @function AdminPage
+ * @returns rendered page after Admin is authenticated and navigates
+ * to a page displaying TaskList that the Admin can edit.
+ * The Admin can view "How to Play".
+ * The Admin can create a Room, then navigates to it.
+ */
 const AdminPage = () => {
   
   const [, forceUpdate] = useReducer(x => x + 1, 0);
@@ -39,6 +46,16 @@ const AdminPage = () => {
     return false;
   });
 
+  /**
+   * async function checkUser created:
+   * Checks if the user is logged into Firebase when the page opens.
+   * If the user is not logged in, navigate to the login page or another appropriate route.
+   * 
+   * Calls checkUser when component is mounted.
+   * 
+   * @async
+   * @function checkUser
+   */
   useEffect(() => {
     // Check if the user is logged into Firebase when the page opens
     const checkUser = async () => {
@@ -60,6 +77,11 @@ const AdminPage = () => {
     checkUser();
   });
 
+  /**
+   * Gets or creates Admin object, then initializes TaskList object.
+   * @async
+   * @function
+   */
   useEffect(() => {
     (async function () {
       try {
@@ -81,20 +103,30 @@ const AdminPage = () => {
   });
 
 
-  //handle adding a task, adds an extra input field and new task object to tasklist
+  /** 
+   * handles adding a task, adds an extra input field and new task object to tasklist 
+   * 
+  */
   const handleAddTask = () => {
     if(!hasEmptyTask){
       setTasklist((prevTasklist) => [...prevTasklist, new Task("")]);
     }
   }
-  
+  /**
+   * handles deleting a task
+   * @param {int} index 
+   */
   const deleteItem = (index) => {
     const updatedTasklist = [...tasklist];
     updatedTasklist.splice(index, 1);
     setTasklist(updatedTasklist);
   }
 
-  //handle task name change in textbox. Updates task object as changes are being made
+  /**
+   * handles task name change in textbox. Updates task object as changes are being made
+   * @param {any} e
+   * @param {int} index
+  */
   const handleTaskChange = (e, index) => {
     const { name, value } = e.target
     console.log("name", name, "val", value)
@@ -106,8 +138,14 @@ const AdminPage = () => {
 
   }
 
-  //handle saving the tasklist (incomplete)
-  //This creates a new tasklist object and prints it to console
+  /**
+   * Handles saving the tasklist (incomplete)
+   * This creates a new tasklist object and prints it to console.
+   * Calls controller from AdminGameController to save the TaskList.
+   * 
+   * @async
+   * @function handleSaveTasklist
+   */
   const handleSaveTasklist = async () => {
     const list = [...tasklist];
     /*const tasklistObj = new TaskList(listName, list);
@@ -164,7 +202,14 @@ const AdminPage = () => {
   const numTasksToDo = 2;
 
 
-  //function to create a room
+  /**
+   * Function to create a Room, uses authentication to verify user id.
+   * Initializes TaskList object.
+   * Navigates to the page rendering the created Room.
+   * 
+   * @async
+   * @function startRoom
+   */
   const startRoom = async () => {  
     console.log("Current user", auth.currentUser.uid);
     let list = [...tasklist];

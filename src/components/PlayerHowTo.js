@@ -1,13 +1,26 @@
 import React, {useState} from "react";
 
+/**
+ * This React component renders the Player How To Play section of the IRL Among Us app.
+ * 
+ * @function PlayerHowTo
+ * @returns The Player How To Play section.
+ */
 function PlayerHowTo() {
+    // State variable for managing the visibility of the help screen
     const [isHelpScreen, setHelpScreen] = useState(false); //how to play overlay
 
-    //function for toggling emergency screen to use (can also directly set emergency screen)
+    /**
+     * Toggles emergency screen to use (can also directly set emergency screen).
+     * 
+     * @function toggleHelpScreen
+     * @returns {void}
+     */
     const toggleHelpScreen = () => {
     setHelpScreen(!isHelpScreen);
     };
 
+    // Render the component.
     return (
         <div>
             {isHelpScreen && (
@@ -86,4 +99,5 @@ function PlayerHowTo() {
     );
 }
 
+// Export the component as the default export.
 export default PlayerHowTo
