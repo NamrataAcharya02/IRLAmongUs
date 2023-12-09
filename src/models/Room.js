@@ -39,6 +39,16 @@ export class Room {
     #playerIds;
 
     #callback;
+    /**
+     * @constructor instantiates Room object
+     * @param {String} id 
+     * @param {String} adminId 
+     * @param {String} code 
+     * @param {DateTime} createdAt 
+     * @param {String[]} tasklist 
+     * @param {Number} numImposters 
+     * @param {Number} numTasksToDo 
+     */
     constructor(id, adminId, code, createdAt, tasklist, numImposters, numTasksToDo) {
         this.status = RoomStatus.new;
         this.#id = id;
