@@ -70,8 +70,12 @@ describe('Player.getPlayer functionality', () => {
         expect(player.getId()).toBe('abc123');
     })
 
-    test('Player.getPlayer("1234") fails with [specify condition]', async () => {
+    test('Player.getPlayer() fails with invalid id', async () => {
         getDoc.mockResolvedValue(badDocSnap);
+        let player = await Player.getPlayer("invalid");
+
+        expect(getDoc).toHaveBeenCalled();
+        expect(player).toBe(false);
 
         // code how you expect this function to act
     })
