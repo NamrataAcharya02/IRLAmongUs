@@ -40,7 +40,7 @@ export class Room {
 
     #callback;
     /**
-     * @constructor instantiates Room object
+     * @constructor
      * @param {String} id 
      * @param {String} adminId 
      * @param {String} code 

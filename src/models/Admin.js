@@ -41,7 +41,7 @@ export class Admin {
 
     /**This function gets the tasklist
      * @function getTaskList
-     * @returns {Array <String>} - The tasklist
+     * @returns {string[]} - The tasklist
      * */
     getTaskList() {
         return this.tasklist;
@@ -96,7 +96,7 @@ export class Admin {
      * @function createAdmin
      * @async
      * @param {string} adminId - The id of the admin
-     * @param {Array <String>} taskLists - The tasklist of the admin
+     * @param {string[]} taskLists - The tasklist of the admin
      * @returns {Admin} - The admin object
      * 
      * 
@@ -125,7 +125,7 @@ export class Admin {
      * @function getOrCreateAdmin
      * @async
      * @param {string} adminId - The id of the admin
-     * @param {Array <String>} taskLists - The tasklist of the admin
+     * @param {string[]} taskLists - The tasklist of the admin
      * @returns {Admin} - The admin object
      * 
      *  
@@ -160,7 +160,7 @@ export class Admin {
      * @function updateAdmin
      * @async
      * @param {string} adminId - The id of the admin
-     * @param {Array <String>} taskLists - The tasklist to be updated with
+     * @param {string[]} taskLists - The tasklist to be updated with
      * @returns {Admin} - The admin object
      * */
     async updateAdminTasklist(tasklist) { 

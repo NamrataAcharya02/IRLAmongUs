@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>JSDoc: Class: Player</title>
+    <title>JSDoc: Source: pages/PlayerGame.js</title>
 
     <script src="scripts/prettify/prettify.js"> </script>
     <script src="scripts/prettify/lang-css.js"> </script>
@@ -17,393 +17,252 @@
 
 <div id="main">
 
-    <h1 class="page-title">Class: Player</h1>
+    <h1 class="page-title">Source: pages/PlayerGame.js</h1>
 
     
 
 
 
-
-<section>
-
-<header>
     
-        <h2><span class="attribs"><span class="type-signature"></span></span>Player<span class="signature">(id, name, status, numVotesReceived, voteToCast, roomCode, taskList, isImposter, calledMeeting, numTasksCompleted)</span><span class="type-signature"></span></h2>
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>import React, { useState, useEffect, useRef } from "react";
+import { Link } from "react-router-dom";
+import { useSelector } from 'react-redux'
+import background from "../images/stars-background.jpg";
+import VoteScreen from "../components/VoteScreen";
+import useSound from 'use-sound';
+import meetingSound from '../sounds/meetingSFX.mp3'
+import meetingBackground from "../images/stars-background.jpg";
+import { useNavigate } from "react-router-dom";
+import PlayerGameController from "../controllers/PlayerGameController";
+import { auth } from "../firebase.js";
+import { current } from "@reduxjs/toolkit";
+import { RoomStatus } from "../models/enum.js";
+import { redirect } from "react-router-dom";
+import PlayerHowTo from "../components/PlayerHowTo.js";
+
+function PlayerGame() {
+    const [currentComplete, setComplete] = useState(0);
+    const [toComplete, setToComplete] = useState(20);
+    const [playSound] = useSound(meetingSound);
+    const [gameState, setGameState] = useState();
+    const [tasks, setTasks] = useState([]);
+    const [room, setRoom] = useState();
+    const [showingRole, setShowingRole] = useState(false);
+    const [roomCode, setRoomCode] = useState("");
+
+    const navigate = useNavigate();
+    let playerId = auth.currentUser.uid; // dummy for testing
+    const forceUpdate = React.useReducer(() => ({}))[1];
+    let controller = useRef(new PlayerGameController(playerId, forceUpdate));
+
+    /**
+     * @function setImposterWin
+     * sets the screen to imposter win
+     */
+    const setImposterWin = () => {
+        setGameState("impostersWin");
+    }
+
+    /**
+     * @function setCrewmateWin
+     * sets the screen to crewmate win
+     */
+    const setCrewmateWin = () => {
+        setGameState("crewmatesWin");
+    }
+
+    /**
+     * @function setEmergencyScreen
+     * sets the emergency screen and updates the database to reflect the call, plays a sound
+     */
+    const setEmergencyScreen = () => {
+        playSound();
+        controller.current.room.updateStatus(RoomStatus.emergencyMeeting);
+        setGameState("emergency");
+    }
+
+    /**
+     * @function setVotingScreen
+     * sets the voting screen
+     */
+    const setVotingScreen = () => {
+        setGameState("voting")
+    }
+
+    const setInGame = () => {
+        setGameState("");
+    }
+
+    /**
+     * @function returnHome
+     * makes player leave room, navigates to home screen
+     */
+    const returnHome = () => {
+        // controller.current.player.deletePlayer();
+        try{
+            controller.current.leaveRoom();
+            navigate("/");
+        }
+        catch{
+            navigate("/");
+        }
         
-    
-</header>
-
-<article>
-    <div class="container-overview">
-    
         
-
-    
-
-    
-    <h4 class="name" id="Player"><span class="type-signature"></span>new Player<span class="signature">(id, name, status, numVotesReceived, voteToCast, roomCode, taskList, isImposter, calledMeeting, numTasksCompleted)</span><span class="type-signature"></span></h4>
-    
-
-    
-
-
-
-<div class="description">
-    Creates a new Player.
-</div>
-
-
-
-
-
-
-
-
-
-    <h5>Parameters:</h5>
-    
-
-<table class="params">
-    <thead>
-    <tr>
         
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    
-
-        <tr>
-            
-                <td class="name"><code>id</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">string</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">The ID of the player.</td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>name</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">string</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">The name of the player.</td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>status</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">string</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">The status of the player.</td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>numVotesReceived</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">number</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">The number of votes received by the player.</td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>voteToCast</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">string</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">The vote to cast by the player.</td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>roomCode</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">string</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">The room code of the player.</td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>taskList</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">Array</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">The task list of the player.</td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>isImposter</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">boolean</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">Whether the player is an imposter or not.</td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>calledMeeting</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">boolean</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">Whether the player has called a meeting or not.</td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>numTasksCompleted</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">number</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">The number of tasks completed by the player.</td>
-        </tr>
-
-    
-    </tbody>
-</table>
-
-
-
-
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="models_Player.js.html">models/Player.js</a>, <a href="models_Player.js.html#line50">line 50</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    
-    </div>
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-</article>
-
-</section>
+    }
+
+
+    //function to add 1 to currentComplete (tracks number of completed tasks)
+    // function completeATask(){
+    //     setComplete(currentComplete + 1);
+    // }
+    //function to calculate total number of tasks (toComplete) based on number of crewmates and number of tasks per crewmate
+    /**
+     * @function setNumTasksToComplete
+     * calculates and sets the number of tasksfor all crewmates to complete to complete
+     * @param {Number} numCrewmates 
+     * @param {Number} numTasksPerCrewmate 
+     */
+    function setNumTasksToComplete(numCrewmates, numTasksPerCrewmate) {
+        setToComplete(numCrewmates * numTasksPerCrewmate);
+    }
+
+    /**
+     * @function markComplete
+     * marks task as complete, updates database to reflect change
+     * @param {String} name 
+     */
+    const markComplete = (name) => {
+        controller.current.markTaskComplete(name);
+        const updatedTasks = controller.current.getVisibleTasks();
+        setTasks(updatedTasks);
+    }
+
+    /**
+     * @function markSelfDead
+     * marks self as dead, updates database to reflect
+     */
+    function markSelfDead() {
+        controller.current.markSelfDead();
+    }
+
+    /**
+     * @function useEffect
+     * called on start to fill in information that is needed
+     */
+    useEffect(() => {
+        (async function () {
+            await controller.current.init();
+
+            // try{
+            //     controller.current.room.getRoomStatus();
+            //     console.log("Tried to get room code");
+            // }catch{
+            //     navigate("/");
+            // }
+            // console.log(`controller.current.room.getRoomCode(): ${controller.current.room.getRoomCode()}`);
+            // console.log(`controller.current.room.getTaskList(): ${controller.current.getVisibleTasks()}`);
+
+            setRoom(controller.current.room);
+            // setRoomCode(controller.current.room.getRoomCode());
+
+            console.log("Room is currently:", room);
+            setTasks(controller.current.getVisibleTasks());
+            // setNumTasksToComplete((controller.current.room.getNumPlayers()-controller.current.room.getNumImposters()), controller.current.room.getNumTasksToDo());
+            // console.log('threshold tasks: ', (controller.current.room.getNumPlayers()-controller.current.room.getNumImposters()) * controller.current.room.getNumTasksToDo());
+            // setComplete(controller.current.getRoomNumTasksCompleted());
+            // console.log("complete", controller.current.getRoomNumTasksCompleted());
+
+        })();
+        const interval = setInterval(() => {
+            forceUpdate();
+            // console.log("ding");
+        }, 5000);
+    }, []);
+
+
+
+
+    return (
+        &lt;div className="background-div">
+            &lt;PlayerHowTo>&lt;/PlayerHowTo>
+            &lt;div className="center" style={{ paddingTop: "20px", paddingBottom: "20px" }}>
+              &lt;button className="back" onClick={() => returnHome()} style={{width: "100px"}}>Leave Game&lt;/button>
+                {/* Progress bar shows how many tasks completed (currentComplete) out of total tasks (toComplete) */}
+                {room &amp;&amp; (
+                    &lt;div className="center">
+                        {!showingRole &amp;&amp; (
+                            &lt;button onClick={() => setShowingRole(true)}>Show Role&lt;/button>
+                        )}
+                        {showingRole &amp;&amp; (
+                            &lt;div className="center">
+                                &lt;h1>Role: {controller.current.player.getImposterStatus() ? "Imposter" : "Crewmate"}&lt;/h1>
+                                &lt;button onClick={() => setShowingRole(false)}>Hide Role&lt;/button>
+                            &lt;/div>
+                        )}
+
+                        &lt;h4>Total Tasks Completed {controller.current.room.getNumTasksComplete()}&lt;/h4>
+                        &lt;progress value={controller.current.room.getNumTasksComplete()} max={controller.current.room.getNumTasksToDo()}>&lt;/progress>
+                        &lt;br>&lt;/br>
+                        &lt;ul className="centered-lists">
+                            {tasks.map((task) => (
+                                &lt;div className="task">
+                                    &lt;h3>
+                                        &lt;input
+                                            type="checkbox"
+                                            className="checkbox"
+                                            onClick={() => markComplete(task)}
+                                            checked={false}
+                                        />
+                                        {task}
+                                    &lt;/h3>
+                                &lt;/div>
+                            ))}
+                        &lt;/ul>
+                        &lt;button onClick={markSelfDead}>Mark Self Dead&lt;/button>
+
+                        {/* emergency meeting called screen */}
+                        {controller.current.getRoomStatus() === "emergencyMeeting" &amp;&amp; (
+                            &lt;div className="overlay">
+                                &lt;h1>EMERGENCY MEETING CALLED&lt;/h1>
+                            &lt;/div>
+                        )}
+                        {controller.current.getRoomStatus() === "voting" &amp;&amp; (
+                            &lt;div className="overlay-meeting" style={{ backgroundImage: `url(${meetingBackground})` }}  >
+                                &lt;h1>Voting in Session&lt;/h1>
+                            &lt;/div>
+                        )}
+                        {controller.current.getRoomStatus() === "impostersWin" &amp;&amp; (
+                            &lt;div className="imposter-win">
+                                &lt;h1>IMPOSTER VICTORY&lt;/h1>
+                                &lt;div className="center">
+                                    &lt;button onClick={returnHome}>Return Home&lt;/button>
+                                &lt;/div>
+                            &lt;/div>
+                        )}
+                        {controller.current.getRoomStatus() === "crewmatesWin" &amp;&amp; (
+                            &lt;div className="crewmate-win">
+                                &lt;h1>CREWMATE VICTORY&lt;/h1>
+                                &lt;div className="center">
+                                    &lt;button onClick={returnHome}>Return Home&lt;/button>
+                                &lt;/div>
+                            &lt;/div>
+                        )}
+                        &lt;button onClick={setEmergencyScreen}>Report Dead Body&lt;/button>
+                        {/* &lt;button onClick={setVotingScreen}>Set Voting Screen&lt;/button>
+                        &lt;button onClick={setImposterWin}>Set Imposter Victory&lt;/button>
+                        &lt;button onClick={setCrewmateWin}>Set Crewmate Victory&lt;/button> */}
+                    &lt;/div>
+                )}
+            &lt;/div>
+        &lt;/div>
+    );
+}
+export default PlayerGame;</code></pre>
+        </article>
+    </section>
 
 
 

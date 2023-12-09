@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>JSDoc: Class: Player</title>
+    <title>JSDoc: Source: pages/PlayerWaiting.js</title>
 
     <script src="scripts/prettify/prettify.js"> </script>
     <script src="scripts/prettify/lang-css.js"> </script>
@@ -17,393 +17,86 @@
 
 <div id="main">
 
-    <h1 class="page-title">Class: Player</h1>
+    <h1 class="page-title">Source: pages/PlayerWaiting.js</h1>
 
     
 
 
 
-
-<section>
-
-<header>
     
-        <h2><span class="attribs"><span class="type-signature"></span></span>Player<span class="signature">(id, name, status, numVotesReceived, voteToCast, roomCode, taskList, isImposter, calledMeeting, numTasksCompleted)</span><span class="type-signature"></span></h2>
-        
-    
-</header>
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>import React, { useEffect, useState, useRef } from "react";
+import { Link, useLocation } from "react-router-dom";
+import background from "../images/stars-background.jpg";
+import PlayerHowTo from "../components/PlayerHowTo.js";
+import { useNavigate } from "react-router-dom";
 
-<article>
-    <div class="container-overview">
-    
-        
+import { auth } from "../firebase.js";
+import PlayerGameController from "../controllers/PlayerGameController";
 
-    
+function PlayerWaiting() {
+    const location = useLocation();
+    const [nickname, setNickname] = useState(location.state.name);
+    const [roomCode, setRoomCode] = useState(location.state.code);
+    const navigate = useNavigate();
+    const [room, setRoom] = useState();
 
-    
-    <h4 class="name" id="Player"><span class="type-signature"></span>new Player<span class="signature">(id, name, status, numVotesReceived, voteToCast, roomCode, taskList, isImposter, calledMeeting, numTasksCompleted)</span><span class="type-signature"></span></h4>
-    
+    const forceUpdate = React.useReducer(() => ({}))[1];
+    let playerId = auth.currentUser.uid; // dummy for testing
+    let controller = useRef(new PlayerGameController(playerId, forceUpdate));
 
-    
+    /**
+     * @function useEffect
+     * called at start to populate waiting screen
+     * also refreshes page to redirect when game has started
+     */
+    useEffect(() => {
+        (async function () {
+            await controller.current.init();
+            // await (await controller.current.init()).joinRoom(roomCode, nickname);
+            await controller.current.joinRoom(roomCode, nickname);
 
+            console.log(`controller.current.room.getRoomCode(): ${controller.current.room.getRoomCode()}`);
+            console.log(`controller.current.room.getTaskList(): ${controller.current.getVisibleTasks()}`);
+            setRoom(controller.current.room);
+            const interval = setInterval(() => {
+                if (controller.current.getRoomStatus() === "inProgress") {
+                    navigate("/game");
+                }
+                // console.log("dong");
+            }, 5000);
+        })();
+    }, []); // 
+    // useEffect(() =>{
+    //     join room here (nickname and roomCode are useable variables)
+    // });
 
-
-<div class="description">
-    Creates a new Player.
-</div>
-
-
-
-
-
-
-
-
-
-    <h5>Parameters:</h5>
-    
-
-<table class="params">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    
-
-        <tr>
-            
-                <td class="name"><code>id</code></td>
-            
-
-            <td class="type">
-            
+    return (
+        &lt;div className="background-div">
+            &lt;PlayerHowTo>&lt;/PlayerHowTo>
+            &lt;div className="center" >
+                &lt;Link to="/">
+                    &lt;button className="back">Back&lt;/button>
+                &lt;/Link>
+                {/* "How to Play" pop-up overlay for Players */}
                 
-<span class="param-type">string</span>
 
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">The ID of the player.</td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>name</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">string</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">The name of the player.</td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>status</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">string</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">The status of the player.</td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>numVotesReceived</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">number</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">The number of votes received by the player.</td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>voteToCast</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">string</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">The vote to cast by the player.</td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>roomCode</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">string</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">The room code of the player.</td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>taskList</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">Array</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">The task list of the player.</td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>isImposter</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">boolean</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">Whether the player is an imposter or not.</td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>calledMeeting</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">boolean</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">Whether the player has called a meeting or not.</td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>numTasksCompleted</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">number</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">The number of tasks completed by the player.</td>
-        </tr>
-
-    
-    </tbody>
-</table>
-
-
-
-
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="models_Player.js.html">models/Player.js</a>, <a href="models_Player.js.html#line50">line 50</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    
-    </div>
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-</article>
-
-</section>
+                &lt;h1>Hello {nickname}!&lt;/h1>
+                {room &amp;&amp; (
+                    &lt;h2 className="whiteh2">Room Code: {controller.current.room.getRoomCode()}&lt;/h2>
+                )}
+                &lt;div>&lt;/div>
+                {/* &lt;Link to="/game">
+                    &lt;button>To Temporary Player Screen&lt;/button>
+                &lt;/Link> */}
+            &lt;/div>
+        &lt;/div>
+    );
+}
+export default PlayerWaiting;</code></pre>
+        </article>
+    </section>
 
 
 

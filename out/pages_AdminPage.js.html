@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>JSDoc: Class: Player</title>
+    <title>JSDoc: Source: pages/AdminPage.js</title>
 
     <script src="scripts/prettify/prettify.js"> </script>
     <script src="scripts/prettify/lang-css.js"> </script>
@@ -17,393 +17,334 @@
 
 <div id="main">
 
-    <h1 class="page-title">Class: Player</h1>
+    <h1 class="page-title">Source: pages/AdminPage.js</h1>
 
     
 
 
 
-
-<section>
-
-<header>
     
-        <h2><span class="attribs"><span class="type-signature"></span></span>Player<span class="signature">(id, name, status, numVotesReceived, voteToCast, roomCode, taskList, isImposter, calledMeeting, numTasksCompleted)</span><span class="type-signature"></span></h2>
-        
-    
-</header>
-
-<article>
-    <div class="container-overview">
-    
-        
-
-    
-
-    
-    <h4 class="name" id="Player"><span class="type-signature"></span>new Player<span class="signature">(id, name, status, numVotesReceived, voteToCast, roomCode, taskList, isImposter, calledMeeting, numTasksCompleted)</span><span class="type-signature"></span></h4>
-    
-
-    
-
-
-
-<div class="description">
-    Creates a new Player.
-</div>
-
-
-
-
-
-
-
-
-
-    <h5>Parameters:</h5>
-    
-
-<table class="params">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    
-
-        <tr>
-            
-                <td class="name"><code>id</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">string</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">The ID of the player.</td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>name</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">string</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">The name of the player.</td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>status</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">string</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">The status of the player.</td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>numVotesReceived</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">number</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">The number of votes received by the player.</td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>voteToCast</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">string</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">The vote to cast by the player.</td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>roomCode</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">string</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">The room code of the player.</td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>taskList</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">Array</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">The task list of the player.</td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>isImposter</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">boolean</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">Whether the player is an imposter or not.</td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>calledMeeting</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">boolean</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">Whether the player has called a meeting or not.</td>
-        </tr>
-
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>// The landing page for an admin
+// Admin may modify lists, customize a game, and start a room
+
+import React, { useState, useEffect, useReducer } from "react";
+import { Link } from "react-router-dom";
+import { Room } from "../models/Room";
+import { Task, TaskList } from "../models/TaskList.js";
+import { Admin } from "../models/Admin.js";
+import background from "../images/stars-background.jpg";
+import { useNavigate } from 'react-router-dom';
+import DevRoomComponent from "../development-components/DevAdminComponent.js";
+import AdminGameController from "../controllers/AdminGameController.js";
+import { auth, googleAuthProvider } from "../firebase";
+import AdminHowTo from "../components/AdminHowTo.js";
+import { useRef } from 'react';
+
+let room = null;
+
+//let controller = null;
+
+/**
+ * @function AdminPage
+ * @returns rendered page after Admin is authenticated and navigates
+ * to a page displaying TaskList that the Admin can edit.
+ * The Admin can view "How to Play".
+ * The Admin can create a Room, then navigates to it.
+ */
+const AdminPage = () => {
+
+  const [, forceUpdate] = useReducer(x => x + 1, 0);
+  //const [controller, setController] = useState(null);
+  let controller = useRef(new AdminGameController(auth.currentUser.uid, forceUpdate));
+  const [tasklist, setTasklist] = useState([]) //object that stores tasklist
+  const [listName, setListName] = useState("") //name of tasklist
+  let list = [];
+  var tasklistObject = null;
+  const navigate = useNavigate();
+  //console.log(tasklist)
+
+  /**
+   * don't exceed number of tasks
+   * 
+   * @function hasEmptyTask
+   */
+  const hasEmptyTask = tasklist.some((singleTask) => {
+    if (singleTask == "") {
+      return true;
+    }
+    return false;
+  });
+
+  /**
+   * async function checkUser created:
+   * Checks if the user is logged into Firebase when the page opens.
+   * If the user is not logged in, navigate to the login page or another appropriate route.
+   * 
+   * Calls checkUser when component is mounted.
+   * 
+   * @async
+   * @function checkUser
+   */
+  useEffect(() => {
+    // Check if the user is logged into Firebase when the page opens
+    const checkUser = async () => {
+      const user = auth.currentUser;
+
+      if (!user) {
+        // If the user is not logged in, navigate to the login page or another appropriate route
+        navigate("/");
+      } else {
+        if (controller == null) {
+          // setController(new AdminGameController(auth.currentUser.uid, forceUpdate));
+
+
+        }
+      }
+    };
+
+    // Call the checkUser function when the component mounts
+    checkUser();
+  });
+
+  /**
+   * Gets or creates Admin object, then initializes TaskList object.
+   * @async
+   * @function
+   */
+  useEffect(() => {
+    (async function () {
+      try {
+        if (tasklist == null || tasklist.length == 0) {
+          console.log("getting admin", auth.currentUser.uid)
+          let admin = await Admin.getOrCreateAdmin(auth.currentUser.uid, ['task']);
+          console.log("got admin", admin)
+          list = admin.getTaskList();
+          setTasklist(list);
+          forceUpdate();
+        }
+        //setTasklist(list);
+
+      } catch (error) {
+        console.error(error);
+      }
+
+    })();
+  });
+
+
+  /** 
+   * handles adding a task, adds an extra input field and new task object to tasklist 
+   * @function handleAddTask
+  */
+  const handleAddTask = () => {
+    if (!hasEmptyTask) {
+      setTasklist((prevTasklist) => [...prevTasklist, ""]);
+    }
+  }
+
+  /**
+   * handles deleting a task
+   * @function deleteItem
+   * @param {int} index 
+   */
+  const deleteItem = (index) => {
+    const updatedTasklist = [...tasklist];
+    updatedTasklist.splice(index, 1);
+    setTasklist(updatedTasklist);
+  }
+
+  /**
+   * handles task name change in textbox. Updates task object as changes are being made
+   * 
+   * @function handleTaskChange
+   * @param {any} e
+   * @param {int} index
+  */
+  const handleTaskChange = (e, index) => {
+    const { name, value } = e.target
+    console.log("name", name, "val", value)
+    const list = [...tasklist];
+    //list[index].updateTask(value);
+    list[index] = value;
+    console.log(list)
+    setTasklist(list)
+
+  }
+
+  /**
+   * Handles saving the tasklist (incomplete)
+   * This creates a new tasklist object and prints it to console.
+   * Calls controller from AdminGameController to save the TaskList.
+   * 
+   * @async
+   * @function handleSaveTasklist
+   */
+  const handleSaveTasklist = async () => {
+    const list = [...tasklist];
+    /*const tasklistObj = new TaskList(listName, list);
+    tasklistObject = tasklistObj;
+    let admin = await Admin.getAdmin(auth.currentUser.uid);
+    console.log(admin)*/
+
+    //let controller = new AdminGameController(auth.currentUser.uid, null, null);
+    controller.current.saveTasklist(list);
+
+    //await admin.updateAdminTasklists(tasklistObj);
+
+    console.log(tasklistObj);
+    /*
+    let adminId = "60000000";     // Dummy for dev purposes
+      try {
+        room = await Room.getOrCreateRoom(adminId, data, tasklist );
+        console.log(room)
+      } catch (error) { 
+        console.log(error); 
+        room = null;
+      } */
+
+    console.log(tasklist)
+    //admin.updateAdminTasklists(tasklist);
+
+  }
+  //---------------------- Room Creation ----------------------------------------
+  const [room, setRoom] = useState(null);
+
+  // Temporary Task Lists
+  const taskListObjs = [{
+    name: "frontend set task list",
+    tasks: {
+      0: "frontend_set_task1",
+      1: "frontend_set_task2",
+      2: "frontend_set_task3",
+    }
+  },
+  {
+    name: "New list",
+    tasks: {
+      0: "new task 1",
+      1: "new task 2",
+      2: "new task 3",
+    }
+  }]
+
+
+
+  //Room configurations
+  const tasklistObj = taskListObjs[1];
+  const numImposters = 1;
+  const numTasksToDo = 2;
+
+
+  /**
+   * Function to create a Room, uses authentication to verify user id.
+   * Initializes TaskList object.
+   * Navigates to the page rendering the created Room.
+   * 
+   * @async
+   * @function startRoom
+   */
+  const startRoom = async () => {
+    if (tasklist.length >= 10 &amp;&amp; !hasEmptyTask)
+    {
+      console.log("Current user", auth.currentUser.uid);
+      let list = [...tasklist];
+      try {
+        //let adminId = auth.currentUser.uid; // Dummy for dev purposes
+        //let controller = new AdminGameController(adminId);
+        // controller.setNumImposters(numImposters);
+        //controller.setNumTasksToComplete(numTasksToDo);
+        //controller.saveTasklist(list);
+
+        let newroom = await controller.current.startRoom(numImposters, numTasksToDo);
+        //let roomCode = AdminGameController.generateRoomCode(4);
+        //let newroom = await Room.getOrCreateRoom(roomCode, adminId, list, numImposters, numTasksToDo);
+        //await controller.setRoomCode(roomCode);
+
+        setRoom(newroom);
+        console.log(newroom);
+        navigate("/room");
+      } catch (error) {
+        console.error(error);
+        setRoom(null);
+      }
+    }
     
 
-        <tr>
-            
-                <td class="name"><code>numTasksCompleted</code></td>
-            
 
-            <td class="type">
-            
-                
-<span class="param-type">number</span>
+    /*let roomCode = '1234';
+    const newRoom = await Room.getOrCreateRoom(
+      adminId,
+      roomCode,
+      adminId,
+      tasklistObj,
+      numImposters,
+      numTasksToDo
+    );
+    await newRoom.updateRoom(tasklistObject, numImposters, numTasksToDo);
+    setRoom(newRoom);
+  } catch (error) {
+    console.error(error);
+    setRoom(null);
+  } */
+  };
+  //----------------------- Room Creation ---------------------------------------
 
+  //TODO: Sign out button (refer to skeleton code)
+  // function SignOut() {
+  //   return auth.currentUser &amp;&amp; (
+  //     &lt;button onClick={() => auth.signOut()} className='sign-out'>Sign Out&lt;/button>
+  //   )
+  // }
+  return (
+    &lt;div className="background-div">
+      &lt;div className="center">
+        &lt;Link to="/">
+          &lt;button className="back">Back&lt;/button>
+        &lt;/Link>
+        {/* &lt;DevRoomComponent>&lt;/DevRoomComponent> */}
 
-            
-            </td>
+        {/* "How to Play" pop-up overlay for Players */}
+        &lt;AdminHowTo>&lt;/AdminHowTo>
 
-            
+        {/* TaskList:: */}
 
-            
+        &lt;div className="text-in-box">
+          &lt;div className="space-divider">&lt;/div>
+          {tasklist.map((singleTask, index) => (
+            &lt;div className='task-container' key={index}>
+              &lt;input className="task" required type="text" placeholder="Task Description" value={singleTask} name="task" onChange={(e) => (handleTaskChange(e, index))} />
+              &lt;button className="delete-x" onClick={() => deleteItem(index)}>&amp;#10006;&lt;/button>
+              {/* {index == tasklist.length - 1}             */}
+            &lt;/div>
 
-            <td class="description last">The number of tasks completed by the player.</td>
-        </tr>
-
-    
-    </tbody>
-</table>
-
-
-
-
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="models_Player.js.html">models/Player.js</a>, <a href="models_Player.js.html#line50">line 50</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-</dl>
+          ))
 
 
+          }
+          &lt;div className="center">
+            &lt;button onClick={handleAddTask} > Add Task &lt;/button>
+            &lt;button onClick={handleSaveTasklist}> Save List&lt;/button>
+          &lt;/div>
+        &lt;/div>
+        {/* Game customizations other than task list: */}
 
+        {/* Room Generation: */}
+        {tasklist.length &lt; 10 &amp;&amp; (
+          &lt;h2 className="whiteh2">Please make sure there are at least 10 tasks before starting a room.&lt;/h2>
+        )}
+        &lt;button onClick={startRoom}>Start a Room&lt;/button>
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    
-    </div>
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-</article>
-
-</section>
+        {/* &lt;h1>Room Code: {room ? room.getRoomCode() : 'N/A'}&lt;/h1> */}
+      &lt;/div>
+    &lt;/div>
+  );
+}
+export default AdminPage;
+</code></pre>
+        </article>
+    </section>
 
 
 

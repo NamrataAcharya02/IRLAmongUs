@@ -35,7 +35,7 @@ export class Player {
 
     /**
      * Creates a new Player.
-     *
+     *@constructor
      * @param {string} id - The ID of the player.
      * @param {string} name - The name of the player.
      * @param {string} status - The status of the player.
@@ -127,7 +127,7 @@ export class Player {
 
     /**
      * Updates the player's state from a snapshot.
-     *
+     *@function updateFromSnapshot
      * @param {Object} snapshot - The snapshot from which to update the player's state.
      */
     #__updateFromSnapshot(snapData) {
@@ -150,6 +150,7 @@ export class Player {
     }
 
     /**
+     * @function addDocSnapshotListener
      * Adds a document snapshot listener for the player.
      * The listener updates the player's state from the snapshot whenever the document changes.
      */
@@ -169,7 +170,7 @@ export class Player {
 
     /**
      * Retrieves a player from the database.
-     *
+     *@function getPlayer
      * @param {string} playerId - The ID of the player to retrieve.
      * @returns {Promise<Object>} The player data if it exists, or false otherwise.
      */
@@ -189,7 +190,7 @@ export class Player {
     //creates a player in the players collection
     /**
      * Creates a new player in the database.
-     *
+     *@function createPlayer
      * @param {string} playerId - The ID of the player to create.
      * @param {string} name - The name of the player to create.
      * @param {string} roomCode - The room code of the player to create.
@@ -213,7 +214,7 @@ export class Player {
     //deletes a player from the players collection
     /**
      * Deletes the current player from the database.
-     *
+     *@function deletePlayer
      * @returns {Promise<void>} Resolves when the player is successfully deleted.
      */
     async deletePlayer() {
@@ -230,7 +231,7 @@ export class Player {
     //sets player as imposter
     /**
      * Sets the imposter status of the player.
-     *
+     *@function setImposterStatus
      * @param {boolean} status - The new imposter status of the player.
      * @returns {Promise<void>} Resolves when the imposter status is successfully updated.
      */
@@ -246,7 +247,7 @@ export class Player {
 
     /**
      * Retrieves the imposter status of the player.
-     *
+     *@function getImposterStatus
      * @returns {string} The imposter status of the player.
      */
     getImposterStatus() {
@@ -255,7 +256,7 @@ export class Player {
 
     /**
      * Sets the ID of the player.
-     *
+     *@function setId
      * @param {string} idCode - The new ID of the player.
      * @returns {Promise<void>} Resolves when the ID is successfully updated.
      */
@@ -271,7 +272,7 @@ export class Player {
 
     /**
      * Retrieves the ID of the player.
-     *
+     *@function getId
      * @returns {string} The ID of the player.
      */
     getId(){
@@ -281,7 +282,7 @@ export class Player {
     //changes name for player
     /**
      * Sets the name of the player.
-     *
+     *@function setName
      * @param {string} newName - The new name of the player.
      * @returns {Promise<void>} Resolves when the name is successfully updated.
      */
@@ -298,7 +299,7 @@ export class Player {
     //returns name
     /**
      * Retrieves the name of the player.
-     *
+     *@function getName
      * @returns {string} The name of the player.
      */
     getName() {
@@ -308,7 +309,7 @@ export class Player {
     //sets calledMeeting to true
     /**
      * Sets the meeting call status of the player.
-     *
+     *@function setCallMeetingStatus
      * @param {boolean} status - The new meeting call status of the player.
      * @returns {Promise<void>} Resolves when the meeting call status is successfully updated.
      */
@@ -325,7 +326,7 @@ export class Player {
     //returns meeting status of player
     /**
      * Retrieves the meeting call status of the player.
-     *
+     *@function getMeetingStatus
      * @returns {boolean} The meeting call status of the player.
      */
     getMeetingStatus() {
@@ -335,7 +336,7 @@ export class Player {
     //sets the room code for player
     /**
      * Sets the room code for the player.
-     *
+     *@function setRoomCode
      * @param {string} newRoomCode - The new room code for the player.
      * @returns {Promise<void>} Resolves when the room code is successfully updated.
      */
@@ -352,7 +353,7 @@ export class Player {
     //gets the room code for player, returns roomCode
     /**
      * Retrieves the room code of the player.
-     *
+     *@function getRoomCode 
      * @returns {string} The room code of the player.
      */
     getRoomCode() {
@@ -362,7 +363,7 @@ export class Player {
     //sets player status to dead
     /**
      * Sets the alive status of the player.
-     *
+     *@function setAliveStatus
      * @param {boolean} status - The new alive status of the player.
      * @returns {Promise<void>} Resolves when the alive status is successfully updated.
      */
@@ -379,7 +380,7 @@ export class Player {
     //returns player status
     /**
      * Retrieves the alive status of the player.
-     *
+     *@function getStatus
      * @returns {boolean} The alive status of the player.
      */
     getStatus() {
@@ -389,7 +390,7 @@ export class Player {
     //set the number of votes the player received in meeting
     /**
      * Sets the number of votes the player received in a meeting.
-     *
+     *@function setVotesReceived
      * @param {number} votes - The number of votes the player received.
      * @returns {Promise<void>} Resolves when the number of votes is successfully updated.
      */
@@ -406,7 +407,7 @@ export class Player {
     //get the number of votes the player received in meeting
     /**
      * Retrieves the number of votes the player received in a meeting.
-     *
+     *@function getVotesReceived
      * @returns {number} The number of votes the player received.
      */
     getVotesReceived() {
@@ -416,7 +417,7 @@ export class Player {
     //sets player to be voted out, voteToCast set to true
     /**
      * Sets the vote out status of the player.
-     *
+    * @function setVoteOut
      * @param {boolean} status - The new vote out status of the player.
      * @returns {Promise<void>} Resolves when the vote out status is successfully updated.
      */
@@ -433,7 +434,7 @@ export class Player {
     //returns vote status, true means player has been voted out
     /**
      * Retrieves the vote status of the player.
-     *
+     * @function getVoteStatus
      * @returns {boolean} The vote status of the player. True means the player has been voted out.
      */
     getVoteStatus() {
@@ -443,7 +444,7 @@ export class Player {
     //sets the players task list
     /**
      * Sets the task list of the player.
-     *
+     * @function setTaskList
      * @param {Array} taskList - The new task list of the player.
      * @returns {Promise<void>} Resolves when the task list is successfully updated.
      */
@@ -459,7 +460,7 @@ export class Player {
 
     /**
      * Retrieves the task list of the player.
-     *
+     * @function getTaskList
      * @returns {Array} The task list of the player.
      */
     getTaskList() {
@@ -468,7 +469,7 @@ export class Player {
 
     /**
      * Retrieves the number of tasks completed by the player.
-     *
+     * @function getNumTasksCompleted
      * @returns {number} The number of tasks completed by the player.
      */
     getNumTasksCompleted(){
@@ -477,7 +478,7 @@ export class Player {
 
     /**
      * Sets the number of tasks completed by the player.
-     *
+     * @function setNumTasksCompleted
      * @param {number} numTasks - The new number of tasks completed by the player.
      * @returns {Promise<void>} Resolves when the number of tasks completed is successfully updated.
      */
@@ -493,7 +494,7 @@ export class Player {
 
     /**
  * Marks a specific task as completed for the player.
-    *
+ *  @function setTaskComplete
     * @param {string} taskId - The ID of the task to be marked as completed.
     * @returns {Promise<void>} Resolves when the task is successfully marked as completed.
     */
@@ -519,7 +520,7 @@ export class Player {
 /**
  * Firestore converter for Player objects. This allows for easy serialization and deserialization
  * of Player objects when storing and retrieving from Firestore.
- *
+ * @function playerConverter
  * @type {Object}
  * @property {function(Player): Object} toFirestore - Converts a Player object into a plain JavaScript object for storage in Firestore.
  * @property {function(firebase.firestore.DocumentSnapshot, firebase.firestore.SnapshotOptions): Player} fromFirestore - Converts a Firestore document snapshot into a Player object.

@@ -1,5 +1,7 @@
 // Adapted from https://github.com/rauschma/enumify/blob/master/ts/src/index.ts
-
+/**
+ * @class
+ */
 export class Enum {
     static closeEnum() {
         const enumKeys = [];
@@ -33,6 +35,7 @@ export class Enum {
 }
 
 /**
+ * @class
  * @enum RoomStatus enum
  * new for new room
  * wait for room in waiting
