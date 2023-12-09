@@ -96,6 +96,10 @@ export class Room {
         }
     }
 
+    /**
+     * 
+     * @param {Number} num of tasks that is to be updated in database
+     */
     addNumTasksComplete(num) {
         if (!(typeof num !== Number)) {
             throw TypeError(`num "${num}" in addNumTasksComplete invalid Type`);
