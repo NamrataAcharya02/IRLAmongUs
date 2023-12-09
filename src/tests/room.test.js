@@ -152,16 +152,22 @@ describe('Room.getOrCreateRoom()', () => {
     })
 
     test('room object was converted from firestore doc', async () => {
-        
+
     })
 })
 
 describe('Room.joinRoom()', () => {
+    test('adding player that already exists in room', async () => {})
 
+    test('update doc with a new player id', async () => {})
+    
+    test('join room returns a room object', async () => {})
 })
 
 describe('Room.leaveRoom()', () => {
-    
+    test('error thrown when invalid roomcode provided', () => {})
+
+    test('player removed from a room', () => {})
 })
 
 describe('Room core getters and setters', () => { 
@@ -169,7 +175,7 @@ describe('Room core getters and setters', () => {
  })
 
 describe('Room.createRoom(...)', () => {
-
+    
 })
 
 describe('Room Status sets and updates', () => {
