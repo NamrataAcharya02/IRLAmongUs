@@ -14,7 +14,7 @@ import { Room, roomConverter } from "../models/Room";
 
 import { RoomStatus } from "../models/enum";
 
-import { RoomNotExistError, MoreThanOneRoomError } from "../errors/roomError";
+import { RoomNotExistError, MoreThanOneRoomError, DuplicateRoomCodeError } from "../errors/roomError";
 
 const roomData = {
     id: '1234',
@@ -34,8 +34,8 @@ const goodDocRef = new DocRefMock(roomData).withConverter(roomConverter);
 const goodDocSnap = new DocSnapMock(goodDocRef, {size: 1});
 
 // const badRef_noConverter = new DocRefMock()
-const badDocRef = new DocRefMock({}).withConverter(roomConverter);
-const badDocSnap = new DocSnapMock(badDocRef, {size: 0});
+const emptyDocRef = new DocRefMock({}).withConverter(roomConverter);
+const emptyDocSnap = new DocSnapMock(emptyDocRef, {size: 0});
 
 jest.mock('firebase/firestore', () => ({
     __esModule: true,
@@ -105,8 +105,8 @@ describe('Room.getRoom()', () => {
     })
 
     test('docSnap room does not exist', async () => {
-        getDoc.mockResolvedValue(badDocSnap);
-        const spy = jest.spyOn(badDocSnap, 'exists');
+        getDoc.mockResolvedValue(emptyDocSnap);
+        const spy = jest.spyOn(emptyDocSnap, 'exists');
 
         expect(async () => await Room.getRoom('1234')).rejects.toThrow(RoomNotExistError);
         expect(async () => await Room.getRoom('1234')).rejects.toEqual(new RoomNotExistError("No room with code: 1234"));
@@ -123,15 +123,16 @@ describe('Room.getRoom()', () => {
 
 describe('Room.createRoom(...)', () => {
     test('doc that exists throws a DuplicateRoomCodeError', async () => {
-        fail('un-implemented');
-    })
-
-    test('a room is created with new status when a doc does not exist', async () => {
-        fail('un-implemented');
+        getDoc.mockResolvedValue(goodDocSnap);
+        
+        expect(async () => await Room.createRoom(
+            "1234", "adminId", [], 0, 0))
+            .rejects.toThrow(new DuplicateRoomCodeError(`Attempting to create a room with the same id: 1234`))
+        expect(getDoc).toHaveBeenCalled();
     })
 
     test('successfully use Room.createRoom(...)', async () => {
-        getDoc.mockResolvedValue(badDocSnap);
+        getDoc.mockResolvedValue(emptyDocSnap);
         const room = await Room.createRoom(
             roomData.id,
             roomData.adminId,
