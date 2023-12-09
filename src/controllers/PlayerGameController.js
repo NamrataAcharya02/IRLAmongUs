@@ -25,6 +25,11 @@ export default class PlayerGameController {
         this.visibleTasks = [];
     }
 
+    /**
+     * Initializes the PlayerGameController.
+     *
+     * @returns {Promise<PlayerGameController>} A promise that resolves to an instance of PlayerGameController.
+     */
     async init() {
         let player = await Player.getPlayer(this.playerId);
         if (!player) {
@@ -53,6 +58,12 @@ export default class PlayerGameController {
         return this;
     }
 
+    /**
+     * Joins the room with the provided room code and player name.
+     *
+     * @param {string} roomCode - The code of the room to join.
+     * @param {string} name - The name of the player.
+     */
     async joinRoom(roomCode, name) {
         if (!this.room) {
             try {
@@ -87,6 +98,9 @@ export default class PlayerGameController {
 
     }
 
+    /**
+     * Sets the tasks for the player.
+     */
     async setTasks() {
         // generate from room.tasklist.tasks a randomized list of 
         // N = room.numTasksToComplete tasks.
@@ -99,7 +113,9 @@ export default class PlayerGameController {
 
     }
 
-
+    /**
+     * Makes the player leave the current room.
+     */
     async leaveRoom() {
         // remove player id from room.playerids
         // delete player db instance
@@ -107,6 +123,9 @@ export default class PlayerGameController {
         this.room.leaveRoom(this.playerId);
     }
 
+    /**
+     * Calls a meeting in the game.
+     */
     async callMeeting() {
         // TODO: SOrt this out
         // Jacob, just use this.player.setCallMeetingStatus();
@@ -119,6 +138,9 @@ export default class PlayerGameController {
         // update room status
     }
 
+    /**
+     * Marks the player as dead in the game.
+     */
     async markSelfDead() {
         // if player is crewmate,
         // then update player status
@@ -128,6 +150,11 @@ export default class PlayerGameController {
 
     }
 
+    /**
+     * Marks a task as complete for the player.
+     *
+     * @param {string} description - The description of the task to be marked as complete.
+     */
     async markTaskComplete(description) {
         // update player tasklists task to completed
        this.taskList = this.player.getTaskList();
@@ -136,6 +163,11 @@ export default class PlayerGameController {
     }
 
 
+    /**
+     * Gets up to four tasks that have not been completed.
+     *
+     * @returns {Array} An array of up to four tasks that have not been completed.
+     */
     getVisibleTasks() {
         // Display up to four tasks that have not been completed.
         this.taskList = this.player.getTaskList();
@@ -155,8 +187,15 @@ export default class PlayerGameController {
         return this.visibleTasks;
     }
 
+    /**
+     * Gets the total tasks completed
+     *
+     * @returns {number} A number represnting the total tasks completed.
+     */
     getTasklistStatus() {
         // return (number of tasks complete, number of tasks requred)
         return this.player.getNumTasksCompleted();
     }
 }
+
+
