@@ -19,6 +19,7 @@ function PlayerWaiting() {
     let controller = useRef(new PlayerGameController(playerId, forceUpdate));
 
     /**
+     * @function useEffect
      * called at start to populate waiting screen
      * also refreshes page to redirect when game has started
      */

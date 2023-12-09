@@ -30,21 +30,24 @@ function PlayerGame() {
     let controller = useRef(new PlayerGameController(playerId, forceUpdate));
 
     /**
-     * @function sets the screen to imposter win
+     * @function setImposterWin
+     * sets the screen to imposter win
      */
     const setImposterWin = () => {
         setGameState("impostersWin");
     }
 
     /**
-     * @function sets the screen to crewmate win
+     * @function setCrewmateWin
+     * sets the screen to crewmate win
      */
     const setCrewmateWin = () => {
         setGameState("crewmatesWin");
     }
 
     /**
-     * @function sets the emergency screen and updates the database to reflect the call, plays a sound
+     * @function setEmergencyScreen
+     * sets the emergency screen and updates the database to reflect the call, plays a sound
      */
     const setEmergencyScreen = () => {
         playSound();
@@ -53,6 +56,7 @@ function PlayerGame() {
     }
 
     /**
+     * @function setVotingScreen
      * sets the voting screen
      */
     const setVotingScreen = () => {
@@ -64,7 +68,8 @@ function PlayerGame() {
     }
 
     /**
-     * @function makes player leave room, navigates to home screen
+     * @function returnHome
+     * makes player leave room, navigates to home screen
      */
     const returnHome = () => {
         // controller.current.player.deletePlayer();
@@ -87,7 +92,8 @@ function PlayerGame() {
     // }
     //function to calculate total number of tasks (toComplete) based on number of crewmates and number of tasks per crewmate
     /**
-     * @function calculates and sets the number of tasksfor all crewmates to complete to complete
+     * @function setNumTasksToComplete
+     * calculates and sets the number of tasksfor all crewmates to complete to complete
      * @param {Number} numCrewmates 
      * @param {Number} numTasksPerCrewmate 
      */
@@ -96,7 +102,8 @@ function PlayerGame() {
     }
 
     /**
-     * @function marks task as complete, updates database to reflect change
+     * @function markComplete
+     * marks task as complete, updates database to reflect change
      * @param {String} name 
      */
     const markComplete = (name) => {
@@ -106,13 +113,15 @@ function PlayerGame() {
     }
 
     /**
-     * @function marks self as dead, updates database to reflect
+     * @function markSelfDead
+     * marks self as dead, updates database to reflect
      */
     function markSelfDead() {
         controller.current.markSelfDead();
     }
 
     /**
+     * @function useEffect
      * called on start to fill in information that is needed
      */
     useEffect(() => {
